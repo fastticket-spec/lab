@@ -7,6 +7,7 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Services\traits\HasFile;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use App\Repositories\BaseRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -88,8 +89,8 @@ class EventService extends BaseRepository
             $eventBanner = $this->uploadFile($eventBanner, $data['title'], '-event-banner-');
         }
 
-        $data['event_image'] = $eventImage;
-        $data['event_banner'] = $eventBanner;
+        $data['logo'] = $eventImage;
+        $data['banner'] = $eventBanner;
 
         $event = $organiser->events()->create($data);
 
@@ -107,5 +108,39 @@ class EventService extends BaseRepository
         $event = $this->findOneOrFail($eventId)->toArray();
         $event['title'] = "[COPY] {$event['title']}";
         return $this->create($event);
+    }
+
+    public function editEvent(Event $event, array $data, UploadedFile $eventImage = null, UploadedFile $eventBanner = null): bool
+    {
+        DB::beginTransaction();
+        $oldEventImage = null;
+        $oldEventBanner = null;
+
+        if ($eventImage) {
+            $eventImage = $this->uploadFile($eventImage, $data['title'] ?? $event->title, '-event-image-');
+            $oldEventImage = $event->logo;
+        }
+
+        if ($eventBanner) {
+            $eventBanner = $this->uploadFile($eventBanner, $data['title'] ?? $event->title, '-event-banner-');
+            $oldEventBanner = $event->banner;
+        }
+
+        $updatedEvent = $this->update($data + [
+                'logo' => $eventImage ?? $event->logo,
+                'banner' => $eventBanner ?? $event->banner,
+            ], $event->id);
+
+        if (!$updatedEvent) {
+            $this->removeUploadedFile($eventImage);
+
+            return false;
+        }
+
+        $this->removeUploadedFile($oldEventImage);
+
+        DB::commit();
+
+        return true;
     }
 }
