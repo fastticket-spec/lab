@@ -41,7 +41,8 @@ class HandleInertiaRequests extends Middleware
                 'alert' => $request->session()->get('alert'),
             ],
             'app_name' => config('app.name'),
-            'app_url' => config('app.url')
+            'app_url' => config('app.url'),
+            'active_organiser' => auth()->check() ? auth()->user()->account->active_organiser : '',
         ]);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Account extends Model
 {
@@ -17,4 +18,9 @@ class Account extends Model
         'active_organiser',
         'access_all_events'
     ];
+
+    public function organiser(): HasMany
+    {
+        return $this->hasMany(Organiser::class, 'account_id', 'id');
+    }
 }

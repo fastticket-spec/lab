@@ -75,15 +75,14 @@ const setCurrentEvent = () => {
 }
 
 onMounted(async () => {
-    try {
-        const {data: {events: allEvents}} = await axios.get('/events/organiser-events');
-
-        events.value = allEvents
-        setCurrentEvent();
-    } catch (e) {
-        console.log(e);
-    }
-    console.log('here');
+    // try {
+    //     const {data: {events: allEvents}} = await axios.get('/events/organiser-events');
+    //
+    //     events.value = allEvents
+    //     setCurrentEvent();
+    // } catch (e) {
+    //     console.log(e);
+    // }
 })
 
 watch(currentComponent, (newVal) => {
