@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Event extends Model
 {
@@ -26,8 +27,20 @@ class Event extends Model
         'organiser_id', 'title', 'title_arabic', 'description', 'description_arabic', 'logo', 'banner', 'status'
     ];
 
+    protected $appends = ['event_image_url', 'event_banner_url'];
+
     public function organiser(): BelongsTo
     {
         return $this->belongsTo(Organiser::class);
+    }
+
+    public function getEventImageUrlAttribute()
+    {
+        return $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : null;
+    }
+
+    public function getEventBannerUrlAttribute()
+    {
+        return $this->banner ? Storage::disk(config('filesystems.default'))->url($this->banner) : null;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Events\EventEditRequest;
 use App\Http\Requests\Events\EventRequest;
 use App\Services\EventService;
 use Illuminate\Http\Request;
@@ -32,6 +33,7 @@ class EventController extends Controller
     {
         $eventImage = $this->eventService->getFile($request, 'event_image_upload');
         $eventBannerImage = $this->eventService->getFile($request, 'event_banner_upload');
+
         $event = $this->eventService->createEvent(
             $request->except([
                 'event_image',
@@ -66,6 +68,41 @@ class EventController extends Controller
             'editMode' => true,
             'event' => $event
         ]);
+    }
+
+    public function update(EventEditRequest $request, string $eventId)
+    {
+        $event = $this->eventService->findOneOrFail($eventId);
+        $eventImage = $this->eventService->getFile($request, 'event_image_upload');
+        $eventBanner = $this->eventService->getFile($request, 'event_banner_upload');
+
+        $updatedEvent = $this->eventService->editEvent(
+            $event,
+            $request->except([
+                'event_image',
+                'event_banner',
+                'event_attachment'
+            ]),
+            $eventImage,
+            $eventBanner,
+        );
+
+        if (!$updatedEvent) {
+            return $this->view(
+                data: [
+                    'message' => 'Could not update event'
+                ], statusCode: Response::HTTP_BAD_REQUEST, component: 'Events\Create');
+        }
+
+        $updatedEvent = $this->eventService->find($eventId);
+
+        $message = 'Event updated successfully';
+
+        return $this->view(
+            data: [
+                'message' => $message,
+                'data' => $updatedEvent,
+            ], flashMessage: $message, component: $request->return_url ? $request->return_url : '/events', returnType: 'redirect');
     }
 //    public function fetchOrganiserEvents()
 //    {
