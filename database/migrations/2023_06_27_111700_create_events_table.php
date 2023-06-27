@@ -17,6 +17,7 @@ return new class extends Migration
             $table->longText('description_arabic')->nullable();
             $table->string('logo')->nullable();
             $table->boolean('status')->default(\App\Models\Event::EVENT_STATUS['ACTIVE']);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

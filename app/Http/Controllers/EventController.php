@@ -57,6 +57,16 @@ class EventController extends Controller
             ], flashMessage: $message, component: '/events', returnType: 'redirect'
         );
     }
+
+    public function edit(string $eventId): \Inertia\Response
+    {
+        $event = $this->eventService->find($eventId);
+
+        return Inertia::render('Events/Create', [
+            'editMode' => true,
+            'event' => $event
+        ]);
+    }
 //    public function fetchOrganiserEvents()
 //    {
 //        return $this->eventService->fetchAllOrganiserEvents();
