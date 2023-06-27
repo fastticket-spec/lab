@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Events\EventEditRequest;
 use App\Http\Requests\Events\EventRequest;
 use App\Services\EventService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Inertia\Inertia;
@@ -70,7 +71,7 @@ class EventController extends Controller
         ]);
     }
 
-    public function duplicateEvent(string $eventId)
+    public function duplicateEvent(string $eventId): RedirectResponse
     {
         $this->eventService->processDuplicateEvent($eventId);
         return redirect('/events');
