@@ -1,0 +1,189 @@
+[
+    {
+        "title": "Organiser",
+        "name": "sidebar.organisers",
+        "is_heading": true,
+        "is_active": false,
+        "class_name": "",
+        "is_icon_class": true,
+        "icon": ""
+    },
+    {
+        "title": "Dashboard",
+        "name": "sidebar.dashboard",
+        "is_heading": false,
+        "is_active": false,
+        "link": "/dashboard",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": ["Dashboard/Index", "Dashboard/TicketSellerDashboard"],
+        "icon": "ri-home-4-line"
+    },
+    {
+        "title": "Orders",
+        "name": "sidebar.orders",
+        "is_heading": false,
+        "is_active": false,
+        "link": "#",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": ["Orders/Index", "Orders/Details"],
+        "icon": "ri-shopping-cart-line",
+        "disabled_for": ["Ticket Sellers", "Report Users", "Checkin Users", "Checkout Users", "Verify Users", "Customer Support Users"],
+        "children": [
+            {
+                "title": "View",
+                "name": "sidebar.view",
+                "is_active": false,
+                "link": "/orders",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": ["Orders/Index", "Orders/Details"],
+                "icon": "",
+                "type": "organiser"
+            }
+        ]
+    },
+    {
+        "title": "Events",
+        "name": "sidebar.events",
+        "is_heading": false,
+        "is_active": false,
+        "link": "#",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": ["Events/Index", "Events/Create"],
+        "icon": "ri-calendar-2-line",
+        "disabled_for": ["Ticket Sellers"],
+        "children": [
+            {
+                "title": "View",
+                "name": "sidebar.view",
+                "is_active": false,
+                "link": "/events",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Events/Index",
+                "icon": ""
+            },
+            {
+                "title": "View",
+                "name": "sidebar.create",
+                "is_active": false,
+                "link": "/events/create",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Events/Create",
+                "icon": "",
+                "disabled_for": ["Editors", "Ticket Sellers", "Report Users", "Checkin Users", "Checkout Users", "Verify Users", "Customer Support Users"]
+            }
+        ]
+    },
+    {
+        "title": "Event Categories",
+        "name": "sidebar.eventCategories",
+        "is_heading": false,
+        "is_active": false,
+        "link": "#",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": ["EventCategories/Index", "EventCategories/Create"],
+        "icon": "ri-calendar-2-line",
+        "disabled_for": ["Customer Support Users", "Ticket Sellers"],
+        "children": [
+            {
+                "title": "View",
+                "name": "sidebar.view",
+                "is_active": false,
+                "link": "/event-categories",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "EventCategories/Index",
+                "icon": ""
+            },
+            {
+                "title": "View",
+                "name": "sidebar.create",
+                "is_active": false,
+                "link": "/event-categories/create",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "EventCategories/Create",
+                "icon": "",
+                "disabled_for": ["Editors", "Ticket Sellers", "Report Users", "Checkin Users", "Checkout Users", "Verify Users", "Customer Support Users"]
+            }
+        ]
+    },
+    {
+        "title": "Users",
+        "name": "sidebar.users",
+        "is_heading": false,
+        "is_active": false,
+        "link": "#",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": ["Users/Index", "Users/Create"],
+        "icon": "ri-user-line",
+        "type": "account manager",
+        "disabled_for": ["Editors", "Ticket Sellers", "Report Users", "Checkin Users", "Checkout Users", "Verify Users", "Customer Support Users"],
+        "children": [
+            {
+                "title": "View",
+                "name": "sidebar.view",
+                "is_active": false,
+                "link": "/users",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Users/Index",
+                "icon": "",
+                "type": "account manager"
+            },
+            {
+                "title": "Create",
+                "name": "sidebar.create",
+                "is_active": false,
+                "link": "/users/create",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Users/Create",
+                "icon": "",
+                "type": "account manager"
+            }
+        ]
+    },
+    {
+        "title": "Coupons",
+        "name": "sidebar.coupons",
+        "is_heading": false,
+        "is_active": false,
+        "link": "#",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": ["Coupons/Index", "Coupons/Create"],
+        "icon": "ri-shopping-cart-line",
+        "disabled_for": ["Customer Support Users", "Ticket Sellers"],
+        "children": [
+            {
+                "title": "View",
+                "name": "sidebar.view",
+                "is_active": false,
+                "link": "/coupons",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Coupons/Index",
+                "icon": ""
+            },
+            {
+                "title": "Create",
+                "name": "sidebar.create",
+                "is_active": false,
+                "link": "/coupons/create",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Coupons/Create",
+                "icon": "",
+                "disabled_for": ["Editors", "Ticket Sellers", "Report Users", "Checkin Users", "Checkout Users", "Verify Users", "Customer Support Users"]
+            }
+        ]
+    }
+]

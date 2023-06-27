@@ -1,0 +1,111 @@
+.sign-in-page {
+    height: 80vh !important;
+    display: flex;
+    align-items: center;
+}
+
+.sign-in-page .sign-in-form {
+    padding: 70px;
+}
+
+@media screen and (max-width: 800px) {
+    .sign-in-page .sign-in-form {
+        padding: 40px
+    }
+}
+
+
+.iq-card-body .vs__dropdown-toggle {
+    margin-top: -3px;
+    border: none;
+}
+
+.iq-card-body .vs__selected {
+    background-color: var(--iq-primary);
+    color: white;
+}
+
+.iq-card-body .v-select {
+    min-height: calc(1.5em + 0.75rem + 2px);
+    height: auto !important;
+}
+
+.form-control.no-border {
+    border: none;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.iq-todo-page .todo-task-list li.active a {
+    color: var(--iq-primary);
+    background: var(--iq-color-light);
+}
+
+.b-pagination .page-item.active .page-link {
+    background: var(--iq-primary);
+}
+
+.order-details {
+    display: flex;
+    justify-content: space-between;
+    margin: 15px 10px !important;
+}
+
+.order-details.full {
+    display: block;
+    margin: 10px 0 !important;
+}
+
+.order-detail-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 7px;
+    background: var(--iq-light-border);
+    width: 49%;
+    padding: 10px 20px;
+}
+
+.order-detail-item.full {
+    width: 100%;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.order-detail-item .answer {
+    align-items: flex-end;
+    word-break: break-all;
+}
+
+section.v-calendar {
+    width: 100%;
+}
+
+section.v-calendar .input-field svg.datepicker {
+    fill: var(--iq-primary);
+}
+
+section.v-calendar .calendar .days .day, section.v-calendar .calendar .days .day .number {
+    padding: 8px;
+}
+
+section.v-calendar .calendar .days .day.selectedDate .number {
+    background-color: var(--iq-primary);
+}
+
+.iq-footer.ar {
+    margin-left: 0;
+    margin-right: 260px;
+}
+
+body.sidebar-main .content-page.ar, body.two-sidebar.sidebar-main .content-page, body.sidebar-main .iq-footer.ar {
+    margin-left: unset;
+    margin-right: 80px;
+}
+
+.navbar-list li a.search-toggle.profile, .navbar-list li a.search-toggle.profile:hover, .navbar-list li a.search-toggle.profile:focus {
+    background-color: var(--iq-primary)!important;
+}

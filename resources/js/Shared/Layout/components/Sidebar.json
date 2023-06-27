@@ -1,0 +1,58 @@
+[
+    {
+        "title": "Account Manager",
+        "name": "sidebar.accountManager",
+        "is_heading": true,
+        "is_active": false,
+        "class_name": "",
+        "is_icon_class": true,
+        "icon": ""
+    },
+    {
+        "title": "Dashboard",
+        "name": "sidebar.dashboard",
+        "is_heading": false,
+        "is_active": false,
+        "link": "/dashboard",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": "Dashboard/Index",
+        "icon": "ri-home-4-line"
+    },
+    {
+        "title": "Organizers",
+        "name": "sidebar.organisers",
+        "is_heading": false,
+        "is_active": false,
+        "link": "#",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": "Organisers/Index",
+        "icon": "ri-user-line",
+        "type": "account manager",
+        "children": [
+            {
+                "title": "View",
+                "name": "sidebar.view",
+                "is_active": false,
+                "link": "/organisers",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Organisers/Index",
+                "icon": "",
+                "type": "account manager"
+            },
+            {
+                "title": "Create",
+                "name": "sidebar.create",
+                "is_active": false,
+                "link": "/organisers/create",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Organisers/Create",
+                "icon": "",
+                "type": "account manager"
+            }
+        ]
+    }
+]
