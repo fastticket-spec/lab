@@ -136,4 +136,12 @@ class EventService extends BaseRepository
 
         return true;
     }
+
+    public function processChangeStatus(string $eventId): string
+    {
+        $event = $this->findOneOrFail($eventId);
+        $this->update(['status' => !$event['status']], $eventId);
+        $event->refresh();
+        return $event['status'] ? "activated" : "deactivated";
+    }
 }
