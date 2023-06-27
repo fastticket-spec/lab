@@ -16,6 +16,7 @@
         "@inertiajs/progress": "^0.2.7",
         "@inertiajs/vue3": "^1.0.8",
         "@vue/compat": "^3.2.36",
+        "@vueup/vue-quill": "^1.1.1",
         "bootstrap": "^4.6.0",
         "bootstrap-vue": "^2.23.1",
         "counterup2": "^2.0.2",

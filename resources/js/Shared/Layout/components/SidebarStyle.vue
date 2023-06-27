@@ -3,10 +3,10 @@
         <div class="iq-sidebar-logo d-flex justify-content-between">
             <a href="/" class="w-100">
                 <div class="iq-light-logo w-100 text-center">
-                    <img src="../../../../images/logo-dark.png" class="img-fluid mx-auto" alt="logo">
+                    <img src="../../../../images/logo-dark.jpeg" class="img-fluid mx-auto" alt="logo">
                 </div>
                 <div class="iq-dark-logo">
-                    <img src="../../../../images/logo-dark.png" class="img-fluid" alt="logo">
+                    <img src="../../../../images/logo-dark.jpeg" class="img-fluid" alt="logo">
                 </div>
             </a>
             <div class="iq-menu-bt-sidebar">

@@ -24,34 +24,11 @@ export const createOrganiserSchema = yup.object({
     email: yup.string().required().email(),
 })
 
-export const createEventCategorySchema = yup.object({
-    title: yup.string().required(),
-    title_arabic: yup.string().required(),
-    description: yup.string().required(),
-    description_arabic: yup.string().required(),
-})
-
 export const createEventSchema = yup.object().shape({
     title: yup.string().required(),
     title_arabic: yup.string().nullable(),
-    event_category_id: yup.string().required(),
     description: yup.string().required(),
-    description_arabic: yup.string().nullable(),
-    venue_name: yup.string().required(),
-    address: yup.string().required(),
-    start_date: yup.string().required(),
-    end_date: yup.string().required(),
-    start_time: yup.string().required(),
-    end_time: yup.string().required(),
-    multidate: yup.array(),
-    occurrence: yup.string().required(),
-    editMode: yup.boolean().required(),
-    selected_dates :yup.array().when(['occurrence', 'editMode'], {
-        is: (occurrence, editMode) => {
-            return !editMode && occurrence === 'custom';
-        },
-        then: () => yup.array().required()
-    })
+    description_arabic: yup.string().nullable()
 })
 
 export const createTicketSchema = yup.object({
