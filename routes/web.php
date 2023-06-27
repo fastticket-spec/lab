@@ -46,5 +46,9 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/{id}/change-status', [EventController::class, 'changeStatus']);
             Route::get('/organiser-events', [EventController::class, 'fetchOrganiserEvents']);
         });
+
+        Route::group(['prefix' => 'event/{id}'], function () {
+            Route::get('/dashboard', [\App\Http\Controllers\Events\DashboardController::class, 'index']);
+        });
     });
 });
