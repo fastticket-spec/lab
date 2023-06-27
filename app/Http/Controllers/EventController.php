@@ -108,8 +108,8 @@ class EventController extends Controller
 
     public function changeStatus(string $eventId): RedirectResponse
     {
-        $this->eventService->processChangeStatus($eventId);
-        return redirect('/events');
+        $status = $this->eventService->processChangeStatus($eventId);
+        return $this->view(flashMessage: "Event {$status} successfully", component: '/events', returnType: 'redirect');
     }
 
 //    public function fetchOrganiserEvents()
