@@ -1,7 +1,7 @@
 {
     "sign-in": {
         "header": "Sign In",
-        "description": "Enter your email address and password to access admin panel.",
+        "description": "Enter your email address and password to access this panel.",
         "email-address": "Email address ",
         "enter-email": "Enter email",
         "password": "Password",
