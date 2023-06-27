@@ -111,6 +111,12 @@ class EventController extends Controller
         $status = $this->eventService->processChangeStatus($eventId);
         return $this->view(flashMessage: "Event {$status} successfully", component: '/events', returnType: 'redirect');
     }
+  
+    public function destroy(string $eventId): RedirectResponse
+    {
+        $this->eventService->delete($eventId);
+        return $this->view(flashMessage: 'Event deleted successfully', component: '/events', returnType: 'redirect');
+    }
 
 //    public function fetchOrganiserEvents()
 //    {
