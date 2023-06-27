@@ -73,9 +73,7 @@ class EventController extends Controller
     public function duplicateEvent(string $eventId)
     {
         $this->eventService->processDuplicateEvent($eventId);
-        return Inertia::render('Events/Index', [
-            'events' => $this->eventService->fetchEvents(request())
-        ]);
+        return redirect('/events');
     }
 
     public function update(EventEditRequest $request, string $eventId)
