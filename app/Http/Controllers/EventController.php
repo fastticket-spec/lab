@@ -74,7 +74,7 @@ class EventController extends Controller
     public function duplicateEvent(string $eventId): RedirectResponse
     {
         $this->eventService->processDuplicateEvent($eventId);
-        return redirect('/events');
+        return $this->view(flashMessage: 'Event duplicated successfully', component: '/events', returnType: 'redirect');
     }
 
     public function update(EventEditRequest $request, string $eventId)
