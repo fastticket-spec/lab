@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Events\EventEditRequest;
 use App\Http\Requests\Events\EventRequest;
 use App\Services\EventService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Inertia\Inertia;
@@ -104,6 +105,13 @@ class EventController extends Controller
                 'data' => $updatedEvent,
             ], flashMessage: $message, component: $request->return_url ? $request->return_url : '/events', returnType: 'redirect');
     }
+
+    public function changeStatus(string $eventId): RedirectResponse
+    {
+        $this->eventService->processChangeStatus($eventId);
+        return redirect('/events');
+    }
+
 //    public function fetchOrganiserEvents()
 //    {
 //        return $this->eventService->fetchAllOrganiserEvents();
