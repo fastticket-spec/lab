@@ -55,7 +55,8 @@
         "event_tools": "Event Tools",
         "affiliates": "Affiliates",
         "seats": "Seats Design",
-        "checkin_attendee": "Checkin Attendee"
+        "checkin_attendee": "Checkin Attendee",
+        "access_levels": "Access Levels"
     },
     "organisers": {
         "create": "إنشاء منظم",
@@ -96,6 +97,10 @@
     "attendees": {
         "create": "إضافة حضور",
         "edit": "تعديل الحضور"
+    },
+    "access_levels": {
+        "create": "Create Access Level",
+        "edit": "Edit Access Level"
     },
     "input": {
         "name": "الأسم",

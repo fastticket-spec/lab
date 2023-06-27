@@ -58,7 +58,6 @@
 <script setup>
 import {router, usePage} from "@inertiajs/vue3";
 import {computed, onMounted, ref} from "vue";
-import axios from 'axios';
 
 const props = defineProps({
     events: {}
@@ -84,13 +83,6 @@ const visit = (link, method = 'get') => {
     } else {
         router.delete(link, {preserveScroll: true})
     }
-}
-
-const onChooseEventDate = async (event, index) => {
-    const date = event.multidate_events.find(x => x.id === event.chosen_multidate)?.schedule_date;
-
-    const {data} = await axios.post(`/events/${event.id}/get-stats-by-date`, {date})
-    props.events[index].stats = data;
 }
 </script>
 

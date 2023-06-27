@@ -55,7 +55,8 @@
         "event_tools": "Event Tools",
         "affiliates": "Affiliates",
         "seats": "Seats Customisation",
-        "checkin_attendee": "Checkin Attendee"
+        "checkin_attendee": "Checkin Attendee",
+        "access_levels": "Access Levels"
     },
     "organisers": {
         "create": "Create Organiser",
@@ -96,6 +97,10 @@
     "attendees": {
         "create": "Create Attendee",
         "edit": "Edit Attendee"
+    },
+    "access_levels": {
+        "create": "Create Access Level",
+        "edit": "Edit Access Level"
     },
     "input": {
         "name": "Name",

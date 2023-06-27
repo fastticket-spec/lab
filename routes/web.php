@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\Events\AccessLevelsController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrganiserController;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +50,15 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::group(['prefix' => 'event/{id}'], function () {
             Route::get('/dashboard', [\App\Http\Controllers\Events\DashboardController::class, 'index']);
+
+            Route::group(['prefix' => 'access-levels'], function () {
+                Route::get('/', [AccessLevelsController::class, 'index']);
+                Route::get('/create', [AccessLevelsController::class, 'create']);
+                Route::post('/', [AccessLevelsController::class, 'store']);
+                Route::get('{access_level_id}/edit', [AccessLevelsController::class, 'edit']);
+                Route::patch('{access_level_id}/update', [AccessLevelsController::class, 'update']);
+                Route::post('{access_level_id}/change-status', [AccessLevelsController::class, 'updateStatus']);
+            });
         });
     });
 });

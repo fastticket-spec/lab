@@ -31,6 +31,11 @@ export const createEventSchema = yup.object().shape({
     description_arabic: yup.string().nullable()
 })
 
+export const createAccessLevelSchema = yup.object().shape({
+    title: yup.string().required(),
+    quantity_available: yup.string().nullable()
+})
+
 export const createTicketSchema = yup.object({
     contact_to_purchase: yup.boolean(),
     title: yup.string().required('This field is required'),
