@@ -67,6 +67,15 @@ class EventController extends Controller
             'event' => $event
         ]);
     }
+
+    public function duplicateEvent(string $eventId)
+    {
+        $this->eventService->processDuplicateEvent($eventId);
+        return Inertia::render('Events/Index', [
+            'events' => $this->eventService->fetchEvents(request())
+        ]);
+    }
+
 //    public function fetchOrganiserEvents()
 //    {
 //        return $this->eventService->fetchAllOrganiserEvents();

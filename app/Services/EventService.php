@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\Event;
-use App\Repositories\BaseRepository;
-use App\Services\traits\HasFile;
 use Carbon\Carbon;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Event;
 use Illuminate\Http\Request;
+use App\Services\traits\HasFile;
 use Illuminate\Http\UploadedFile;
+use App\Repositories\BaseRepository;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class EventService extends BaseRepository
 {
@@ -100,5 +100,12 @@ class EventService extends BaseRepository
         }
 
         return $event;
+    }
+
+    public function processDuplicateEvent(string $eventId): Event
+    {
+        $event = $this->findOneOrFail($eventId)->toArray();
+        $event['title'] = "[COPY] {$event['title']}";
+        return $this->create($event);
     }
 }
