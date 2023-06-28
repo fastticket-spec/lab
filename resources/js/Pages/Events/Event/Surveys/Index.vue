@@ -61,12 +61,20 @@ onMounted(() => {
     }
 });
 
-const {handleSubmit, isSubmitting} = useForm({
+const {handleSubmit, isSubmitting, setFieldValue} = useForm({
     initialValues,
     validationSchema: createSurveySchema,
 });
 
 const {value: surveys} = useField('surveys');
+
+const closeSurvey = surveyId => {
+    // console.log(surveys)
+    // console.log({...surveys.value[surveyId], open: 0})
+    setFieldValue(`surveys[${surveyId}].open`, false)
+    // surveys.value[surveyId].open = 0;
+    console.log(surveys.value[surveyId])
+}
 
 const onSubmit = handleSubmit((values) => {
     accessLevelError.value = '';
@@ -110,7 +118,7 @@ const onSubmit = handleSubmit((values) => {
 
                             <FieldArray name="surveys" v-slot="{ fields, insert, remove }">
                                 <b-row v-for="(field, idx) in fields" :key="field.key" class="mt-3 border p-2">
-                                    <b-col sm="6">
+                                    <b-col v-show="field?.value?.open" sm="6">
                                         <div class="form-group mb-0">
                                             <label for="question">{{ $t('input.question') }}</label>
                                             <Field type="text"
@@ -121,7 +129,7 @@ const onSubmit = handleSubmit((values) => {
                                         </div>
                                     </b-col>
 
-                                    <b-col sm="6" v-if="fillArabic">
+                                    <b-col v-show="field?.value?.open" sm="6" v-if="fillArabic">
                                         <div class="form-group mb-0">
                                             <label for="question_arabic">{{ $t('input.question_arabic') }}</label>
                                             <Field type="text"
@@ -129,11 +137,12 @@ const onSubmit = handleSubmit((values) => {
                                                    :id="`question_arabic-${idx}`"
                                                    :class="`form-control mb-0`"
                                                    :validateOnInput="true"/>
-                                            <ErrorMessage :name="`surveys[${idx}].title_arabic`" class="text-danger"/>
+                                            <ErrorMessage :name="`surveys[${idx}].title_arabic`"
+                                                          class="text-danger"/>
                                         </div>
                                     </b-col>
 
-                                    <b-col sm="6" :class="{'mt-2': fillArabic}">
+                                    <b-col v-show="field?.value?.open" sm="6" :class="{'mt-2': fillArabic}">
                                         <div class="form-group mb-0">
                                             <label for="question_type">{{ $t('input.question_type') }}</label>
                                             <Field as="select"
@@ -150,7 +159,7 @@ const onSubmit = handleSubmit((values) => {
                                         </div>
                                     </b-col>
 
-                                    <b-col sm="6">
+                                    <b-col v-show="field?.value?.open" sm="6">
                                         <Field
                                             v-slot="{ field }"
                                             :name="`surveys[${idx}].required`"
@@ -158,16 +167,17 @@ const onSubmit = handleSubmit((values) => {
                                             :value="true"
                                         >
                                             <label>
-                                                <input type="checkbox" :name="`surveys[${idx}].required`" v-bind="field"
+                                                <input type="checkbox" :name="`surveys[${idx}].required`"
+                                                       v-bind="field"
                                                        :value="true"/>
                                                 Required
                                             </label>
                                         </Field>
                                     </b-col>
 
-
-                                    <b-col sm="12">
-                                        <FieldArray :name="`surveys[${idx}].options`" v-slot="{ fields: optionFields, insert: optionInsert, remove: optionRemove }">
+                                    <b-col v-show="field?.value?.open" sm="12">
+                                        <FieldArray :name="`surveys[${idx}].options`"
+                                                    v-slot="{ fields: optionFields, insert: optionInsert, remove: optionRemove }">
                                             <b-row
                                                 class="mt-3 bg-gray py-3"
                                                 v-show="field_types[surveys[idx].type].has_options"
@@ -177,7 +187,8 @@ const onSubmit = handleSubmit((values) => {
                                                 </b-col>
 
                                                 <b-col sm="12">
-                                                    <b-row v-for="(optionField, optionIdx) in optionFields" :key="`options-${optionField.key}`"
+                                                    <b-row v-for="(optionField, optionIdx) in optionFields"
+                                                           :key="`options-${optionField.key}`"
                                                            class="mt-3">
                                                         <b-col sm="5">
                                                             <div class="form-group">
@@ -185,8 +196,11 @@ const onSubmit = handleSubmit((values) => {
                                                                 <Field type="text"
                                                                        :name="`surveys[${idx}].options[${optionIdx}].name`"
                                                                        :id="`option-name-${optionIdx}`"
-                                                                       :class="`form-control mb-0`" :validateOnInput="true"/>
-                                                                <ErrorMessage :name="`surveys[${idx}].options[${optionIdx}].name`" class="text-danger"/>
+                                                                       :class="`form-control mb-0`"
+                                                                       :validateOnInput="true"/>
+                                                                <ErrorMessage
+                                                                    :name="`surveys[${idx}].options[${optionIdx}].name`"
+                                                                    class="text-danger"/>
                                                             </div>
                                                         </b-col>
 
@@ -196,8 +210,11 @@ const onSubmit = handleSubmit((values) => {
                                                                 <Field type="text"
                                                                        :name="`surveys[${idx}].options[${optionIdx}].name_arabic`"
                                                                        :id="`option-name_arabic-${optionIdx}`"
-                                                                       :class="`form-control mb-0`" :validateOnInput="true"/>
-                                                                <ErrorMessage :name="`surveys[${idx}].options[${optionIdx}].name_arabic`" class="text-danger"/>
+                                                                       :class="`form-control mb-0`"
+                                                                       :validateOnInput="true"/>
+                                                                <ErrorMessage
+                                                                    :name="`surveys[${idx}].options[${optionIdx}].name_arabic`"
+                                                                    class="text-danger"/>
                                                             </div>
                                                         </b-col>
 
@@ -213,7 +230,8 @@ const onSubmit = handleSubmit((values) => {
                                                                            variant="outline-danger"
                                                                            @click="optionRemove(optionIdx)"
                                                                            class="ml-2"><i
-                                                                        class="ri-delete-bin-2-line p-0"></i></b-btn>
+                                                                        class="ri-delete-bin-2-line p-0"></i>
+                                                                    </b-btn>
                                                                 </div>
                                                             </div>
                                                         </b-col>
@@ -223,16 +241,53 @@ const onSubmit = handleSubmit((values) => {
                                         </FieldArray>
                                     </b-col>
 
-                                    <b-col sm="6" class="my-3">
-                                        <b-btn variant="primary" class="mr-2"
-                                               @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, options: [{name: '', name_arabic: ''}], open: true})">
-                                            <i class="ri-add-line" /> Add Section
-                                        </b-btn>
-                                        <b-btn variant="danger" class="mr-2" v-show="surveys.length > 1"
-                                               @click="remove(idx)"><i class="ri-subtract-line"></i> Remove
-                                            Section
+                                    <b-col v-if="field?.value?.open" sm="12"
+                                           class="my-3 d-flex justify-content-between">
+                                        <div>
+                                            <b-btn variant="primary" class="mr-2"
+                                                   @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, options: [{name: '', name_arabic: ''}], open: true})">
+                                                <i class="ri-add-line"/> Add Section
+                                            </b-btn>
+                                            <b-btn variant="danger" class="mr-2" v-show="surveys.length > 1"
+                                                   @click="remove(idx)"><i class="ri-subtract-line"></i> Remove
+                                                Section
+                                            </b-btn>
+                                        </div>
+                                        <b-btn
+                                            v-show="surveys[idx].title"
+                                            variant="secondary" class="mr-2"
+                                            @click="closeSurvey(idx)"
+                                        >
+                                            <i class="ri-eye-close-line"/> Minimize
                                         </b-btn>
                                     </b-col>
+
+                                    <b-col v-if="!field?.value?.open" sm="12"
+                                           class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex">
+                                            <h5>{{ surveys[idx].title }}</h5>
+                                            <h5
+                                                v-if="surveys[idx]?.title_arabic">&nbsp;({{
+                                                    surveys[idx].title_arabic
+                                                }})</h5>
+                                        </div>
+                                        <span>{{field_types[surveys[idx].type].name}}</span>
+                                        <div>
+                                            <b-btn variant="primary" class="mr-2"
+                                                   @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, options: [{name: '', name_arabic: ''}], open: true})">
+                                                <i class="ri-add-line p-0"/>
+                                            </b-btn>
+                                            <b-btn variant="danger" class="mr-2" v-show="surveys.length > 1"
+                                                   @click="remove(idx)"><i class="ri-subtract-line p-0"></i>
+                                            </b-btn>
+                                            <b-btn variant="secondary" class="mr-2"
+                                                   @click="surveys[idx].open = 1"
+                                            >
+                                                <i class="ri-edit-2-line p-0"/>
+                                            </b-btn>
+                                        </div>
+                                    </b-col>
+
                                 </b-row>
                             </FieldArray>
 
