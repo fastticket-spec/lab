@@ -69,11 +69,7 @@ const {handleSubmit, isSubmitting, setFieldValue} = useForm({
 const {value: surveys} = useField('surveys');
 
 const closeSurvey = surveyId => {
-    // console.log(surveys)
-    // console.log({...surveys.value[surveyId], open: 0})
     setFieldValue(`surveys[${surveyId}].open`, false)
-    // surveys.value[surveyId].open = 0;
-    console.log(surveys.value[surveyId])
 }
 
 const onSubmit = handleSubmit((values) => {
@@ -116,7 +112,7 @@ const onSubmit = handleSubmit((values) => {
                                 </b-col>
                             </b-row>
 
-                            <FieldArray name="surveys" v-slot="{ fields, insert, remove }">
+                            <FieldArray name="surveys" v-slot="{ fields, insert, remove, swap }">
                                 <b-row v-for="(field, idx) in fields" :key="field.key" class="mt-3 border p-2">
                                     <b-col v-show="field?.value?.open" sm="6">
                                         <div class="form-group mb-0">
@@ -284,6 +280,18 @@ const onSubmit = handleSubmit((values) => {
                                                    @click="surveys[idx].open = 1"
                                             >
                                                 <i class="ri-edit-2-line p-0"/>
+                                            </b-btn>
+                                            <b-btn variant="primary" class="mr-2"
+                                                   :disabled="idx === 0"
+                                                   @click="swap(idx, idx - 1)"
+                                            >
+                                                <i class="ri-arrow-up-line p-0"/>
+                                            </b-btn>
+                                            <b-btn variant="secondary" class="mr-2"
+                                                   :disabled="idx === surveys.length - 1"
+                                                   @click="swap(idx, idx + 1)"
+                                            >
+                                                <i class="ri-arrow-down-line p-0"/>
                                             </b-btn>
                                         </div>
                                     </b-col>
