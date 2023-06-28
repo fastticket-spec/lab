@@ -16,13 +16,12 @@ class EventService extends BaseRepository
 {
     use HasFile;
 
-    protected $images_path;
+    protected string $images_path;
 
     public function __construct(Event $model, private OrganiserService $organiserService, public FileService $file)
     {
         parent::__construct($model);
         $this->images_path = config('filesystems.directory') . "event_images/";
-
     }
 
     public function fetchEvents(Request $request): LengthAwarePaginator

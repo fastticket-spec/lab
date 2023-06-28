@@ -182,7 +182,7 @@
         "question_options": "خيارات السؤال",
         "make_required": "جعل هذا خيارًا مطلوبًا",
         "post_order": "لما بعد الطلب؟",
-        "require_for_tickets": "جعل هذا السؤال إجباري للتذاكر",
+        "require_for_levels": "Require this question for access level(s):",
         "has_parent": "لديه سؤال اساسي؟",
         "parent": "سؤال ساسي",
         "parent_survey": "استبيان السؤال الأساسي",

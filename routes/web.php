@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Event\SurveyController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\Events\AccessLevelsController;
+use App\Http\Controllers\Events\DashboardController as EventDashboardController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrganiserController;
 use Illuminate\Support\Facades\Route;
@@ -49,7 +51,7 @@ Route::group(['middleware' => 'auth'], function () {
         });
 
         Route::group(['prefix' => 'event/{id}'], function () {
-            Route::get('/dashboard', [\App\Http\Controllers\Events\DashboardController::class, 'index']);
+            Route::get('/dashboard', [EventDashboardController::class, 'index']);
 
             Route::group(['prefix' => 'access-levels'], function () {
                 Route::get('/', [AccessLevelsController::class, 'index']);
@@ -59,6 +61,13 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::patch('{access_level_id}/update', [AccessLevelsController::class, 'update']);
                 Route::post('{access_level_id}/change-status', [AccessLevelsController::class, 'updateStatus']);
             });
+
+            Route::prefix('/surveys')->group(function () {
+                Route::get('/', [SurveyController::class, 'index']);
+                Route::get('/create', [SurveyController::class, 'create']);
+                Route::post('/', [SurveyController::class, 'store']);
+            });
         });
+
     });
 });

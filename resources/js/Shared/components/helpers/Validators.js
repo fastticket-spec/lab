@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import {array} from "yup";
 
 export const signInSchema = yup.object({
     email: yup.string().required().email(),
@@ -14,7 +15,7 @@ export const passwordTokenSchema = yup.object({
 })
 
 export const changePasswordSchema = yup.object({
-    password:  yup.string().required().min(7),
+    password: yup.string().required().min(7),
     confirm_password: yup.string()
         .oneOf([yup.ref('password'), null], 'Passwords must match')
 })
@@ -81,24 +82,33 @@ export const createServiceSchema = yup.object({
 });
 
 export const createSurveySchema = yup.object({
-    title: yup.string().required(),
-    title_arabic: yup.string().nullable(),
-    type: yup.string().required(),
-    has_parent: yup.boolean().required(),
-    required: yup.boolean().required(),
-    post_order: yup.boolean().required(),
-    parent_survey: yup.string().when(['has_parent'], {
-        is: has_parent => {
-            return has_parent;
-        },
-        then: () => yup.string().required()
-    }),
-    parent:  yup.string().when(['has_parent'], {
-        is: has_parent => {
-            return has_parent;
-        },
-        then: () => yup.string().required()
-    })
+    surveys: array()
+        .of(
+            yup.object().shape({
+                title: yup.string().required('This field is required'),
+                title_arabic: yup.string().nullable(),
+                type: yup.string().required('This field is required'),
+
+                contact_email: yup.string().when(['contact_to_purchase'], {
+                    is: (contact_to_purchase) => {
+                        return !!contact_to_purchase;
+                    },
+                    then: () => yup.string().email().required('This field is required')
+                }).nullable(),
+
+                options: yup.array().when(['type'], {
+                    is: type => {
+                        return ['5', '6', '7', '8'].includes(type)
+                    },
+                    then: () => array().of(
+                        yup.object().shape({
+                            name: yup.string().required('This fields is required'),
+                            name_arabic: yup.string().nullable()
+                        })
+                    )
+                })
+            })
+        )
 })
 
 export const createCouponSchema = yup.object({

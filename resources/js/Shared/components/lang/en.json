@@ -182,7 +182,7 @@
         "question_options": "Question Options",
         "make_required": "Make this a required option",
         "post_order": "For post order?",
-        "require_for_tickets": "Require this question for ticket(s):",
+        "require_for_levels": "Require this question for access level(s):",
         "has_parent": "Has parent?",
         "parent": "Parent",
         "parent_survey": "Parent Survey",

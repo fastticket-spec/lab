@@ -36,16 +36,6 @@ export const eventSideBar = eventId => ([
         "icon": "ri-settings-3-line",
         "children": [
             {
-                "title": "Surveys",
-                "name": "sidebar.surveys",
-                "is_active": false,
-                "link": `/event/${eventId}/surveys`,
-                "class_name": "",
-                "is_icon_class": true,
-                "component": ["Events/Event/Surveys/Index", "Events/Event/Surveys/Create"],
-                "icon": ""
-            },
-            {
                 "title": "Access Levels",
                 "name": "sidebar.access_levels",
                 "is_active": false,
@@ -53,6 +43,16 @@ export const eventSideBar = eventId => ([
                 "class_name": "",
                 "is_icon_class": true,
                 "component": ["Events/Event/AccessLevels/Index", "Events/Event/AccessLevels/Create"],
+                "icon": ""
+            },
+            {
+                "title": "Surveys",
+                "name": "sidebar.surveys",
+                "is_active": false,
+                "link": `/event/${eventId}/surveys`,
+                "class_name": "",
+                "is_icon_class": true,
+                "component": ["Events/Event/Surveys/Index", "Events/Event/Surveys/Create"],
                 "icon": ""
             }
         ]
