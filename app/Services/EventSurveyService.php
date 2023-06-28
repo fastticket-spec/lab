@@ -17,15 +17,16 @@ class EventSurveyService extends BaseRepository
     public function createSurvey(Request $request, string $eventId)
     {
         DB::beginTransaction();
+
+        $this->updateOrCreate(['event_id' => $eventId],
+            ['access_levels' => $request->access_levels]
+        );
+
         $eventSurvey = $this->findOneBy(['event_id' => $eventId]);
-        if ($eventSurvey) {
+
+        if ($eventSurvey && $eventSurvey->surveys) {
             $eventSurvey->surveys()->delete();
-            $eventSurvey->delete();
         }
-        $eventSurvey = $this->create([
-            'event_id' => $eventId,
-            'access_levels' => $request->access_levels
-        ]);
 
         foreach ($request->surveys as $survey) {
             $eventSurvey->surveys()->create([
