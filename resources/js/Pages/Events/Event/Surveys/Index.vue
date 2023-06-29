@@ -11,7 +11,8 @@ const props = defineProps({
     event_id: String,
     access_levels: Array,
     field_types: Array,
-    event_survey: Object
+    event_survey: Object,
+    survey_access_levels: Array
 });
 
 const fillArabic = ref(false);
@@ -47,14 +48,15 @@ const initialValues = props.event_survey ? {
             required: false,
             options: [
                 {name: '', name_arabic: ''}
-            ]
+            ],
+            open: true
         }
     ]
 }
 
 onMounted(() => {
     if (props.event_survey) {
-        selectedAccessLevels.value = props.event_survey.access_levels;
+        selectedAccessLevels.value = props.survey_access_levels;
         if (props.event_survey.surveys.length > 0 && props.event_survey.surveys[0].title_arabic) {
             fillArabic.value = true
         }

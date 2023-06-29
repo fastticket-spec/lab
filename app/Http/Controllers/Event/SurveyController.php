@@ -24,14 +24,15 @@ class SurveyController extends Controller
         $eventSurvey = $this->eventSurveyService->findOneBy(['event_id' => $eventId]);
 
         if ($eventSurvey) {
-            $eventSurvey->load('surveys');
+            $eventSurvey->load(['surveys', 'surveyAccessLevels']);
         }
 
         return Inertia::render('Events/Event/Surveys/Index', [
             'event_id' => $eventId,
             'field_types' => config('formfields.field_types'),
             'access_levels' => $this->accessLevelsService->findBy(['status' => 1, 'event_id' => $eventId]),
-            'event_survey' => $eventSurvey
+            'event_survey' => $eventSurvey,
+            'survey_access_levels' => $eventSurvey ? $eventSurvey->surveyAccessLevels->pluck('access_level_id') : []
         ]);
     }
 

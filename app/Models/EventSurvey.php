@@ -11,14 +11,15 @@ class EventSurvey extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['event_id', 'access_levels'];
+    protected $guarded = [];
 
     public function surveys(): HasMany
     {
         return $this->hasMany(Survey::class);
     }
 
-    protected $casts = [
-        'access_levels' => 'array'
-    ];
+    public function surveyAccessLevels(): HasMany
+    {
+        return $this->hasMany(EventSurveyAccessLevel::class);
+    }
 }

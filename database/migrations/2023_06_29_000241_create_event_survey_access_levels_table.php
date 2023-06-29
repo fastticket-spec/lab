@@ -6,23 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('event_surveys', function (Blueprint $table) {
+        Schema::create('event_survey_access_levels', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('event_id')->constrained('events')->cascadeOnDelete();
+            $table->foreignUuid('event_survey_id')->constrained('event_surveys')->cascadeOnDelete();
+            $table->foreignUuid('access_level_id')->constrained('access_levels')->cascadeOnDelete();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('event_surveys');
+        Schema::dropIfExists('event_survey_access_levels');
     }
 };

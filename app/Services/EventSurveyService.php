@@ -19,10 +19,18 @@ class EventSurveyService extends BaseRepository
         DB::beginTransaction();
 
         $this->updateOrCreate(['event_id' => $eventId],
-            ['access_levels' => $request->access_levels]
+            []
         );
 
         $eventSurvey = $this->findOneBy(['event_id' => $eventId]);
+
+        $eventSurvey->surveyAccessLevels()->delete();
+
+        foreach ($request->access_levels as $access_level) {
+            $eventSurvey->surveyAccessLevels()->create([
+                'access_level_id' => $access_level
+            ]);
+        }
 
         if ($eventSurvey && $eventSurvey->surveys) {
             $eventSurvey->surveys()->delete();

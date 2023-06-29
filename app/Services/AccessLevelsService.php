@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AccessLevel;
+use App\Models\EventSurvey;
 use App\Repositories\BaseRepository;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,7 @@ class AccessLevelsService extends BaseRepository
     public function fetchAccessLevels(Request $request, string $eventId)
     {
         return $this->model->query()
-            ->with('event')
+            ->with(['event', 'surveyAccessLevels.surveys'])
             ->whereEventId($eventId)
             ->latest()
             ->paginate($request->per_page ?: 10)
@@ -31,7 +32,8 @@ class AccessLevelsService extends BaseRepository
                     'quantity_available' => $quantity,
                     'quantity_filled' => $accessLevel->quantity_filled,
                     'event' => $accessLevel->event,
-                    'status' => $accessLevel->status
+                    'status' => $accessLevel->status,
+                    'has_surveys' => !!optional($accessLevel->surveyAccessLevels)->surveys
                 ];
             });
     }
