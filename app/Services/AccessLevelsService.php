@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Requests\AccessLevelGeneralRequest;
 use App\Models\AccessLevel;
 use App\Models\EventSurvey;
 use App\Repositories\BaseRepository;
@@ -82,6 +83,31 @@ class AccessLevelsService extends BaseRepository
             $message = 'Could not update access level status';
 
             return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: "/event/$eventId/access-levels/$accessLevelId/edit", returnType: 'redirect');
+        }
+    }
+
+    public function updateGeneralCustomization(AccessLevelGeneralRequest $request, string $eventId, string $accessLevelId)
+    {
+        $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=general";
+        try {
+            $accessLevel = $this->find($accessLevelId);
+            $accessLevel->update([
+                'title' => $request->title,
+                'title_arabic' => $request->title_arabic,
+                'quantity_available' => $request->quantity_available,
+            ]);
+
+            $accessLevel->generalSettings()->updateOrCreate(['access_level_id' => $accessLevelId], $request->all());
+
+            $message = 'Access level settings updated';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
+        } catch (\Throwable $th) {
+            \Log::error($th);
+
+            $message = 'Could not update access level settings';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
         }
     }
 }

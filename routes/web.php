@@ -63,6 +63,8 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::get('{access_level_id}/edit', [AccessLevelsController::class, 'edit']);
                 Route::patch('{access_level_id}/update', [AccessLevelsController::class, 'update']);
                 Route::post('{access_level_id}/change-status', [AccessLevelsController::class, 'updateStatus']);
+                Route::get('{access_level_id}/customize', [AccessLevelsController::class, 'customize']);
+                Route::post('{access_level_id}/customize/general', [AccessLevelsController::class, 'customizeGeneral']);
             });
 
             Route::prefix('/surveys')->group(function () {

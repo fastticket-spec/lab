@@ -26,4 +26,9 @@ class AccessLevel extends Model
     {
         return $this->hasOne(EventSurveyAccessLevel::class);
     }
+
+    public function generalSettings(): HasOne
+    {
+        return $this->hasOne(AccessLevelGeneralSetting::class);
+    }
 }

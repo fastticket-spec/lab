@@ -75,6 +75,9 @@ const visit = (link, method = 'get') => {
                         <a href="#" @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/edit`)"><i
                             class="ri-edit-line"></i>
                             Edit</a>
+                        <a href="#" @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/customize`)"><i
+                            class="ri-settings-2-line"></i>
+                            Customize</a>
                         <a href="#"
                            @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/change-status`, 'post')"
                            :class="access_level.status === 0 ? 'text-success' : 'text-danger'"><i

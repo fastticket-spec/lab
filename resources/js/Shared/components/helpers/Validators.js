@@ -67,6 +67,27 @@ export const createSurveySchema = yup.object({
         )
 })
 
+export const accessLevelGeneralSchema = yup.object({
+    visibility: yup.string().required('This field is required.'),
+    accept_reject: yup.string().required('This field is required.'),
+    waiting_list: yup.string().required('This field is required.'),
+    send_tc: yup.string().required('This field is required.'),
+    title: yup.string().required('This field is required.'),
+    title_arabic: yup.string().nullable(),
+    quantity_available: yup.string().nullable(),
+    description: yup.string().required('This field is required.'),
+    description_arabic: yup.string().nullable(),
+    success_message: yup.string().required('This field is required.'),
+    success_message_arabic: yup.string().nullable(),
+    approval_message_title: yup.string().required('This field is required.'),
+    approval_message: yup.string().required('This field is required.'),
+    email_message_title: yup.string().required('This field is required.'),
+    email_message: yup.string().required('This field is required.'),
+    email_message_arabic: yup.string().nullable(),
+    start_on: yup.string().nullable(),
+    end_on: yup.string().nullable()
+})
+
 export const editAttendeeSchema = yup.object({
     first_name: yup.string(),
     last_name: yup.string(),

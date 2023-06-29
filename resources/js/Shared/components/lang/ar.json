@@ -58,6 +58,12 @@
         "checkin_attendee": "Checkin Attendee",
         "access_levels": "Access Levels"
     },
+    "customize": {
+        "general": "General",
+        "design": "Event Page Design",
+        "request_form": "Request Form",
+        "socials": "Socials"
+    },
     "organisers": {
         "create": "إنشاء منظم",
         "edit": "تعديل المنظم"
