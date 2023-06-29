@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import {array} from "yup";
 
 export const signInSchema = yup.object({
     email: yup.string().required().email(),
@@ -14,7 +15,7 @@ export const passwordTokenSchema = yup.object({
 })
 
 export const changePasswordSchema = yup.object({
-    password:  yup.string().required().min(7),
+    password: yup.string().required().min(7),
     confirm_password: yup.string()
         .oneOf([yup.ref('password'), null], 'Passwords must match')
 })
@@ -31,86 +32,73 @@ export const createEventSchema = yup.object().shape({
     description_arabic: yup.string().nullable()
 })
 
-export const createTicketSchema = yup.object({
-    contact_to_purchase: yup.boolean(),
-    title: yup.string().required('This field is required'),
-    title_arabic: yup.string().nullable(),
-    price: yup.string().nullable(),
-    quantity_available: yup.number(),
-    description: yup.string().nullable(),
-    description_arabic: yup.string().nullable(),
-    notes: yup.string().nullable(),
-    notes_arabic: yup.string().nullable(),
-    checkin_limit: yup.number().required(),
-    checkout_limit: yup.number().required(),
-    minimum_ticket_per_order: yup.string().required(),
-    maximum_ticket_per_order: yup.string().required(),
-    for_ticket_seller: yup.boolean().required(),
-    tax_included: yup.boolean().required(),
-    hide_ticket: yup.boolean().required(),
-    request_visa: yup.boolean().required(),
-    start_sale: yup.string(),
-    end_sale: yup.string(),
-    all_day: yup.boolean().required(),
-    time_slots_minutes: yup.number(),
-    contact_email: yup.string().when(['contact_to_purchase'], {
-        is: (contact_to_purchase) => {
-            return !!contact_to_purchase;
-        },
-        then: () => yup.string().email().required('This field is required')
-    }).nullable()
-});
-
-export const createServiceSchema = yup.object({
-    service: yup.string().required(),
-    service_arabic: yup.string().nullable(),
-    price: yup.number().required(),
-    quantity_available: yup.number(),
-    description: yup.string().nullable(),
-    description_arabic: yup.string().nullable(),
-    min_person_per_service: yup.string().required(),
-    max_person_per_service: yup.string().required(),
-    hide_service: yup.boolean().required(),
-    start_sale: yup.string(),
-    end_sale: yup.string(),
-});
+export const createAccessLevelSchema = yup.object().shape({
+    title: yup.string().required(),
+    quantity_available: yup.string().nullable()
+})
 
 export const createSurveySchema = yup.object({
-    title: yup.string().required(),
+    surveys: array()
+        .of(
+            yup.object().shape({
+                title: yup.string().required('This field is required'),
+                title_arabic: yup.string().nullable(),
+                type: yup.string().required('This field is required'),
+
+                contact_email: yup.string().when(['contact_to_purchase'], {
+                    is: (contact_to_purchase) => {
+                        return !!contact_to_purchase;
+                    },
+                    then: () => yup.string().email().required('This field is required')
+                }).nullable(),
+
+                options: yup.array().when(['type'], {
+                    is: type => {
+                        return ['6', '7', '8', '9'].includes(type)
+                    },
+                    then: () => array().of(
+                        yup.object().shape({
+                            name: yup.string().required('This fields is required'),
+                            name_arabic: yup.string().nullable()
+                        })
+                    )
+                })
+            })
+        )
+})
+
+export const accessLevelGeneralSchema = yup.object({
+    visibility: yup.string().required('This field is required.'),
+    accept_reject: yup.string().required('This field is required.'),
+    waiting_list: yup.string().required('This field is required.'),
+    send_tc: yup.string().required('This field is required.'),
+    title: yup.string().required('This field is required.'),
     title_arabic: yup.string().nullable(),
-    type: yup.string().required(),
-    has_parent: yup.boolean().required(),
-    required: yup.boolean().required(),
-    post_order: yup.boolean().required(),
-    parent_survey: yup.string().when(['has_parent'], {
-        is: has_parent => {
-            return has_parent;
-        },
-        then: () => yup.string().required()
-    }),
-    parent:  yup.string().when(['has_parent'], {
-        is: has_parent => {
-            return has_parent;
-        },
-        then: () => yup.string().required()
-    })
+    quantity_available: yup.string().nullable(),
+    description: yup.string().required('This field is required.'),
+    description_arabic: yup.string().nullable(),
+    success_message: yup.string().required('This field is required.'),
+    success_message_arabic: yup.string().nullable(),
+    approval_message_title: yup.string().required('This field is required.'),
+    approval_message: yup.string().required('This field is required.'),
+    email_message_title: yup.string().required('This field is required.'),
+    email_message: yup.string().required('This field is required.'),
+    email_message_arabic: yup.string().nullable(),
+    start_on: yup.string().nullable(),
+    end_on: yup.string().nullable()
 })
 
-export const createCouponSchema = yup.object({
-    code: yup.string().required(),
-    discount_type: yup.string().nullable(),
-    value: yup.number().required(),
-    usage_limit: yup.number().nullable(),
-    for_weekends: yup.boolean().required(),
+export const accessLevelRequestFormSchema = yup.object({
+    message_before: yup.string().required('This field is required.'),
+    message_before_arabic: yup.string().nullable(),
+    message_after: yup.string().required('This field is required.'),
+    message_after_arabic: yup.string().nullable()
 })
 
-export const createUserSchema = yup.object({
-    first_name: yup.string().required(),
-    last_name: yup.string().required(),
-    email: yup.string().email().required(),
-    role_id: yup.string().required(),
-    events: yup.array().nullable(),
-    all_events: yup.boolean().nullable()
+export const accessLevelSocialsSchema = yup.object({
+    email: yup.string().nullable(),
+    instagram: yup.string().nullable(),
+    phone_number: yup.string().nullable(),
 })
 
 export const editAttendeeSchema = yup.object({

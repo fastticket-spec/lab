@@ -109,3 +109,9 @@ body.sidebar-main .content-page.ar, body.two-sidebar.sidebar-main .content-page,
 .navbar-list li a.search-toggle.profile, .navbar-list li a.search-toggle.profile:hover, .navbar-list li a.search-toggle.profile:focus {
     background-color: var(--iq-primary)!important;
 }
+
+.ql-editor{
+    height: 250px;
+    max-height: 250px;
+    overflow: auto;
+}

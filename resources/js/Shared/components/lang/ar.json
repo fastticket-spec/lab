@@ -55,7 +55,14 @@
         "event_tools": "Event Tools",
         "affiliates": "Affiliates",
         "seats": "Seats Design",
-        "checkin_attendee": "Checkin Attendee"
+        "checkin_attendee": "Checkin Attendee",
+        "access_levels": "Access Levels"
+    },
+    "customize": {
+        "general": "General",
+        "design": "Event Page Design",
+        "request_form": "Request Form",
+        "socials": "Socials"
     },
     "organisers": {
         "create": "إنشاء منظم",
@@ -96,6 +103,10 @@
     "attendees": {
         "create": "إضافة حضور",
         "edit": "تعديل الحضور"
+    },
+    "access_levels": {
+        "create": "Create Access Level",
+        "edit": "Edit Access Level"
     },
     "input": {
         "name": "الأسم",
@@ -177,7 +188,7 @@
         "question_options": "خيارات السؤال",
         "make_required": "جعل هذا خيارًا مطلوبًا",
         "post_order": "لما بعد الطلب؟",
-        "require_for_tickets": "جعل هذا السؤال إجباري للتذاكر",
+        "require_for_levels": "Require this question for access level(s):",
         "has_parent": "لديه سؤال اساسي؟",
         "parent": "سؤال ساسي",
         "parent_survey": "استبيان السؤال الأساسي",

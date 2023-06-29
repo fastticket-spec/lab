@@ -45,6 +45,11 @@ class Organiser extends Model
         return $this->hasMany(Event::class, 'organiser_id');
     }
 
+    public function designImages(): HasMany
+    {
+        return $this->hasMany(EventDesignImage::class, 'organiser_id');
+    }
+
     public function getLogoUrlAttribute()
     {
         return $this->organiser_logo ? Storage::disk(config('filesystems.default'))->url($this->organiser_logo) : null;

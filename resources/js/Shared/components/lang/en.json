@@ -55,7 +55,14 @@
         "event_tools": "Event Tools",
         "affiliates": "Affiliates",
         "seats": "Seats Customisation",
-        "checkin_attendee": "Checkin Attendee"
+        "checkin_attendee": "Checkin Attendee",
+        "access_levels": "Access Levels"
+    },
+    "customize": {
+        "general": "General",
+        "design": "Event Page Design",
+        "request_form": "Request Form",
+        "socials": "Socials"
     },
     "organisers": {
         "create": "Create Organiser",
@@ -96,6 +103,10 @@
     "attendees": {
         "create": "Create Attendee",
         "edit": "Edit Attendee"
+    },
+    "access_levels": {
+        "create": "Create Access Level",
+        "edit": "Edit Access Level"
     },
     "input": {
         "name": "Name",
@@ -177,7 +188,7 @@
         "question_options": "Question Options",
         "make_required": "Make this a required option",
         "post_order": "For post order?",
-        "require_for_tickets": "Require this question for ticket(s):",
+        "require_for_levels": "Require this question for access level(s):",
         "has_parent": "Has parent?",
         "parent": "Parent",
         "parent_survey": "Parent Survey",
