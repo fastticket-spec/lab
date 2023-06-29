@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Events;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AccessLevelGeneralRequest;
 use App\Services\AccessLevelsService;
+use App\Services\EventService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -17,7 +18,7 @@ class AccessLevelsController extends Controller
         ['id' => 'socials', 'name' => 'Socials', 'iI8' => 'customize.socials']
     ];
 
-    public function __construct(private AccessLevelsService $accessLevelsService)
+    public function __construct(private AccessLevelsService $accessLevelsService, private EventService $eventService)
     {
     }
 
@@ -69,25 +70,47 @@ class AccessLevelsController extends Controller
     public function customize(string $eventId, string $accessLevelId): \Inertia\Response
     {
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
+        $event = $this->eventService->find($eventId);
 
         $page = request()->page ?? 'general';
 
         $data = [];
+        $designImages = [];
         if ($page == 'general') {
             $data = $accessLevel->generalSettings;
+        } else if ($page == 'design') {
+            $accessLevel->load('generalSettings');
+            $data = $accessLevel->pageDesign;
+            $designImages = $event->organiser->designImages;
         }
 
         return Inertia::render('Events/Event/AccessLevels/Customize', [
-            'eventId' => $eventId,
+            'event' => $event,
             'access_level' => $accessLevel,
             'menuLists' => $this->menuLists,
             'currentMenu' => $page,
-            'data' => $data
+            'data' => $data,
+            'design_images' => $designImages
         ]);
     }
 
     public function customizeGeneral(AccessLevelGeneralRequest $request, string $eventId, string $accessLevelId)
     {
         return $this->accessLevelsService->updateGeneralCustomization($request, $eventId, $accessLevelId);
+    }
+
+    public function customizePageDesign(Request $request, string $eventId, string $accessLevelId)
+    {
+        return $this->accessLevelsService->updatePageDesign($request, $eventId, $accessLevelId);
+    }
+
+    public function designImages(Request $request, string $eventId, string $accessLevelId)
+    {
+        $request->validate([
+            'design_images' => 'required|array',
+            'design_images.*' => 'mimes:jpeg,jpg,png|max:4000'
+        ]);
+
+        return $this->accessLevelsService->uploadDesignImages($request, $eventId, $accessLevelId);
     }
 }

@@ -6,13 +6,24 @@ use App\Http\Requests\AccessLevelGeneralRequest;
 use App\Models\AccessLevel;
 use App\Models\EventSurvey;
 use App\Repositories\BaseRepository;
+use App\Services\traits\HasFile;
 use Illuminate\Http\Request;
 
 class AccessLevelsService extends BaseRepository
 {
-    public function __construct(AccessLevel $model)
+    use HasFile;
+
+    protected $images_path;
+
+    public function __construct(
+        AccessLevel          $model,
+        private FileService  $file,
+        private EventService $eventService
+    )
     {
         parent::__construct($model);
+
+        $this->images_path = config('filesystems.directory') . "access_level_images/";
     }
 
     public function fetchAccessLevels(Request $request, string $eventId)
@@ -109,5 +120,63 @@ class AccessLevelsService extends BaseRepository
 
             return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
         }
+    }
+
+    public function updatePageDesign(Request $request, string $eventId, string $accessLevelId)
+    {
+        $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
+        try {
+            $accessLevel = $this->find($accessLevelId);
+
+            $accessLevel->pageDesign()->updateOrCreate(['access_level_id' => $accessLevelId], $request->all());
+
+            $message = 'Access level page design updated';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
+        } catch (\Throwable $th) {
+            \Log::error($th);
+
+            $message = 'Could not update access level page design!';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
+        }
+    }
+
+    public function uploadDesignImages(Request $request, string $eventId, string $accessLevelId)
+    {
+        $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
+        try {
+            $event = $this->eventService->find($eventId);
+
+            foreach ($request->design_images as $img) {
+                if (!is_uploaded_file($img)) {
+                    continue;
+                }
+
+                $path = $this->uploadFile($img, 'event-', '-bg-', 1400);
+
+                if (!$path) {
+                    return false;
+                }
+
+                $event->organiser->designImages()->create(['event_id' => $event->id, 'design_image' => $path]);
+            }
+
+            $message = 'Event Images uploaded successfully';
+
+            return $this->view(
+                data: [
+                    'message' => $message,
+                    'data' => $event
+                ], flashMessage: $message, component: $route, returnType: 'redirect'
+            );
+        } catch (\Throwable $th) {
+            \Log::error($th);
+
+            $message = 'An error occurred while uploading image!';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
+        }
+
     }
 }

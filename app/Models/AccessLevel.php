@@ -31,4 +31,9 @@ class AccessLevel extends Model
     {
         return $this->hasOne(AccessLevelGeneralSetting::class);
     }
+
+    public function pageDesign(): HasOne
+    {
+        return $this->hasOne(AccessLevelPageDesign::class);
+    }
 }

@@ -11,8 +11,9 @@ const props = defineProps({
     order: {},
     menuLists: [],
     currentMenu: String,
-    eventId: String,
-    data: []
+    event: Object,
+    data: [],
+    design_images: []
 })
 
 const selectedListName = ref(props.currentMenu);
@@ -36,10 +37,10 @@ const selectList = item => {
             </b-col>
 
             <b-col lg="12">
-                <general :list="selectedList" :event-id="eventId" :data="data" :access-level="access_level" v-if="currentMenu === 'general'"/>
-                <design :list="selectedList" :event-id="eventId" :data="data" :access-level-id="access_level.id" v-if="currentMenu === 'design'"/>
-                <request-form :list="selectedList" :event-id="eventId" :data="data" :access-level-id="access_level.id" v-if="currentMenu === 'request_form'"/>
-                <socials :list="selectedList" :event-id="eventId" :data="data" :access-level-id="access_level.id" v-if="currentMenu === 'socials'"/>
+                <general :list="selectedList" :event-id="event.id" :data="data" :access-level="access_level" v-if="currentMenu === 'general'"/>
+                <design :list="selectedList" :event="event" :data="data" :access-level="access_level" :design-images="design_images" v-if="currentMenu === 'design'"/>
+                <request-form :list="selectedList" :event-id="event.id" :data="data" :access-level-id="access_level.id" v-if="currentMenu === 'request_form'"/>
+                <socials :list="selectedList" :event-id="event.id" :data="data" :access-level-id="access_level.id" v-if="currentMenu === 'socials'"/>
             </b-col>
         </b-row>
     </b-container>
