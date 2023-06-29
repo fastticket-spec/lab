@@ -82,6 +82,8 @@ class AccessLevelsController extends Controller
             $accessLevel->load('generalSettings');
             $data = $accessLevel->pageDesign;
             $designImages = $event->organiser->designImages;
+        } else if ($page == 'request_form') {
+            $data = $accessLevel->requestForm;
         }
 
         return Inertia::render('Events/Event/AccessLevels/Customize', [
@@ -112,5 +114,10 @@ class AccessLevelsController extends Controller
         ]);
 
         return $this->accessLevelsService->uploadDesignImages($request, $eventId, $accessLevelId);
+    }
+
+    public function requestForm(Request $request, string $eventId, string $accessLevelId)
+    {
+        return $this->accessLevelsService->updateRequestForm($request, $eventId, $accessLevelId);
     }
 }

@@ -88,6 +88,13 @@ export const accessLevelGeneralSchema = yup.object({
     end_on: yup.string().nullable()
 })
 
+export const accessLevelRequestFormSchema = yup.object({
+    message_before: yup.string().required('This field is required.'),
+    message_before_arabic: yup.string().nullable(),
+    message_after: yup.string().required('This field is required.'),
+    message_after_arabic: yup.string().nullable()
+})
+
 export const editAttendeeSchema = yup.object({
     first_name: yup.string(),
     last_name: yup.string(),

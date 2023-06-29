@@ -67,6 +67,7 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('{access_level_id}/customize/general', [AccessLevelsController::class, 'customizeGeneral']);
                 Route::post('{access_level_id}/customize/page-design', [AccessLevelsController::class, 'customizePageDesign']);
                 Route::post('{access_level_id}/customize/design-images', [AccessLevelsController::class, 'designImages']);
+                Route::post('{access_level_id}/customize/request-form', [AccessLevelsController::class, 'requestForm']);
             });
 
             Route::prefix('/surveys')->group(function () {

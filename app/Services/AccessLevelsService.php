@@ -179,4 +179,24 @@ class AccessLevelsService extends BaseRepository
         }
 
     }
+
+    public function updateRequestForm(Request $request, string $eventId, string $accessLevelId)
+    {
+        $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=request_form";
+        try {
+            $accessLevel = $this->find($accessLevelId);
+
+            $accessLevel->requestForm()->updateOrCreate(['access_level_id' => $accessLevelId], $request->all());
+
+            $message = 'Access level request form updated';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
+        } catch (\Throwable $th) {
+            \Log::error($th);
+
+            $message = 'Could not update access level request form!';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
+        }
+    }
 }
