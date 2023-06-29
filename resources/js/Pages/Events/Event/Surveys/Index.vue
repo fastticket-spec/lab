@@ -2,7 +2,7 @@
 import {ErrorMessage, Field, FieldArray, useField, useForm} from 'vee-validate';
 import {createSurveySchema} from '../../../../Shared/components/helpers/Validators';
 import {router} from "@inertiajs/vue3";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 
 const props = defineProps({
     code: Number,
@@ -19,6 +19,14 @@ const fillArabic = ref(false);
 const selectedAccessLevels = ref([]);
 const accessLevelError = ref('');
 
+const emailField = computed(() => {
+    const emailField = Object.keys(props.field_types).find(x => {
+        return props.field_types[x].key === 'email';
+    })
+
+    return emailField.toString();
+})
+
 const initialValues = props.event_survey ? {
     surveys: props.event_survey.surveys.length > 0
         ? props.event_survey.surveys.map(x => ({
@@ -30,9 +38,9 @@ const initialValues = props.event_survey ? {
             open: false
         }))
         : [{
-            title: '',
-            title_arabic: '',
-            type: '1',
+            title: 'Email Address',
+            title_arabic: 'Email Address',
+            type: emailField.value,
             required: false,
             options: [
                 {name: '', name_arabic: ''}
@@ -42,9 +50,9 @@ const initialValues = props.event_survey ? {
 } : {
     surveys: [
         {
-            title: '',
-            title_arabic: '',
-            type: '1',
+            title: 'Email Address',
+            title_arabic: 'Email Address',
+            type: emailField.value,
             required: false,
             options: [
                 {name: '', name_arabic: ''}
@@ -244,11 +252,11 @@ const onSubmit = handleSubmit((values) => {
                                         <div>
                                             <b-btn variant="primary" class="mr-2"
                                                    @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, options: [{name: '', name_arabic: ''}], open: true})">
-                                                <i class="ri-add-line"/> Add Section
+                                                <i class="ri-add-line"/> Add Field
                                             </b-btn>
-                                            <b-btn variant="danger" class="mr-2" v-show="surveys.length > 1"
+                                            <b-btn variant="danger" :disabled="field?.value?.type === emailField" class="mr-2" v-show="surveys.length > 1"
                                                    @click="remove(idx)"><i class="ri-subtract-line"></i> Remove
-                                                Section
+                                                Field
                                             </b-btn>
                                         </div>
                                         <b-btn
@@ -275,7 +283,7 @@ const onSubmit = handleSubmit((values) => {
                                                    @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, options: [{name: '', name_arabic: ''}], open: true})">
                                                 <i class="ri-add-line p-0"/>
                                             </b-btn>
-                                            <b-btn variant="danger" class="mr-2" v-show="surveys.length > 1"
+                                            <b-btn :disabled="field?.value?.type === emailField" variant="danger" class="mr-2" v-show="surveys.length > 1"
                                                    @click="remove(idx)"><i class="ri-subtract-line p-0"></i>
                                             </b-btn>
                                             <b-btn variant="secondary" class="mr-2"

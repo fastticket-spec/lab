@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccreditationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Event\SurveyController;
 use App\Http\Controllers\EventController;
@@ -21,6 +22,8 @@ Route::get('/verify-token', [LoginController::class, 'acceptToken']);
 Route::post('/verify-token', [LoginController::class, 'verifyToken']);
 Route::get('/change-password', [LoginController::class, 'changePassword']);
 Route::post('/change-password', [LoginController::class, 'updatePassword']);
+
+Route::get('/e/{event_id}/a/{access_level_id}', [AccreditationController::class, 'index']);
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('home');

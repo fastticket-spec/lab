@@ -68,7 +68,7 @@ const visit = (link, method = 'get') => {
                     </b-card-text>
 
                     <div v-if="access_level.has_surveys" class="card-date d-flex flex-column text-center" :class="{'card-date-ar': locale === 'ar'}">
-                        <a href="#">View Form</a>
+                        <a :href="`/e/${event_id}/a/${access_level.id}`" target="_blank">View Form</a>
                     </div>
 
                     <div class="d-flex justify-content-around">

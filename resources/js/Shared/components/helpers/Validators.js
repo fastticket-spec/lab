@@ -54,7 +54,7 @@ export const createSurveySchema = yup.object({
 
                 options: yup.array().when(['type'], {
                     is: type => {
-                        return ['5', '6', '7', '8'].includes(type)
+                        return ['6', '7', '8', '9'].includes(type)
                     },
                     then: () => array().of(
                         yup.object().shape({
