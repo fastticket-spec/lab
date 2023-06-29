@@ -95,6 +95,12 @@ export const accessLevelRequestFormSchema = yup.object({
     message_after_arabic: yup.string().nullable()
 })
 
+export const accessLevelSocialsSchema = yup.object({
+    email: yup.string().nullable(),
+    instagram: yup.string().nullable(),
+    phone_number: yup.string().nullable(),
+})
+
 export const editAttendeeSchema = yup.object({
     first_name: yup.string(),
     last_name: yup.string(),

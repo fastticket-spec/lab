@@ -41,4 +41,9 @@ class AccessLevel extends Model
     {
         return $this->hasOne(AccessLevelRequestForm::class);
     }
+
+    public function socials(): HasOne
+    {
+        return $this->hasOne(AccessLevelSocial::class);
+    }
 }

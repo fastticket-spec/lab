@@ -199,4 +199,24 @@ class AccessLevelsService extends BaseRepository
             return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
         }
     }
+
+    public function updateSocials(Request $request, string $eventId, string $accessLevelId)
+    {
+        $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=socials";
+        try {
+            $accessLevel = $this->find($accessLevelId);
+
+            $accessLevel->socials()->updateOrCreate(['access_level_id' => $accessLevelId], $request->all());
+
+            $message = 'Access level socials updated';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
+        } catch (\Throwable $th) {
+            \Log::error($th);
+
+            $message = 'Could not update access level socials!';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
+        }
+    }
 }
