@@ -126,8 +126,8 @@ class EventService extends BaseRepository
         }
 
         $updatedEvent = $this->update($data + [
-                'logo' => $eventImage ?? $event->logo,
-                'banner' => $eventBanner ?? $event->banner,
+                'logo' => $eventImage ?: $event->logo,
+                'banner' => $eventBanner ?: $event->banner,
             ], $event->id);
 
         if (!$updatedEvent) {

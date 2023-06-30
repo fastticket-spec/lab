@@ -11,7 +11,7 @@ class EventSurvey extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $guarded = [];
+    protected $fillable = ['event_id', 'status'];
 
     public function surveys(): HasMany
     {

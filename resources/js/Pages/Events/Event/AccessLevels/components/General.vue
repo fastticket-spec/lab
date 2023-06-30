@@ -27,6 +27,9 @@ const initialValues = props.data
         accept_reject: '1',
         waiting_list: '1',
         send_tc: '1',
+        title: props.accessLevel.title,
+        title_arabic: props.accessLevel.title_arabic,
+        quantity_available: props.accessLevel.quantity_available,
     }
 
 const {handleSubmit, isSubmitting} = useForm({

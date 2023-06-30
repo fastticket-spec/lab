@@ -56,7 +56,8 @@
         "affiliates": "Affiliates",
         "seats": "Seats Customisation",
         "checkin_attendee": "Checkin Attendee",
-        "access_levels": "Access Levels"
+        "access_levels": "Access Levels",
+        "event_surveys": "Event Surveys"
     },
     "customize": {
         "general": "General",

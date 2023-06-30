@@ -18,4 +18,14 @@ class EventSurveyAccessLevel extends Model
     {
         return $this->hasMany(Survey::class, 'event_survey_id', 'event_survey_id');
     }
+
+    public function eventSurvey(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(EventSurvey::class);
+    }
+
+    public function accessLevel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AccessLevel::class);
+    }
 }

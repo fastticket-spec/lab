@@ -49,10 +49,10 @@ export const eventSideBar = eventId => ([
                 "title": "Surveys",
                 "name": "sidebar.surveys",
                 "is_active": false,
-                "link": `/event/${eventId}/surveys`,
+                "link": `/event/${eventId}/event-surveys`,
                 "class_name": "",
                 "is_icon_class": true,
-                "component": ["Events/Event/Surveys/Index", "Events/Event/Surveys/Create"],
+                "component": ["Events/Event/Surveys/EventSurveys", "Events/Event/Surveys/Index", "Events/Event/Surveys/Create"],
                 "icon": ""
             }
         ]
