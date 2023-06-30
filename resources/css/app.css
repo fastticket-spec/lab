@@ -20,14 +20,18 @@
     border: none;
 }
 
-.iq-card-body .vs__selected {
+.iq-card-body .vs__selected, .accreditation-form .vs__selected {
     background-color: var(--iq-primary);
     color: white;
 }
 
-.iq-card-body .v-select {
+.iq-card-body .v-select, .accreditation-form .v-select {
     min-height: calc(1.5em + 0.75rem + 2px);
     height: auto !important;
+}
+
+.accreditation-form .vs__dropdown-toggle {
+    border: none;
 }
 
 .form-control.no-border {

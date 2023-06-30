@@ -1,10 +1,10 @@
 <template>
-    <div class="page-preview-container">
-        <div class="bg-div" :style="{
+    <div class="page-preview-container" :style="{
             backgroundColor: data.background.type === 'color' && data.background.color,
             backgroundImage: data.background.type === 'image' ? 'url(' + data.background.bgImage?.full + ')' : '',
 
         }">
+        <div class="bg-div bg-white m-5">
             <div class="text-center">
                 <img class="my-3 text-center img-fluid logo" :src="event.event_image_url" alt="">
             </div>
@@ -39,6 +39,7 @@ defineProps({
 .bg-div {
     height: 100%;
     width: 100%;
+    border-radius: 10px;
 }
 
 .page-preview-container :deep(ul) {
