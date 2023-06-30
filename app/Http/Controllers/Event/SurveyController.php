@@ -19,9 +19,9 @@ class SurveyController extends Controller
     {
     }
 
-    public function index(Request $request, string $eventId): \Inertia\Response
+    public function index(string $eventId, string $eventSurveyId): \Inertia\Response
     {
-        $eventSurvey = $this->eventSurveyService->findOneBy(['event_id' => $eventId]);
+        $eventSurvey = $this->eventSurveyService->find($eventSurveyId);
 
         if ($eventSurvey) {
             $eventSurvey->load(['surveys', 'surveyAccessLevels']);
@@ -36,8 +36,30 @@ class SurveyController extends Controller
         ]);
     }
 
+    public function create(string $eventId): \Inertia\Response
+    {
+        $accessLevels = $this->eventService
+            ->find($eventId)
+            ->accessLevels()
+            ->whereStatus(1)
+            ->whereDoesntHave('surveyAccessLevels')
+            ->get();
+
+        return Inertia::render('Events/Event/Surveys/Index', [
+            'event_id' => $eventId,
+            'field_types' => config('formfields.field_types'),
+            'access_levels' => $accessLevels,
+            'event_survey' => null
+        ]);
+    }
+
     public function store(Request $request, string $eventId)
     {
         return $this->eventSurveyService->createSurvey($request, $eventId);
+    }
+
+    public function update(Request $request, string $eventId, string $eventSurveyId)
+    {
+        return $this->eventSurveyService->updateSurvey($request, $eventId, $eventSurveyId);
     }
 }

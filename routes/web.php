@@ -6,6 +6,7 @@ use App\Http\Controllers\Event\SurveyController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\Events\AccessLevelsController;
 use App\Http\Controllers\Events\DashboardController as EventDashboardController;
+use App\Http\Controllers\EventSurveyController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrganiserController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,7 @@ Route::get('/change-password', [LoginController::class, 'changePassword']);
 Route::post('/change-password', [LoginController::class, 'updatePassword']);
 
 Route::get('/e/{event_id}/a/{access_level_id}', [AccreditationController::class, 'index']);
+Route::get('/form/{access_level_id}', [AccreditationController::class, 'form']);
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('home');
@@ -71,12 +73,15 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('{access_level_id}/customize/socials', [AccessLevelsController::class, 'socials']);
             });
 
-            Route::prefix('/surveys')->group(function () {
-                Route::get('/', [SurveyController::class, 'index']);
+            Route::prefix('/event-surveys')->group(function () {
+                Route::get('/', [EventSurveyController::class, 'index']);
+                Route::post('/{event_survey_id}/status', [EventSurveyController::class, 'status']);
+
                 Route::get('/create', [SurveyController::class, 'create']);
                 Route::post('/', [SurveyController::class, 'store']);
+                Route::get('/{event_survey_id}/surveys', [SurveyController::class, 'index']);
+                Route::patch('/{event_survey_id}/edit-surveys', [SurveyController::class, 'update']);
             });
         });
-
     });
 });
