@@ -5,8 +5,11 @@
             backgroundImage: data.background.type === 'image' ? 'url(' + data.background.bgImage?.full + ')' : '',
 
         }">
-            <img class="my-3 text-center" :src="event.event_image_url" alt="">
-            <p class="pt-3 px-4" v-html="accessLevel?.general_settings?.description" />
+            <div class="text-center">
+                <img class="my-3 text-center img-fluid logo" :src="event.event_image_url" alt="">
+            </div>
+
+            <p class="pt-3 px-4" v-html="accessLevel?.general_settings?.description"/>
 
             <div class="py-4 text-center">
                 <b-btn size="lg" class="w-75" :style="{backgroundColor: data.btn.color, color: data.btn.font_color}">
@@ -40,5 +43,9 @@ defineProps({
 
 .page-preview-container :deep(ul) {
     list-style: unset;
+}
+
+img.logo {
+    height: 80px;
 }
 </style>

@@ -81,7 +81,9 @@ class EventController extends Controller
             $request->except([
                 'event_image',
                 'event_banner',
-                'event_attachment'
+                'event_attachment',
+                'logo',
+                'banner'
             ]),
             $eventImage,
             $eventBanner,
