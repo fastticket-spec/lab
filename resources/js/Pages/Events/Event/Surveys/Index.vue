@@ -65,6 +65,7 @@ const initialValues = props.event_survey ? {
 onMounted(() => {
     if (props.event_survey) {
         selectedAccessLevels.value = props.survey_access_levels;
+        console.log(selectedAccessLevels.value)
         if (props.event_survey.surveys.length > 0 && props.event_survey.surveys[0].title_arabic) {
             fillArabic.value = true
         }
@@ -89,7 +90,7 @@ const onSubmit = handleSubmit((values) => {
         return accessLevelError.value = 'Please choose an access level';
     }
 
-    values.access_levels = selectedAccessLevels.value.filter(x => !!x);
+    values.access_levels = [... new Set(selectedAccessLevels.value.filter(x => !!x))];
     values.event_id = props.event_id;
 
     values.surveys = values.surveys.map(survey => {

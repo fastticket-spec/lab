@@ -21,6 +21,15 @@ class SurveyController extends Controller
 
     public function index(string $eventId, string $eventSurveyId): \Inertia\Response
     {
+        $accessLevels = $this->eventService
+            ->find($eventId)
+            ->accessLevels()
+            ->whereStatus(1)
+            ->whereDoesntHave('surveyAccessLevels', function ($query) use ($eventSurveyId) {
+                $query->where('event_survey_id', '!=', $eventSurveyId);
+            })
+            ->get();
+
         $eventSurvey = $this->eventSurveyService->find($eventSurveyId);
 
         if ($eventSurvey) {
@@ -30,7 +39,7 @@ class SurveyController extends Controller
         return Inertia::render('Events/Event/Surveys/Index', [
             'event_id' => $eventId,
             'field_types' => config('formfields.field_types'),
-            'access_levels' => $this->accessLevelsService->findBy(['status' => 1, 'event_id' => $eventId]),
+            'access_levels' => $accessLevels->toArray(),
             'event_survey' => $eventSurvey,
             'survey_access_levels' => $eventSurvey ? $eventSurvey->surveyAccessLevels->pluck('access_level_id') : []
         ]);

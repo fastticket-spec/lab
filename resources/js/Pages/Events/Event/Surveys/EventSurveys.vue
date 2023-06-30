@@ -43,7 +43,7 @@ const onPaginate = page => {
                     </b-card-sub-title>
 
                     <div class="d-flex justify-content-around mt-5">
-                        <a href="#" :class="{'text-primary': event_survey.status, 'text-danger': !event_survey.status }" @click.prevent="visit(`/event/${event_id}/event-surveys/${event_survey.id}/status`, 'post')"><i
+                        <a href="#" :class="{'text-primary': !event_survey.status, 'text-danger': event_survey.status }" @click.prevent="visit(`/event/${event_id}/event-surveys/${event_survey.id}/status`, 'post')"><i
                             class="ri-key-2-line"></i> {{ event_survey.status ? 'Deactivate' : 'Activate' }} </a>
                         <a href="#" @click.prevent.stop="visit(`/event/${event_id}/event-surveys/${event_survey.id}/surveys`)" class="text-primary"><i class="ri-edit-line"></i>
                             {{ $t('button.edit') }}</a>
