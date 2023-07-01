@@ -4,10 +4,11 @@ import AttendeeComponent from "../../../Attendees/components/AttendeeComponent.v
 defineProps({
     attendees: Object,
     eventId: String,
-    sort: String
+    sort: String,
+    zones: Array
 })
 </script>
 
 <template>
-    <attendee-component :attendees="attendees" :event-id="eventId" :sort="sort" />
+    <attendee-component :attendees="attendees" :event-id="eventId" :zones="zones" :sort="sort" />
 </template>

@@ -1,23 +1,36 @@
 <script setup>
 import {router} from "@inertiajs/vue3";
-import {ref, onUpdated, reactive} from "vue";
+import {ref, onUpdated, reactive, computed} from "vue";
 
 const props = defineProps({
     attendees: Object,
     eventId: String,
-    sort: String
+    sort: String,
+    zones: Array
 })
 
 const selectedAttendee = ref({})
 const answerModalShow = ref(false)
 const messageModalShow = ref(false)
+const zonesModalShow = ref(false)
+const selectedSort = ref(props.sort || '');
+const message = reactive({
+    subject: '',
+    content: ''
+})
+const selectedZones = ref([]);
+
+const fields = ['access_level', 'event', 'ref', 'email', 'status', 'accept_status', 'date_submitted', 'action']
+
+const answerFields = ['question', 'answers'];
 
 const sortEvents = () => {
     visit(`/attendees?sort=${selectedSort.value}`)
 }
 
 onUpdated(() => {
-    answerModalShow.value = false
+    answerModalShow.value = false;
+    zonesModalShow.value = false;
 })
 
 const visit = (link, method = 'get') => {
@@ -29,16 +42,6 @@ const visit = (link, method = 'get') => {
         router.delete(link)
     }
 }
-
-const selectedSort = ref(props.sort || '');
-const message = reactive({
-    subject: '',
-    content: ''
-})
-
-const fields = ['access_level', 'event', 'ref', 'email', 'status', 'accept_status', 'date_submitted', 'action']
-
-const answerFields = ['question', 'answers'];
 
 const onPaginate = page => {
     props.eventId
@@ -69,6 +72,20 @@ const onSubmitMessage = () => {
         ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/send-message`, message)
         : router.post(`/attendees/${selectedAttendee.value.id}/send-message`, message)
 };
+
+const eventZones = computed(() => {
+    if (selectedAttendee.value) {
+        return props.zones.filter(zone => zone.event_id === selectedAttendee.value.event.id)
+    }
+
+    return props.zones;
+});
+
+const onAssignZones = () => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/assign-zones`, {zones: selectedZones.value})
+        : router.post(`/attendees/${selectedAttendee.value.id}/assign-zones`, {zones: selectedZones.value})
+}
 </script>
 
 <template>
@@ -128,8 +145,12 @@ const onSubmitMessage = () => {
                                                 @click.prevent="selectedAttendee = data.item; answerModalShow = true">Answer</b-dropdown-item>
                                             <b-dropdown-item
                                                 @click.prevent="selectedAttendee = data.item; messageModalShow = true">Message</b-dropdown-item>
-                                            <b-dropdown-item v-if="data.item.status !== 'declined'" @click.prevent="declineAttendee(data.item.id)">Decline</b-dropdown-item>
-                                            <b-dropdown-item v-if="data.item.status === 'declined'" @click.prevent="reinstateAttendee(data.item.id)">Reinstate</b-dropdown-item>
+                                            <b-dropdown-item v-if="data.item.status !== 'declined'"
+                                                             @click.prevent="declineAttendee(data.item.id)">Decline</b-dropdown-item>
+                                            <b-dropdown-item v-if="data.item.status === 'declined'"
+                                                             @click.prevent="reinstateAttendee(data.item.id)">Reinstate</b-dropdown-item>
+                                            <b-dropdown-item
+                                                @click.prevent="selectedAttendee = data.item; zonesModalShow = true; selectedZones = (data.item.zones || [])">Assign Zones</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>
@@ -182,52 +203,83 @@ const onSubmitMessage = () => {
                     >
                         Approve
                     </b-button>
-                    <span v-else-if="selectedAttendee.status === 'approved'" class="badge badge-primary float-right ml-2">Approved</span>
-                    <span v-else-if="selectedAttendee.status === 'declined'" class="badge badge-danger float-right ml-2">Declined</span>
+                    <span v-else-if="selectedAttendee.status === 'approved'"
+                          class="badge badge-primary float-right ml-2">Approved</span>
+                    <span v-else-if="selectedAttendee.status === 'declined'"
+                          class="badge badge-danger float-right ml-2">Declined</span>
                 </div>
             </template>
         </b-modal>
 
         <b-modal v-model="messageModalShow" id="message-modal" title="Message Attendee">
-                <b-row class="mt-3">
-                    <b-col sm="12">
-                        <div class="form-group">
-                            <label for="subject">Message Subject</label>
-                            <input type="text" v-model="message.subject"
-                                   :class="`form-control mb-0`"
-                                   id="subject"/>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="content">Message Content</label>
-                            <textarea v-model="message.content"
-                                   rows="5"
-                                   :class="`form-control mb-0`"
-                                   id="content"/>
-                        </div>
-
-                        <span>The attendee will be instructed to send any reply to media@thesaudicup.com.sa</span>
-                    </b-col>
-                </b-row>
-
-                <template #modal-footer>
-                    <div class="w-100">
-                        <b-button
-                            variant="primary"
-                            @click="onSubmitMessage"
-                            :disabled="!message.content || !message.subject"
-                            class="btn btn-primary float-right ml-2">Send Message
-                        </b-button>
-                        <b-button
-                            type="button"
-                            variant="danger"
-                            class="float-right ml-2"
-                            @click="messageModalShow = false"
-                        >
-                            Close
-                        </b-button>
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <div class="form-group">
+                        <label for="subject">Message Subject</label>
+                        <input type="text" v-model="message.subject"
+                               :class="`form-control mb-0`"
+                               id="subject"/>
                     </div>
-                </template>
+
+                    <div class="form-group">
+                        <label for="content">Message Content</label>
+                        <textarea v-model="message.content"
+                                  rows="5"
+                                  :class="`form-control mb-0`"
+                                  id="content"/>
+                    </div>
+
+                    <span>The attendee will be instructed to send any reply to media@thesaudicup.com.sa</span>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        @click="onSubmitMessage"
+                        :disabled="!message.content || !message.subject"
+                        class="btn btn-primary float-right ml-2">Send Message
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="danger"
+                        class="float-right ml-2"
+                        @click="messageModalShow = false"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="zonesModalShow" id="zones-modal" title="Assign Zones">
+            <b-row class="mt-3">
+                <b-col sm="6" v-for="zone in eventZones" :key="zone.id">
+                    <div class="form-group">
+                        <b-checkbox v-model="selectedZones" :value="zone.id">{{zone.zone}}</b-checkbox>
+                    </div>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        @click="onAssignZones"
+                        :disabled="selectedZones.length === 0"
+                        class="btn btn-primary float-right ml-2">Assign Zones
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="danger"
+                        class="float-right ml-2"
+                        @click="zonesModalShow = false"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
         </b-modal>
     </b-container>
 </template>

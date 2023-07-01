@@ -62,22 +62,21 @@ export const eventSideBar = eventId => ([
         "name": "sidebar.attendees",
         "is_heading": false,
         "is_active": false,
-        "link": '#',
+        "link": `/event/${eventId}/attendees`,
         "class_name": "",
         "is_icon_class": true,
         "component": ["Events/Event/Attendees/Index", "Events/Event/Attendees/Edit"],
-        "icon": "ri-settings-3-line",
-        "children": [
-            {
-                "title": "View",
-                "name": "sidebar.view",
-                "is_active": false,
-                "link": `/event/${eventId}/attendees`,
-                "class_name": "",
-                "is_icon_class": true,
-                "component": "Events/Event/Attendees/Index",
-                "icon": ""
-            }
-        ]
+        "icon": "ri-settings-3-line"
+    },
+    {
+        "title": "Zones",
+        "name": "sidebar.zones",
+        "is_heading": false,
+        "is_active": false,
+        "link": `/event/${eventId}/zones`,
+        "class_name": "",
+        "is_icon_class": true,
+        "component": ["Events/Event/Zones/Index", "Events/Event/Zones/Create"],
+        "icon": "ri-settings-3-line"
     }
 ])

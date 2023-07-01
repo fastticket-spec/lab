@@ -40,6 +40,11 @@ class Event extends Model
         return $this->hasMany(AccessLevel::class);
     }
 
+    public function zones(): HasMany
+    {
+        return $this->hasMany(Zone::class);
+    }
+
     public function getEventImageUrlAttribute()
     {
         return $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : null;
