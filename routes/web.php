@@ -87,10 +87,12 @@ Route::group(['middleware' => 'auth'], function () {
             });
 
             Route::get('attendees', [AttendeesController::class, 'eventAttendees']);
-            Route::post('attendees/{attendee_id}/approve', [AttendeesController::class, 'approveEventAttendee']);
+            Route::post('attendees/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveEventAttendee']);
+            Route::post('attendees/{attendee_id}/send-message', [AttendeesController::class, 'sendEventAttendeeMessage']);
         });
 
         Route::get('attendees', [AttendeesController::class, 'index']);
-        Route::post('attendees/{attendee_id}/approve', [AttendeesController::class, 'approveAttendee']);
+        Route::post('attendees/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveAttendee']);
+        Route::post('attendees/{attendee_id}/send-message', [AttendeesController::class, 'sendAttendeeMessage']);
     });
 });

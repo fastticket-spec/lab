@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AttendeeMessageRequest;
 use App\Services\AttendeeService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -29,13 +30,23 @@ class AttendeesController extends Controller
         ]);
     }
 
-    public function approveAttendee(string $attendeeId)
+    public function approveAttendee(string $attendeeId, int $status)
     {
-        return $this->attendeeService->approveAttendee($attendeeId);
+        return $this->attendeeService->approveAttendee($attendeeId, $status);
     }
 
-    public function approveEventAttendee(string $eventId, string $attendeeId)
+    public function approveEventAttendee(string $eventId, string $attendeeId, int $status)
     {
-        return $this->attendeeService->approveAttendee($attendeeId, $eventId);
+        return $this->attendeeService->approveAttendee($attendeeId, $status, $eventId);
+    }
+
+    public function sendAttendeeMessage(AttendeeMessageRequest $request, string $attendeeId)
+    {
+        return $this->attendeeService->sendMessage($request->all(), $attendeeId);
+    }
+
+    public function sendEventAttendeeMessage(AttendeeMessageRequest $request, string $eventId, string $attendeeId)
+    {
+        return $this->attendeeService->sendMessage($request->all(), $attendeeId, $eventId);
     }
 }

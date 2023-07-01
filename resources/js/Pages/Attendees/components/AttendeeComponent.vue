@@ -1,6 +1,6 @@
 <script setup>
 import {router} from "@inertiajs/vue3";
-import {ref, onUpdated} from "vue";
+import {ref, onUpdated, reactive} from "vue";
 
 const props = defineProps({
     attendees: Object,
@@ -10,6 +10,7 @@ const props = defineProps({
 
 const selectedAttendee = ref({})
 const answerModalShow = ref(false)
+const messageModalShow = ref(false)
 
 const sortEvents = () => {
     visit(`/attendees?sort=${selectedSort.value}`)
@@ -30,6 +31,10 @@ const visit = (link, method = 'get') => {
 }
 
 const selectedSort = ref(props.sort || '');
+const message = reactive({
+    subject: '',
+    content: ''
+})
 
 const fields = ['access_level', 'event', 'ref', 'email', 'status', 'accept_status', 'date_submitted', 'action']
 
@@ -43,9 +48,27 @@ const onPaginate = page => {
 
 const approveAttendee = () => {
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/approve`)
-        : router.post(`/attendees/${selectedAttendee.value.id}/approve`)
+        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/approval/1`)
+        : router.post(`/attendees/${selectedAttendee.value.id}/approval/1`)
 }
+
+const declineAttendee = (attendeeId) => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/${attendeeId}/approval/2`)
+        : router.post(`/attendees/${attendeeId}/approval/2`)
+}
+
+const reinstateAttendee = (attendeeId) => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/${attendeeId}/approval/0`)
+        : router.post(`/attendees/${attendeeId}/approval/0`)
+}
+
+const onSubmitMessage = () => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/send-message`, message)
+        : router.post(`/attendees/${selectedAttendee.value.id}/send-message`, message)
+};
 </script>
 
 <template>
@@ -101,10 +124,12 @@ const approveAttendee = () => {
                                       <span>
                                           <b-dropdown id="dropdown-right" right text="Actions" size="sm"
                                                       variant="primary">
-                                            <b-dropdown-item v-b-modal.answer-modal
-                                                             @click.prevent="selectedAttendee = data.item; answerModalShow = true">Answer</b-dropdown-item>
-                                            <b-dropdown-item @click="message(data.item.id)">Message</b-dropdown-item>
-                                            <b-dropdown-item>Reinstate</b-dropdown-item>
+                                            <b-dropdown-item
+                                                @click.prevent="selectedAttendee = data.item; answerModalShow = true">Answer</b-dropdown-item>
+                                            <b-dropdown-item
+                                                @click.prevent="selectedAttendee = data.item; messageModalShow = true">Message</b-dropdown-item>
+                                            <b-dropdown-item v-if="data.item.status !== 'declined'" @click.prevent="declineAttendee(data.item.id)">Decline</b-dropdown-item>
+                                            <b-dropdown-item v-if="data.item.status === 'declined'" @click.prevent="reinstateAttendee(data.item.id)">Reinstate</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>
@@ -153,13 +178,56 @@ const approveAttendee = () => {
                         variant="primary"
                         class="float-right ml-2"
                         @click="approveAttendee"
-                        v-if="selectedAttendee.accept_status === 'not accepted'"
+                        v-if="selectedAttendee.status !== 'approved'"
                     >
                         Approve
                     </b-button>
-                    <span v-else class="badge badge-primary float-right ml-2">Approved</span>
+                    <span v-else-if="selectedAttendee.status === 'approved'" class="badge badge-primary float-right ml-2">Approved</span>
+                    <span v-else-if="selectedAttendee.status === 'declined'" class="badge badge-danger float-right ml-2">Declined</span>
                 </div>
             </template>
+        </b-modal>
+
+        <b-modal v-model="messageModalShow" id="message-modal" title="Message Attendee">
+                <b-row class="mt-3">
+                    <b-col sm="12">
+                        <div class="form-group">
+                            <label for="subject">Message Subject</label>
+                            <input type="text" v-model="message.subject"
+                                   :class="`form-control mb-0`"
+                                   id="subject"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="content">Message Content</label>
+                            <textarea v-model="message.content"
+                                   rows="5"
+                                   :class="`form-control mb-0`"
+                                   id="content"/>
+                        </div>
+
+                        <span>The attendee will be instructed to send any reply to media@thesaudicup.com.sa</span>
+                    </b-col>
+                </b-row>
+
+                <template #modal-footer>
+                    <div class="w-100">
+                        <b-button
+                            variant="primary"
+                            @click="onSubmitMessage"
+                            :disabled="!message.content || !message.subject"
+                            class="btn btn-primary float-right ml-2">Send Message
+                        </b-button>
+                        <b-button
+                            type="button"
+                            variant="danger"
+                            class="float-right ml-2"
+                            @click="messageModalShow = false"
+                        >
+                            Close
+                        </b-button>
+                    </div>
+                </template>
         </b-modal>
     </b-container>
 </template>

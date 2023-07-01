@@ -20,8 +20,8 @@ class Attendee extends Model
 
     const STATUS_READABLE = [
         0 => 'pending',
-        1 => 'Approved',
-        2 => 'Declined'
+        1 => 'approved',
+        2 => 'declined'
     ];
 
     const ACCEPT_STATUS = [

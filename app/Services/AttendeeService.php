@@ -130,11 +130,11 @@ class AttendeeService extends BaseRepository
         }
     }
 
-    public function approveAttendee(string $attendeeId, ?string $eventId = null)
+    public function approveAttendee(string $attendeeId, int $status, ?string $eventId = null)
     {
         $attendee = $this->find($attendeeId);
         $attendee->update([
-            'accept_status' => Attendee::ACCEPT_STATUS['ACCEPTED']
+            'status' => $status
         ]);
 
         $email = $attendee->email;
@@ -143,12 +143,19 @@ class AttendeeService extends BaseRepository
         // TODO: Send approval email to the $attendee->email if status is 1.
         // Email template can be found in access level $generalSettings->approval_message_title && $approval_message.
 
-        $message = 'Attendee has been accepted.';
+        $message = 'Attendee has been ' . ($status === 1 ? 'approved' : ($status === 2 ? 'declined' : 'reinstated'));
         $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
             component: $route, returnType: 'redirect'
         );
+    }
+
+    public function sendMessage(array $data, string $attendeeId)
+    {
+        $attendee = $this->find($attendeeId);
+
+        // TODO: Send message to attendee->email
     }
 }

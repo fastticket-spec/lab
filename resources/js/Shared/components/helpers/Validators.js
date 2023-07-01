@@ -101,12 +101,8 @@ export const accessLevelSocialsSchema = yup.object({
     phone_number: yup.string().nullable(),
 })
 
-export const editAttendeeSchema = yup.object({
-    first_name: yup.string(),
-    last_name: yup.string(),
-    email: yup.string().email(),
-    ticket_id: yup.string().required(),
-    attend_date: yup.date(),
-    note: yup.string().nullable(),
+export const messageAttendeeSchema = yup.object({
+    subject: yup.string().required('Subject is required'),
+    content: yup.string().required('Content is required')
 })
 
