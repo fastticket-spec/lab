@@ -29,7 +29,7 @@ class AttendeeService extends BaseRepository
         $account = auth()->user()->account;
 
         return $this->model->query()
-            ->with(['event', 'accessLevel'])
+            ->with(['event', 'accessLevel', 'zones.zone'])
             ->when($account->active_organiser, function ($query) use ($account) {
                 $query->where('organiser_id', $account->active_organiser);
             })
@@ -73,7 +73,8 @@ class AttendeeService extends BaseRepository
                     'email' => $attendee->email,
                     'status' => Attendee::STATUS_READABLE[$attendee->status],
                     'accept_status' => Attendee::ACCEPT_STATUS_READABLE[$attendee->accept_status],
-                    'date_submitted' => $attendee->created_at->format('jS M, Y H:i')
+                    'date_submitted' => $attendee->created_at->format('jS M, Y H:i'),
+                    'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id)
                 ];
             });
     }
@@ -157,5 +158,30 @@ class AttendeeService extends BaseRepository
         $attendee = $this->find($attendeeId);
 
         // TODO: Send message to attendee->email
+    }
+
+    public function assignZones(array $zones, string $attendeeId, ?string $eventId = null)
+    {
+        $attendee = $this->find($attendeeId);
+
+        $attendee->zones()->delete();
+
+        $zones = collect($zones)->map(fn($zone) => [
+            'id' => Str::uuid(),
+            'attendee_id' => $attendeeId,
+            'zone_id' => $zone,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        DB::table('attendee_zones')->insert($zones->toArray());
+
+        $message = 'Zones has been assigned to attendee';
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
     }
 }

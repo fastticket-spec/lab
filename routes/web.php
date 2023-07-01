@@ -10,6 +10,7 @@ use App\Http\Controllers\Events\DashboardController as EventDashboardController;
 use App\Http\Controllers\EventSurveyController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrganiserController;
+use App\Http\Controllers\ZonesController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -86,13 +87,25 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::patch('/{event_survey_id}/edit-surveys', [SurveyController::class, 'update']);
             });
 
-            Route::get('attendees', [AttendeesController::class, 'eventAttendees']);
-            Route::post('attendees/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveEventAttendee']);
-            Route::post('attendees/{attendee_id}/send-message', [AttendeesController::class, 'sendEventAttendeeMessage']);
-        });
+            Route::prefix('attendees')->group(function () {
+                Route::get('/', [AttendeesController::class, 'eventAttendees']);
+                Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveEventAttendee']);
+                Route::post('/{attendee_id}/send-message', [AttendeesController::class, 'sendEventAttendeeMessage']);
+                Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignEventZones']);
+            });
 
-        Route::get('attendees', [AttendeesController::class, 'index']);
-        Route::post('attendees/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveAttendee']);
-        Route::post('attendees/{attendee_id}/send-message', [AttendeesController::class, 'sendAttendeeMessage']);
+            Route::prefix('/zones')->group(function () {
+                Route::get('/', [ZonesController::class, 'index']);
+                Route::get('/create', [ZonesController::class, 'create']);
+                Route::post('/', [ZonesController::class, 'store']);
+                Route::patch('/{zone_id}/update-status', [ZonesController::class, 'updateStatus']);
+            });
+        });
+        Route::prefix('attendees')->group(function () {
+            Route::get('/', [AttendeesController::class, 'index']);
+            Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveAttendee']);
+            Route::post('/{attendee_id}/send-message', [AttendeesController::class, 'sendAttendeeMessage']);
+            Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignZones']);
+        });
     });
 });

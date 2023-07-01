@@ -101,8 +101,12 @@ export const accessLevelSocialsSchema = yup.object({
     phone_number: yup.string().nullable(),
 })
 
-export const messageAttendeeSchema = yup.object({
-    subject: yup.string().required('Subject is required'),
-    content: yup.string().required('Content is required')
+export const zoneSchema = yup.object({
+    zones: array()
+        .of(
+            yup.object().shape({
+                zone: yup.string().required('This field is required'),
+            })
+        )
 })
 

@@ -57,7 +57,8 @@
         "seats": "Seats Design",
         "checkin_attendee": "Checkin Attendee",
         "access_levels": "Access Levels",
-        "event_surveys": "Event Surveys"
+        "event_surveys": "Event Surveys",
+        "zones": "Zones"
     },
     "customize": {
         "general": "General",

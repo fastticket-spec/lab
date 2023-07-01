@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Attendee extends Model
@@ -50,5 +51,10 @@ class Attendee extends Model
     public function accessLevel(): BelongsTo
     {
         return $this->belongsTo(AccessLevel::class);
+    }
+
+    public function zones(): HasMany
+    {
+        return $this->hasMany(AttendeeZone::class);
     }
 }
