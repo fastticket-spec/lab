@@ -63,8 +63,6 @@
         "is_icon_class": true,
         "component": ["Attendees/Index", "Attendees/Create"],
         "icon": "ri-user-line",
-        "type": "account manager",
-        "children": [
-        ]
+        "type": "account manager"
     }
 ]

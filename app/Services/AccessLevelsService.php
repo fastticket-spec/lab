@@ -29,7 +29,7 @@ class AccessLevelsService extends BaseRepository
     public function fetchAccessLevels(Request $request, string $eventId)
     {
         return $this->model->query()
-            ->with(['event', 'surveyAccessLevels.surveys'])
+            ->with(['event', 'surveyAccessLevels.surveys', 'attendees'])
             ->whereEventId($eventId)
             ->latest()
             ->paginate($request->per_page ?: 10)
@@ -42,9 +42,10 @@ class AccessLevelsService extends BaseRepository
                     'title' => $accessLevel->title,
                     'title_arabic' => $accessLevel->title_arabic,
                     'quantity_available' => $quantity,
-                    'quantity_filled' => $accessLevel->quantity_filled,
+                    'quantity_filled' => $accessLevel->attendees->count(),
                     'event' => $accessLevel->event,
                     'status' => $accessLevel->status,
+                    'attendees' => $accessLevel->attendees,
                     'has_surveys' => !!optional($accessLevel->surveyAccessLevels)->surveys
                 ];
             });

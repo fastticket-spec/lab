@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Event;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
-use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
