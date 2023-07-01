@@ -280,11 +280,11 @@ const onSubmit = handleSubmit((values) => {
                                     <b-col v-if="!field?.value?.open" sm="12"
                                            class="d-flex justify-content-between align-items-center">
                                         <div class="d-flex">
-                                            <h5>{{ surveys[idx].title }}</h5>
-                                            <h5
+                                            <h6>{{ surveys[idx].title }}</h6>
+                                            <h6
                                                 v-if="surveys[idx]?.title_arabic">&nbsp;({{
                                                     surveys[idx].title_arabic
-                                                }})</h5>
+                                                }})</h6>
                                         </div>
                                         <span>{{ field_types[surveys[idx].type].name }}</span>
                                         <div>

@@ -46,4 +46,9 @@ class AccessLevel extends Model
     {
         return $this->hasOne(AccessLevelSocial::class);
     }
+
+    public function attendees(): HasMany
+    {
+        return $this->hasMany(Attendee::class);
+    }
 }

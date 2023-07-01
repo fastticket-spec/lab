@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccreditationController;
+use App\Http\Controllers\AttendeesController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Event\SurveyController;
 use App\Http\Controllers\EventController;
@@ -84,6 +85,14 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::get('/{event_survey_id}/surveys', [SurveyController::class, 'index']);
                 Route::patch('/{event_survey_id}/edit-surveys', [SurveyController::class, 'update']);
             });
+
+            Route::get('attendees', [AttendeesController::class, 'eventAttendees']);
+            Route::post('attendees/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveEventAttendee']);
+            Route::post('attendees/{attendee_id}/send-message', [AttendeesController::class, 'sendEventAttendeeMessage']);
         });
+
+        Route::get('attendees', [AttendeesController::class, 'index']);
+        Route::post('attendees/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveAttendee']);
+        Route::post('attendees/{attendee_id}/send-message', [AttendeesController::class, 'sendAttendeeMessage']);
     });
 });
