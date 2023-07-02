@@ -29,10 +29,12 @@ const visit = (link, method = 'get') => {
     <b-container fluid>
         <b-row>
             <b-col sm="12">
+                <Link :href="`/event/${event_id}/access-levels/create`" class="btn btn-primary mb-3">Add Access Level</Link>
+
                 <no-data v-if="!access_levels.total" title="Access Levels"
                          :link="`/event/${event_id}/access-levels/create`"/>
 
-                <a :href="`/event/${event_id}/access-levels/create`" class="btn btn-primary mb-3">Create Access Level</a>
+                <!-- <a :href="`/event/${event_id}/access-levels/create`" class="btn btn-primary mb-3">Create Access Level</a> -->
 
                 <iq-card v-if="access_levels.total">
                     <template v-slot:headerTitle>

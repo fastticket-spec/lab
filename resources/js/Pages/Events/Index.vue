@@ -2,7 +2,7 @@
     <b-container fluid>
         <b-row>
             <b-col sm="12">
-                <no-data v-if="!events.total" title="Events" link="/events/create"/>
+                <no-data v-if="!events.total" title="Categories" link="/events/create"/>
 
                 <iq-card v-if="events.total">
                     <template v-slot:headerTitle>
