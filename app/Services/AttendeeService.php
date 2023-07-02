@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Mail\ApprovalMail;
 use App\Mail\AttendeeMail;
+use App\Mail\CustomAttendeeMail;
 use App\Mail\InvitationMail;
 use App\Models\Attendee;
 use App\Models\AttendeeZone;
@@ -198,11 +199,20 @@ class AttendeeService extends BaseRepository
         }
     }
 
-    public function sendMessage(array $data, string $attendeeId)
+    public function sendMessage(array $data, string $attendeeId, ?string $eventId = null)
     {
         $attendee = $this->find($attendeeId);
 
-        // TODO: Send message to attendee->email
+        Mail::to($attendee->email)->later(now()->addSeconds(3), new CustomAttendeeMail($data));
+
+        $message = 'Email sent successfully';
+
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
     }
 
     public function assignZones(array $zones, string $attendeeId, ?string $eventId = null)
