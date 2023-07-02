@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+  
+  <script style="display: none;">var tvt = tvt || {}; tvt.captureVariables = function(a){for(var b=
+new Date,c={},d=Object.keys(a||{}),e=0,f;f=d[e];e++)if(a.hasOwnProperty(f)&&"undefined"!=typeof a[f])try{var g=[];c[f]=JSON.stringify(a[f],function(a,b){try{if("function"!==typeof b){if("object"===typeof b&&null!==b){if(b instanceof HTMLElement||b instanceof Node||-1!=g.indexOf(b))return;g.push(b)}return b}}catch(H){}})}catch(l){}a=document.createEvent("CustomEvent");a.initCustomEvent("TvtRetrievedVariablesEvent",!0,!0,{variables:c,date:b});window.dispatchEvent(a)};window.setTimeout(function() {tvt.captureVariables({'dataLayer.hide': (function(a){a=a.split(".");for(var b=window,c=0;c</head>
+
+  <body class="bg-light">
+
+      <div class="row" style="width: 50%; padding: 10px; margin: auto;text-align: center; ">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body"><img src="http://127.0.0.1:800/EasyticketJs-master/libs/builder/../../../../../EasyticketJs-master/libs/builder/icons/image.svg" height="128" width="128" style="">
+        <h5 class="card-title">Special title treatment</h5>
+        <p class="card-text"></p><p class="full_name" id="full_name" style="">Full name</p>It's a broader card with text below as a natural lead-in to extra content. This content is a little longer.<p></p>
+        
+      <img src="http://127.0.0.1:800/EasyticketJs-master/libs/builder/../../../../../EasyticketJs-master/libs/builder/icons/barcode.svg" height="128" width="128" id="barcode" class="barcode" style=""></div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Special title treatment</h5>
+        <p class="card-text">It's a broader card with text below as a natural lead-in to extra content. This content is a little longer.</p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    
+	<script>
+	var LoaderCss = function (param) {
+        var headID = document.getElementsByTagName('head')[0];
+        var link = document.createElement('link');
+        link.type = 'text/css';
+        link.rel = 'stylesheet';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.href = 'http://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+	var LoaderScript = function (param) {
+        var headID = document.getElementsByTagName('body')[0];
+        var link = document.createElement('script');
+        link.type = 'text/javascript';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.src = 'http://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+	
+	
+	LoaderCss("EasyticketJs-master/css/editor.css");
+	LoaderCss("EasyticketJs-master/demo/offcanvas/offcanvas.css");
+	LoaderScript("EasyticketJs-master/js/bootstrap.min.js");
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    
+    
+    <style>
+
+    </style>
+  </head>
+	
+  <body>
+
+
+<div class="card" style="width: 50%; padding: 10px; margin: auto;text-align: center; ">
+  <div class="card-header">
+    Quote
+  </div>
+  <div class="card-body">
+    <blockquote class="blockquote mb-0">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+      <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
+    </blockquote>
+  </div>
+</div>
+<script>
+	var LoaderCss = function (param) {
+        var headID = document.getElementsByTagName('head')[0];
+        var link = document.createElement('link');
+        link.type = 'text/css';
+        link.rel = 'stylesheet';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.href = 'http://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+	var LoaderScript = function (param) {
+        var headID = document.getElementsByTagName('body')[0];
+        var link = document.createElement('script');
+        link.type = 'text/javascript';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.src = 'http://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+	
+	
+	LoaderCss("EasyticketJs-master/css/editor.css");
+	LoaderCss("EasyticketJs-master/demo/narrow-jumbotron/narrow-jumbotron.css");
+	LoaderScript("EasyticketJs-master/js/bootstrap.min.js");
+	</script>
+
+</body>
+</html>

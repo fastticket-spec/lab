@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+.container  {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.container .row {
+  margin: 0 auto;
+}
+</style>
+</head>
+<body>
+
+
+<div class="card" style="width: 50%; padding: 10px; margin: auto;text-align: center; ">
+  <svg class="bd-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" aria-label="Placeholder: Image cap" preserveAspectRatio="xMidYMid slice" role="img"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text></svg>
+
+  <div class="card-body">
+    <h5 class="card-title">Card title</h5>
+    <p class="card-text">Quick sample text to create the card title and make up the body of the card's content.</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  <img src="http://127.0.0.1:800/EasyticketJs-master/libs/builder/../../../../../EasyticketJs-master/libs/builder/icons/barcode.svg" height="128" width="128" id="barcode" class="barcode" style=""></div>
+</div>
+ 
+<script>
+	var LoaderCss = function (param) {
+        var headID = document.getElementsByTagName('head')[0];
+        var link = document.createElement('link');
+        link.type = 'text/css';
+        link.rel = 'stylesheet';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.href = 'http://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+	var LoaderScript = function (param) {
+        var headID = document.getElementsByTagName('body')[0];
+        var link = document.createElement('script');
+        link.type = 'text/javascript';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.src = 'http://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+	
+	
+	LoaderCss("EasyticketJs-master/css/editor");
+	LoaderCss("EasyticketJs-master/demo/blog/blog.css");
+	LoaderScript("EasyticketJs-master/js/bootstrap.min.js");
+	</script>
+
+</body>
+</html>

@@ -110,3 +110,10 @@ export const zoneSchema = yup.object({
         )
 })
 
+export const createBadgeSchema = yup.object({
+    title: yup.string().required(),
+    description: yup.string().required(),
+    width: yup.number().required(),
+    height: yup.number().required(),
+})
+
