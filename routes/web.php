@@ -5,6 +5,7 @@ use App\Http\Controllers\AttendeesController;
 use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Event\SurveyController;
+use App\Http\Controllers\EventBadgeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\Events\AccessLevelsController;
 use App\Http\Controllers\Events\DashboardController as EventDashboardController;
@@ -108,8 +109,10 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('/', [BadgeController::class, 'store']);
                 Route::get('/{badge_id}/edit', [BadgeController::class, 'edit']);
                 Route::patch('/{badge_id}/update', [BadgeController::class, 'update']);
-                Route::get('/{badge_id}/attendees', [BadgeController::class, 'attendees']);
+                Route::get('/{badge_id}/customize', [BadgeController::class, 'customize']);
             });
+
+            Route::post('/event-badges/{badge_id}', [EventBadgeController::class, 'saveEventBadge']);
         });
 
         Route::prefix('attendees')->group(function () {

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Badge;
+use App\Models\EventBadge;
+use App\Models\EventSurveyAccessLevel;
 use App\Services\AccessLevelsService;
 use App\Services\BadgeService;
 use Illuminate\Http\Request;
@@ -70,5 +72,25 @@ class BadgeController extends Controller
         ]);
 
         return $this->badgeService->updateBadge($request, $eventId, $badgeId);
+    }
+
+    public function customize(string $eventId, string $badgeId)
+    {
+        $badge = $this->badgeService->find($badgeId);
+        $accessLevelsId = $badge->badgeAccessLevels()->get()->map(fn($bAL) => $bAL->access_level_id);
+
+        $questions = array_merge(...EventSurveyAccessLevel::with('surveys')
+            ->whereIn('access_level_id', $accessLevelsId)
+            ->get()
+            ->map(fn($level) => $level->surveys)->toArray());
+
+        $data = [
+            'badge' => $this->badgeService->find($badgeId),
+            'event' => $badge->event,
+            'store_url' => "/event/$eventId/event-badges/$badgeId",
+            'event_badge' => EventBadge::where('badge_id', $badgeId)->where('event_id', $eventId)->first(),
+            'questions' => $questions
+        ];
+        return view('badge_customize', $data);
     }
 }

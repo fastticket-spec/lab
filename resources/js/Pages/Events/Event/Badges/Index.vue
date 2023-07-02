@@ -8,9 +8,9 @@ const props = defineProps({
 
 const fields = ['title', 'event', 'description', 'width', 'height', 'status', 'access_levels', 'date_created', 'action']
 
-const visit = (link, method = 'get') => {
+const visit = (link, method = 'get', useInertia = true) => {
     if (method === 'get') {
-        router.get(link);
+        useInertia ? router.get(link) : location.href = link;
     } else {
         router.post(link);
     }
@@ -56,9 +56,9 @@ const onPaginate = page => {
                                           <b-dropdown id="dropdown-right" right text="Actions" size="sm"
                                                       variant="primary">
                                             <b-dropdown-item
-                                                @click.prevent="visit(`/event/${eventId}/badges/${data.item.id}/edit`)">Edit</b-dropdown-item>
-                                              <!--                                            <b-dropdown-item-->
-                                              <!--                                                @click.prevent="selectedBadge = data.item; messageModalShow = true">Message</b-dropdown-item>-->
+                                                @click.prevent="visit(`/event/${eventId}/badges/${data.item.id}/edit`, 'get')">Edit</b-dropdown-item>
+                                            <b-dropdown-item
+                                                @click.prevent="visit(`/event/${eventId}/badges/${data.item.id}/customize`, 'get', false)">Customize</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>

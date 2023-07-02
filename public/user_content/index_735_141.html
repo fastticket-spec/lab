@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+    <style>
+        .circle {
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            background-color:red;
+            position: absolute;
+        }
+        .square {
+            width: 100px;
+            height: 100px;
+            background: red;
+        }
+        img {
+  max-width: 100%; /* This rule is very important, please do not ignore this! */
+}
+    </style>
+
+
+  </head>
+
+  <body data-new-gr-c-s-check-loaded="14.1097.0" data-gr-ext-installed="" data-gr-ext-disabled="forever">
+      <div id="hold" style="display: none; height: 11px; width: 10px;"></div>
+    <div id="badgeContainer" style="background-color: rgb(0, 151, 102); position: absolute; height: 418px; width: 380px;">
+
+    <p class="1" key="zone" style="position: absolute; left: 153px; top: 217px;" id="1">Function</p></div>
+
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+
+
+    <script>
+	var LoaderCss = function (param) {
+        var headID = document.getElementsByTagName('head')[0];
+        var link = document.createElement('link');
+        link.type = 'text/css';
+        link.rel = 'stylesheet';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.href = 'https://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+	var LoaderScript = function (param) {
+        var headID = document.getElementsByTagName('body')[0];
+        var link = document.createElement('script');
+        link.type = 'text/javascript';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.src = 'https://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+
+
+
+    var url_string = window.location.href
+    url_string = url_string.replace('&amp;', '&')
+    var url = new URL(url_string);
+    var width = url.searchParams.get("width");
+    var height = url.searchParams.get("height");
+
+    document.getElementById("hold").style.height = height+'px';
+    document.getElementById("hold").style.width = width+'px';
+
+
+    width = width * 38
+    height = height * 38
+    document.getElementById("badgeContainer").style.height = height+'px';
+    document.getElementById("badgeContainer").style.width = width+'px';
+
+
+
+	LoaderCss("EasyticketJs-master/css/editor.css");
+	LoaderCss("EasyticketJs-master/css/product.css");
+	LoaderScript("EasyticketJs-master/js/bootstrap.min.js");
+    </script><script type="text/javascript" src="https://localhost:8000/EasyticketJs-master/js/bootstrap.min.js"></script>
+
+  
+
+<div id="mouseposition-extension-element-full-container" style="position: fixed; inset: 0px; pointer-events: none; z-index: 2147483647; font-weight: 400;"><div id="mouseposition-extension-element-rect-display" style="display: none; position: absolute; background: rgba(255, 255, 255, 0.7); outline: black solid 1px; font-size: 12px; z-index: 2147483647; justify-content: center; align-items: center; user-select: none; cursor: default; color: rgb(0, 0, 0); font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; width: 0px; height: 0px;"><pre style="flex: 1 1 0%; text-align: center; background-color: rgba(255, 255, 255, 0.7); color: rgb(0, 0, 0); min-width: 42px; min-height: 12px; transition: all 1s ease 0s;"></pre></div><pre id="mouseposition-extension-element-coordinate-display" style="position: absolute; display: none; background: rgb(255, 255, 255); font-size: 12px; line-height: 14px; border-radius: 3px; border-width: 1px; border-color: rgb(34, 34, 34) black rgb(51, 51, 51); border-style: solid; padding: 3px; z-index: 2147483647; color: rgb(34, 34, 34); user-select: none; cursor: default; font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;"></pre></div></body>
+</html>
