@@ -101,6 +101,7 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::patch('/{zone_id}/update-status', [ZonesController::class, 'updateStatus']);
             });
         });
+
         Route::prefix('attendees')->group(function () {
             Route::get('/', [AttendeesController::class, 'index']);
             Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveAttendee']);
