@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Mail\ApprovalMail;
+use App\Mail\AttendeeMail;
 use App\Mail\InvitationMail;
 use App\Models\Attendee;
 use App\Models\AttendeeZone;
@@ -107,7 +108,7 @@ class AttendeeService extends BaseRepository
                 }
             }
 
-            $this->create([
+            $attendee = $this->create([
                 'access_level_id' => $accessLevelId,
                 'event_id' => $eventId,
                 'organiser_id' => $event->organiser_id,
@@ -117,6 +118,10 @@ class AttendeeService extends BaseRepository
             ]);
 
             DB::commit();
+
+            $settings = optional($attendee->accessLevel)->generalSettings;
+
+            Mail::to($email)->later(now()->addSeconds(5), new AttendeeMail($settings, $lang));
 
             $message = $lang === 'arabic' ? optional($settings)->success_message_arabic ?: 'Saved successfully' : (optional($settings)->success_message ?: 'Saved successfully');
 
