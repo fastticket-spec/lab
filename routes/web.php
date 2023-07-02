@@ -91,9 +91,13 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::prefix('attendees')->group(function () {
                 Route::get('/', [AttendeesController::class, 'eventAttendees']);
+                Route::post('/bulk-approval/{status}', [AttendeesController::class, 'bulkEventApproval']);
                 Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveEventAttendee']);
                 Route::post('/{attendee_id}/send-message', [AttendeesController::class, 'sendEventAttendeeMessage']);
+                Route::post('/bulk-assign-zones', [AttendeesController::class, 'bulkAssignEventZones']);
+                Route::post('/send-bulk-invitation', [AttendeesController::class, 'sendBulkEventInvitation']);
                 Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignEventZones']);
+                Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendEventInvitation']);
             });
 
             Route::prefix('/zones')->group(function () {
@@ -117,9 +121,13 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::prefix('attendees')->group(function () {
             Route::get('/', [AttendeesController::class, 'index']);
+            Route::post('/bulk-approval/{status}', [AttendeesController::class, 'bulkApproval']);
             Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveAttendee']);
             Route::post('/{attendee_id}/send-message', [AttendeesController::class, 'sendAttendeeMessage']);
+            Route::post('/bulk-assign-zones', [AttendeesController::class, 'bulkAssignZones']);
+            Route::post('/send-bulk-invitation', [AttendeesController::class, 'sendBulkInvitation']);
             Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignZones']);
+            Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendInvitation']);
         });
     });
 });
