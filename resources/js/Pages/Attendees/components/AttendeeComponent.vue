@@ -105,10 +105,21 @@ const declineAttendees = () => {
         : router.post(`/attendees/bulk-approval/2`, {attendee_ids: checkedRows.value})
 }
 const assignZonesToAttendees = () => {
-    console.log('in here')
     props.eventId
         ? router.post(`/event/${props.eventId}/attendees/bulk-assign-zones`, {attendee_ids: checkedRows.value, zones: selectedZones.value})
         : router.post(`/attendees/bulk-assign-zones`, {attendee_ids: checkedRows.value, zones: selectedZones.value})
+}
+
+const sendInvitation = attendeeId => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/${attendeeId}/send-invitation`)
+        : router.post(`/attendees/${attendeeId}/send-invitation`)
+}
+
+const sendBulkInvitations = () => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/send-bulk-invitation`, {attendee_ids: checkedRows.value})
+        : router.post(`/attendees/send-bulk-invitation`, {attendee_ids: checkedRows.value})
 }
 </script>
 
@@ -137,19 +148,25 @@ const assignZonesToAttendees = () => {
                         <b-row class="mt-3">
                             <b-col sm="12" class="mb-3" v-show="checkedRows.length > 0">
                                 <b-btn @click="approveAttendees"
-                                       variant="outline-primary" class="mr-2">Approve selected attendee{{
+                                       variant="outline-primary" class="mr-2">Approve attendee{{
                                         checkedRows.length !== 1 ? 's' : ''
                                     }}
                                 </b-btn>
 
                                 <b-btn @click="declineAttendees"
-                                       variant="outline-danger" class="mr-2">Decline selected attendee{{
+                                       variant="outline-danger" class="mr-2">Decline attendee{{
                                         checkedRows.length !== 1 ? 's' : ''
                                     }}
                                 </b-btn>
 
                                 <b-btn @click="zonesModalShow = true; zonesForBulk = true; selectedAttendee = null"
-                                       variant="outline-primary" class="mr-2">Assign zones to selected attendee{{
+                                       variant="outline-primary" class="mr-2">Assign zones to attendee{{
+                                        checkedRows.length !== 1 ? 's' : ''
+                                    }}
+                                </b-btn>
+
+                                <b-btn @click="sendBulkInvitations"
+                                       variant="outline-primary" class="mr-2">Send Invite to attendee{{
                                         checkedRows.length !== 1 ? 's' : ''
                                     }}
                                 </b-btn>
@@ -198,6 +215,8 @@ const assignZonesToAttendees = () => {
                                                              @click.prevent="reinstateAttendee(data.item.id)">Reinstate</b-dropdown-item>
                                             <b-dropdown-item
                                                 @click.prevent="selectedAttendee = data.item; checkedRows = []; zonesModalShow = true; zonesForBulk = false; selectedZones = (data.item.zones || [])">Assign Zones</b-dropdown-item>
+                                            <b-dropdown-item
+                                                @click.prevent="sendInvitation(data.item.id)">Send Invitation</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>

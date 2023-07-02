@@ -94,4 +94,28 @@ class AttendeesController extends Controller
 
         return $this->attendeeService->bulkAssignZones($request->attendee_ids, $request->zones, $eventId);
     }
+
+    public function sendInvitation(string $attendeeId)
+    {
+        return $this->attendeeService->sendInvitation($attendeeId);
+    }
+
+    public function sendEventInvitation(string $eventId, string $attendeeId)
+    {
+        return $this->attendeeService->sendInvitation($attendeeId);
+    }
+
+    public function sendBulkInvitation(Request $request)
+    {
+        $request->validate(['attendee_ids' => 'array|required']);
+
+        return $this->attendeeService->sendBulkInvitations($request->attendee_ids);
+    }
+
+    public function sendBulkEventInvitation(Request $request, string $eventId)
+    {
+        $request->validate(['attendee_ids' => 'array|required']);
+
+        return $this->attendeeService->sendBulkInvitations($request->attendee_ids, $eventId);
+    }
 }
