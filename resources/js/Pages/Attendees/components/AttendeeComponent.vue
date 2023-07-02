@@ -13,6 +13,7 @@ const selectedAttendee = ref({})
 const answerModalShow = ref(false)
 const messageModalShow = ref(false)
 const zonesModalShow = ref(false)
+const zonesForBulk = ref(false)
 const selectedSort = ref(props.sort || '');
 const message = reactive({
     subject: '',
@@ -20,9 +21,11 @@ const message = reactive({
 })
 const selectedZones = ref([]);
 
-const fields = ['access_level', 'event', 'ref', 'email', 'status', 'accept_status', 'date_submitted', 'action']
+const fields = ['check', 'access_level', 'event', 'ref', 'email', 'status', 'accept_status', 'date_submitted', 'action']
 
 const answerFields = ['question', 'answers'];
+
+const checkedRows = ref([]);
 
 const sortEvents = () => {
     visit(`/attendees?sort=${selectedSort.value}`)
@@ -78,6 +81,10 @@ const eventZones = computed(() => {
         return props.zones.filter(zone => zone.event_id === selectedAttendee.value.event.id)
     }
 
+    if (checkedRows.value.length > 0 && props.eventId) {
+        return props.zones.filter(zone => zone.event_id === props.eventId)
+    }
+
     return props.zones;
 });
 
@@ -85,6 +92,23 @@ const onAssignZones = () => {
     props.eventId
         ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/assign-zones`, {zones: selectedZones.value})
         : router.post(`/attendees/${selectedAttendee.value.id}/assign-zones`, {zones: selectedZones.value})
+}
+
+const approveAttendees = () => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/bulk-approval/1`, {attendee_ids: checkedRows.value})
+        : router.post(`/attendees/bulk-approval/1`, {attendee_ids: checkedRows.value})
+}
+const declineAttendees = () => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/bulk-approval/2`, {attendee_ids: checkedRows.value})
+        : router.post(`/attendees/bulk-approval/2`, {attendee_ids: checkedRows.value})
+}
+const assignZonesToAttendees = () => {
+    console.log('in here')
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/bulk-assign-zones`, {attendee_ids: checkedRows.value, zones: selectedZones.value})
+        : router.post(`/attendees/bulk-assign-zones`, {attendee_ids: checkedRows.value, zones: selectedZones.value})
 }
 </script>
 
@@ -111,9 +135,32 @@ const onAssignZones = () => {
 
                     <template v-slot:body>
                         <b-row class="mt-3">
+                            <b-col sm="12" class="mb-3" v-show="checkedRows.length > 0">
+                                <b-btn @click="approveAttendees"
+                                       variant="outline-primary" class="mr-2">Approve selected attendee{{
+                                        checkedRows.length !== 1 ? 's' : ''
+                                    }}
+                                </b-btn>
+
+                                <b-btn @click="declineAttendees"
+                                       variant="outline-danger" class="mr-2">Decline selected attendee{{
+                                        checkedRows.length !== 1 ? 's' : ''
+                                    }}
+                                </b-btn>
+
+                                <b-btn @click="zonesModalShow = true; zonesForBulk = true; selectedAttendee = null"
+                                       variant="outline-primary" class="mr-2">Assign zones to selected attendee{{
+                                        checkedRows.length !== 1 ? 's' : ''
+                                    }}
+                                </b-btn>
+                            </b-col>
+
                             <b-col sm="12" class="table-responsive">
                                 <b-table :items="attendees.data" :fields="fields"
                                          class="table-responsive-sm table-borderless">
+                                    <template #cell(check)="data">
+                                        <b-form-checkbox v-model="checkedRows" :value="data.item.id" inline/>
+                                    </template>
                                     <template #cell(access_level)="data">
                                         <span>
                                             {{
@@ -150,7 +197,7 @@ const onAssignZones = () => {
                                             <b-dropdown-item v-if="data.item.status === 'declined'"
                                                              @click.prevent="reinstateAttendee(data.item.id)">Reinstate</b-dropdown-item>
                                             <b-dropdown-item
-                                                @click.prevent="selectedAttendee = data.item; zonesModalShow = true; selectedZones = (data.item.zones || [])">Assign Zones</b-dropdown-item>
+                                                @click.prevent="selectedAttendee = data.item; checkedRows = []; zonesModalShow = true; zonesForBulk = false; selectedZones = (data.item.zones || [])">Assign Zones</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>
@@ -257,7 +304,7 @@ const onAssignZones = () => {
             <b-row class="mt-3">
                 <b-col sm="6" v-for="zone in eventZones" :key="zone.id">
                     <div class="form-group">
-                        <b-checkbox v-model="selectedZones" :value="zone.id">{{zone.zone}}</b-checkbox>
+                        <b-checkbox v-model="selectedZones" :value="zone.id">{{ zone.zone }}</b-checkbox>
                     </div>
                 </b-col>
             </b-row>
@@ -266,7 +313,7 @@ const onAssignZones = () => {
                 <div class="w-100">
                     <b-button
                         variant="primary"
-                        @click="onAssignZones"
+                        @click="(checkedRows.length > 0 && !selectedAttendee) ? assignZonesToAttendees() : onAssignZones()"
                         :disabled="selectedZones.length === 0"
                         class="btn btn-primary float-right ml-2">Assign Zones
                     </b-button>

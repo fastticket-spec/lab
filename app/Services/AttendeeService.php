@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Models\Attendee;
+use App\Models\AttendeeZone;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -138,11 +140,9 @@ class AttendeeService extends BaseRepository
             'status' => $status
         ]);
 
-        $email = $attendee->email;
-        $generalSettings = $attendee->accessLevel->generalSettings;
-
-        // TODO: Send approval email to the $attendee->email if status is 1.
-        // Email template can be found in access level $generalSettings->approval_message_title && $approval_message.
+        if ($status == 1) {
+            $this->sendApprovalEmailToAttendees([$attendee]);
+        }
 
         $message = 'Attendee has been ' . ($status === 1 ? 'approved' : ($status === 2 ? 'declined' : 'reinstated'));
         $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
@@ -151,6 +151,35 @@ class AttendeeService extends BaseRepository
             flashMessage: $message,
             component: $route, returnType: 'redirect'
         );
+    }
+
+    public function bulkApproveAttendee(array $attendeeIds, int $status, ?string $eventId = null)
+    {
+        $this->model->query()
+            ->whereIn('id', $attendeeIds)
+            ->update(['status' => $status]);
+
+        $attendees = $this->model->query()
+            ->with('accessLevel.generalSettings')
+            ->whereIn('id', $attendeeIds)
+            ->get();
+
+        if ($status == 1) {
+            $this->sendApprovalEmailToAttendees($attendees->toArray());
+        }
+
+        $message = 'Attendees has been ' . ($status === 1 ? 'approved' : ($status === 2 ? 'declined' : 'reinstated'));
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
+    private function sendApprovalEmailToAttendees(array $attendees)
+    {
+
     }
 
     public function sendMessage(array $data, string $attendeeId)
@@ -177,6 +206,33 @@ class AttendeeService extends BaseRepository
         DB::table('attendee_zones')->insert($zones->toArray());
 
         $message = 'Zones has been assigned to attendee';
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
+    public function bulkAssignZones(array $attendeeIds, array $zones, ?string $eventId = null)
+    {
+        $attendees = $this->model->query()
+            ->with('zones')
+            ->whereIn('id', $attendeeIds)
+            ->get();
+
+        foreach ($attendees as $attendee) {
+            $attendee->zones()->delete();
+
+            foreach ($zones as $zone) {
+                AttendeeZone::create([
+                    'attendee_id' => $attendee->id,
+                    'zone_id' => $zone,
+                ]);
+            }
+        }
+
+        $message = 'Zones has been assigned to attendees';
         $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
         return $this->view(
             data: ['message' => $message],
