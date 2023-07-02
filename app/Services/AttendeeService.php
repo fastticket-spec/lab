@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\InvitationMail;
 use App\Models\Attendee;
 use App\Models\AttendeeZone;
 use App\Repositories\BaseRepository;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -239,5 +241,54 @@ class AttendeeService extends BaseRepository
             flashMessage: $message,
             component: $route, returnType: 'redirect'
         );
+    }
+
+    public function sendInvitation(string $attendeeId)
+    {
+        $attendee = $this->find($attendeeId);
+        $eventId = $attendee->event_id;
+
+        $surveyLink = config('app.url') . '/e/' . $eventId . '/a/' . $attendee->access_level_id;
+        $settings = $attendee->accessLevel->generalSettings;
+
+        $this->sendInvitationMail($attendee, $settings, $surveyLink);
+
+        $message = 'Invitation Link has been sent';
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
+    public function sendBulkInvitations(array $attendeeIds, ?string $event_id = null)
+    {
+        $attendees = $this->model->query()
+            ->whereIn('id', $attendeeIds)
+            ->get();
+
+        foreach ($attendees as $attendee) {
+            $eventId = $attendee->event_id;
+
+            $surveyLink = config('app.url') . '/e/' . $eventId . '/a/' . $attendee->access_level_id;
+            $settings = $attendee->accessLevel->generalSettings;
+
+            $this->sendInvitationMail($attendee, $settings, $surveyLink);
+        }
+
+        $message = 'Invitation Link has been sent to the attendees';
+        $route = $event_id ? "/event/$event_id/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
+    private function sendInvitationMail($attendee, $settings, $surveyLink): void
+    {
+        Mail::to($attendee->email)
+            ->send(new InvitationMail($settings, $surveyLink));
     }
 }

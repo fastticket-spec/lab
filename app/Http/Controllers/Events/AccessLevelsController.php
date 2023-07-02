@@ -74,7 +74,6 @@ class AccessLevelsController extends Controller
 
         $page = request()->page ?? 'general';
 
-        $data = [];
         $designImages = [];
         if ($page == 'general') {
             $data = $accessLevel->generalSettings;
