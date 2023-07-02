@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+
+  <script style="display: none;">var tvt = tvt || {}; tvt.captureVariables = function(a){for(var b=
+new Date,c={},d=Object.keys(a||{}),e=0,f;f=d[e];e++)if(a.hasOwnProperty(f)&&"undefined"!=typeof a[f])try{var g=[];c[f]=JSON.stringify(a[f],function(l,t){try{if("function"!==typeof t){if("object"===typeof t&&null!==t){if(t instanceof HTMLElement||t instanceof Node||-1!=g.indexOf(t))return;g.push(t)}return t}}catch(A){}})}catch(l){}a=document.createEvent("CustomEvent");a.initCustomEvent("TvtRetrievedVariablesEvent",!0,!0,{variables:c,date:b});window.dispatchEvent(a)};window.setTimeout(function() {tvt.captureVariables({'dataLayer.hide': (function(a){a=a.split(".");for(var b=window,c=0;c<a.length&&(b=b[a[c]],b);c++);return b})('dataLayer.hide'),'gaData': window['gaData'],'dataLayer': window['dataLayer']})}, 2000);</script></head>
+
+  <body style="width: 500px; height: 500px;"><div class="container" style="min-height: 150px; position: absolute; left: 180px; top: 7px; width: 500px; height: 500px; background-color: rgb(0, 151, 102);"><h1 style="left: 163px; top: 233.003px; width: 200px;" id="full_name" class="full_name">Shafi Abdulrahman</h1><img src="http://127.0.0.1:8001/EasyticketJs-master/libs/builder/../../../../../EasyticketJs-master/libs/builder/icons/barcode.svg" height="128" width="128" id="barcode" class="barcode"></div>
+
+    <!-- <div class="card border-primary mb-3" style="width: 50%; padding: 10px; margin: auto;text-align: center; ">
+  <div class="card-header">Header</div>
+  <div class="card-body text-primary">
+    <h5 class="card-title">Primary card title</h5>
+    <p class="card-text">Quick sample text to create the card title and make up the body of the card's content.</p>
+  </div>
+</div>
+<div class="card border-secondary mb-3" style="width: 50%; padding: 10px; margin: auto;text-align: center; ">
+  <div class="card-header">Header</div>
+  <div class="card-body text-secondary">
+    <h5 class="card-title">Secondary card title</h5>
+    <p class="card-text">Quick sample text to create the card title and make up the body of the card's content.</p>
+  </div>
+</div>
+<div class="card border-success mb-3" style="width: 50%; padding: 10px; margin: auto;text-align: center; ">
+  <div class="card-header">Header</div>
+  <div class="card-body text-success">
+    <h5 class="card-title">Success card title</h5>
+    <p class="card-text">Quick sample text to create the card title and make up the body of the card's content.</p>
+  </div>
+</div>
+<div class="card border-danger mb-3" style="width: 50%; padding: 10px; margin: auto;text-align: center; ">
+  <div class="card-header">Header</div>
+  <div class="card-body text-danger">
+    <h5 class="card-title">Danger card title</h5>
+    <p class="card-text">Quick sample text to create the card title and make up the body of the card's content.</p>
+  </div>
+</div>
+<div class="card border-warning mb-3" style="width: 50%; padding: 10px; margin: auto;text-align: center; ">
+  <div class="card-header">Header</div>
+  <div class="card-body text-warning">
+    <h5 class="card-title">Warning card title</h5>
+    <p class="card-text">Quick sample text to create the card title and make up the body of the card's content.</p>
+  </div>
+</div>
+<div class="card border-info mb-3" style="width: 50%; padding: 10px; margin: auto;text-align: center; ">
+  <div class="card-header">Header</div>
+  <div class="card-body text-info">
+    <h5 class="card-title">Info card title</h5>
+    <p class="card-text">Quick sample text to create the card title and make up the body of the card's content.</p>
+  </div>
+</div>
+<div class="card border-light mb-3" style="width: 50%; padding: 10px; margin: auto;text-align: center; ">
+  <div class="card-header">Header</div>
+  <div class="card-body">
+    <h5 class="card-title">Light card title</h5>
+    <p class="card-text">Quick sample text to create the card title and make up the body of the card's content.</p>
+  </div>
+</div>
+<div class="card border-dark mb-3" style="width: 50%; padding: 10px; margin: auto;text-align: center; ">
+  <div class="card-header">Header</div>
+  <div class="card-body text-dark">
+    <h5 class="card-title">Dark card title</h5>
+    <p class="card-text">Quick sample text to create the card title and make up the body of the card's content.</p>
+  </div>
+</div> -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script>
+	var LoaderCss = function (param) {
+        var headID = document.getElementsByTagName('head')[0];
+        var link = document.createElement('link');
+        link.type = 'text/css';
+        link.rel = 'stylesheet';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.href = 'http://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+	var LoaderScript = function (param) {
+        var headID = document.getElementsByTagName('body')[0];
+        var link = document.createElement('script');
+        link.type = 'text/javascript';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.src = 'http://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+
+
+	LoaderCss("EasyticketJs-master/css/editor.css");
+	LoaderCss("EasyticketJs-master/demo/product/product.css");
+	LoaderScript("EasyticketJs-master/js/bootstrap.min.js");
+	</script><script type="text/javascript" src="http://127.0.0.1:8001/EasyticketJs-master/js/bootstrap.min.js"></script>
+  
+
+</body>
+</html>

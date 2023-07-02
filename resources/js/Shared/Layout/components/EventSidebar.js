@@ -54,6 +54,16 @@ export const eventSideBar = eventId => ([
                 "is_icon_class": true,
                 "component": ["Events/Event/Surveys/EventSurveys", "Events/Event/Surveys/Index", "Events/Event/Surveys/Create"],
                 "icon": ""
+            },
+            {
+                "title": "Badges",
+                "name": "sidebar.badges",
+                "is_active": false,
+                "link": `/event/${eventId}/badges`,
+                "class_name": "",
+                "is_icon_class": true,
+                "component": ["Events/Event/Badges/Index", "Events/Event/Badges/Create"],
+                "icon": ""
             }
         ]
     },

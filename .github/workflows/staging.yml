@@ -1,0 +1,25 @@
+name: Staging Deploy
+
+on:
+  push:
+    branches: [ staging ]
+  pull_request:
+    branches: [ staging ]
+
+jobs:
+  Staging-Deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to Staging
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USERNAME }}
+        key: ${{ secrets.STAGING_KEY }}
+        port: ${{ secrets.STAGING_PORT }}
+        script: |
+          cd /var/www/staging && ./staging_deploy.sh
+          cd /var/www/staging && npm install
+          cd /var/www/staging && npm run build

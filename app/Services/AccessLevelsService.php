@@ -51,6 +51,14 @@ class AccessLevelsService extends BaseRepository
             });
     }
 
+    public function allAccessLevels(string $eventId): \Illuminate\Database\Eloquent\Collection|array
+    {
+        return $this->model->query()
+            ->whereEventId($eventId)
+            ->latest()
+            ->get();
+    }
+
     public function createAccessLevel(array $data, string $eventId)
     {
         try {

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css" crossorigin="anonymous">
+
+    <style>
+        .circle {
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            background-color:red;
+            position: absolute;
+        }
+        .square {
+            width: 100px;
+            height: 100px;
+            background: red;
+        }
+        img {
+  max-width: 100%; /* This rule is very important, please do not ignore this! */
+}
+    </style>
+
+
+  </head>
+
+  <body>
+      <div id="hold" style="display: none; height: 528px; width: 336px;"></div>
+    <div id="badgeContainer" class="container" style="background-color: rgb(0, 151, 102); height: 701px; width: 446px; float: left;"><p style="left: 71px; top: 188px; color: rgb(234, 247, 251); font-size: 41px; position: absolute;" key="fulll">Lorem ipsum</p>
+
+    </div>
+
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+
+
+    <script>
+	var LoaderCss = function (param) {
+        var headID = document.getElementsByTagName('head')[0];
+        var link = document.createElement('link');
+        link.type = 'text/css';
+        link.rel = 'stylesheet';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.href = 'http://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+	var LoaderScript = function (param) {
+        var headID = document.getElementsByTagName('body')[0];
+        var link = document.createElement('script');
+        link.type = 'text/javascript';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.src = 'http://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+
+
+
+    var url_string = window.location.href
+    url_string = url_string.replace('&amp;', '&')
+    var url = new URL(url_string);
+    var width = url.searchParams.get("width");
+    var height = url.searchParams.get("height");
+
+    document.getElementById("hold").style.height = height+'px';
+    document.getElementById("hold").style.width = width+'px';
+
+
+    width = width * 1.3281472327365
+    height = height * 1.3281472327365
+    console.log(width);
+    document.getElementById("badgeContainer").style.height = height+'px';
+    document.getElementById("badgeContainer").style.width = width+'px';
+
+
+
+	LoaderCss("EasyticketJs-master/css/editor.css");
+	LoaderCss("EasyticketJs-master/demo/product/product.css");
+	LoaderScript("EasyticketJs-master/js/bootstrap.min.js");
+    </script><script type="text/javascript" src="http://localhost:8000/EasyticketJs-master/js/bootstrap.min.js"></script><script type="text/javascript" src="http://localhost:8000/EasyticketJs-master/js/bootstrap.min.js"></script><script type="text/javascript" src="http://localhost:8000/EasyticketJs-master/js/bootstrap.min.js"></script><script type="text/javascript" src="http://localhost:8000/EasyticketJs-master/js/bootstrap.min.js"></script>
+
+  
+
+
+
+
+</body>
+</html>

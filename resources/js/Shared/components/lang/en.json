@@ -58,7 +58,8 @@
         "checkin_attendee": "Checkin Attendee",
         "access_levels": "Access Levels",
         "event_surveys": "Event Surveys",
-        "zones": "Zones"
+        "zones": "Zones",
+        "badges": "Badges"
     },
     "customize": {
         "general": "General",
@@ -109,6 +110,10 @@
     "access_levels": {
         "create": "Create Access Level",
         "edit": "Edit Access Level"
+    },
+    "badges": {
+        "create": "Create Badge",
+        "edit": "Edit Badge"
     },
     "input": {
         "name": "Name",
