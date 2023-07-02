@@ -170,7 +170,7 @@ class AttendeeService extends BaseRepository
             ->get();
 
         if ($status == 1) {
-            $this->sendApprovalEmailToAttendees($attendees->toArray());
+            $this->sendApprovalEmailToAttendees($attendees);
         }
 
         $message = 'Attendees has been ' . ($status === 1 ? 'approved' : ($status === 2 ? 'declined' : 'reinstated'));
@@ -182,9 +182,10 @@ class AttendeeService extends BaseRepository
         );
     }
 
-    private function sendApprovalEmailToAttendees(array $attendees): void
+    private function sendApprovalEmailToAttendees($attendees): void
     {
         foreach ($attendees as $attendee) {
+
             $settings = optional($attendee->accessLevel)->generalSettings;
 
             Mail::to($attendee->email)
