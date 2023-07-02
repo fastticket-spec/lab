@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\ApprovalMail;
 use App\Mail\InvitationMail;
 use App\Models\Attendee;
 use App\Models\AttendeeZone;
@@ -138,6 +139,8 @@ class AttendeeService extends BaseRepository
     public function approveAttendee(string $attendeeId, int $status, ?string $eventId = null)
     {
         $attendee = $this->find($attendeeId);
+        $attendee->load(['accessLevel.generalSettings']);
+
         $attendee->update([
             'status' => $status
         ]);
@@ -179,9 +182,14 @@ class AttendeeService extends BaseRepository
         );
     }
 
-    private function sendApprovalEmailToAttendees(array $attendees)
+    private function sendApprovalEmailToAttendees(array $attendees): void
     {
+        foreach ($attendees as $attendee) {
+            $settings = optional($attendee->accessLevel)->generalSettings;
 
+            Mail::to($attendee->email)
+                ->later(now()->addSeconds(5), new ApprovalMail($settings));
+        }
     }
 
     public function sendMessage(array $data, string $attendeeId)
@@ -289,6 +297,6 @@ class AttendeeService extends BaseRepository
     private function sendInvitationMail($attendee, $settings, $surveyLink): void
     {
         Mail::to($attendee->email)
-            ->send(new InvitationMail($settings, $surveyLink));
+            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink));
     }
 }
