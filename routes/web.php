@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccreditationController;
 use App\Http\Controllers\AttendeesController;
+use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Event\SurveyController;
 use App\Http\Controllers\EventController;
@@ -99,6 +100,15 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::get('/create', [ZonesController::class, 'create']);
                 Route::post('/', [ZonesController::class, 'store']);
                 Route::patch('/{zone_id}/update-status', [ZonesController::class, 'updateStatus']);
+            });
+
+            Route::prefix('/badges')->group(function () {
+                Route::get('/', [BadgeController::class, 'index']);
+                Route::get('/create', [BadgeController::class, 'create']);
+                Route::post('/', [BadgeController::class, 'store']);
+                Route::get('/{badge_id}/edit', [BadgeController::class, 'edit']);
+                Route::patch('/{badge_id}/update', [BadgeController::class, 'update']);
+                Route::get('/{badge_id}/attendees', [BadgeController::class, 'attendees']);
             });
         });
 

@@ -45,6 +45,11 @@ class Event extends Model
         return $this->hasMany(Zone::class);
     }
 
+    public function badges(): HasMany
+    {
+        return $this->hasMany(Badge::class);
+    }
+
     public function getEventImageUrlAttribute()
     {
         return $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : null;
