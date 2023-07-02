@@ -66,4 +66,56 @@ class AttendeesController extends Controller
 
         return $this->attendeeService->assignZones($request->zones, $attendeeId, $eventId);
     }
+
+    public function bulkApproval(Request $request, int $status)
+    {
+        $request->validate(['attendee_ids' => 'array|required']);
+
+        return $this->attendeeService->bulkApproveAttendee($request->attendee_ids, $status);
+    }
+
+    public function bulkEventApproval(Request $request, string $eventId, int $status)
+    {
+        $request->validate(['attendee_ids' => 'array|required']);
+
+        return $this->attendeeService->bulkApproveAttendee($request->attendee_ids, $status, $eventId);
+    }
+
+    public function bulkAssignZones(Request $request)
+    {
+        $request->validate(['attendee_ids' => 'array|required', 'zones' => 'required|array', 'zones.*' => 'required|string']);
+
+        return $this->attendeeService->bulkAssignZones($request->attendee_ids, $request->zones);
+    }
+
+    public function bulkAssignEventZones(Request $request, string $eventId)
+    {
+        $request->validate(['attendee_ids' => 'array|required', 'zones' => 'required|array', 'zones.*' => 'required|string']);
+
+        return $this->attendeeService->bulkAssignZones($request->attendee_ids, $request->zones, $eventId);
+    }
+
+    public function sendInvitation(string $attendeeId)
+    {
+        return $this->attendeeService->sendInvitation($attendeeId);
+    }
+
+    public function sendEventInvitation(string $eventId, string $attendeeId)
+    {
+        return $this->attendeeService->sendInvitation($attendeeId);
+    }
+
+    public function sendBulkInvitation(Request $request)
+    {
+        $request->validate(['attendee_ids' => 'array|required']);
+
+        return $this->attendeeService->sendBulkInvitations($request->attendee_ids);
+    }
+
+    public function sendBulkEventInvitation(Request $request, string $eventId)
+    {
+        $request->validate(['attendee_ids' => 'array|required']);
+
+        return $this->attendeeService->sendBulkInvitations($request->attendee_ids, $eventId);
+    }
 }

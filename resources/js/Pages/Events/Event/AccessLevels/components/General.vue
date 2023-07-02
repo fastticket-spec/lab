@@ -45,6 +45,7 @@ const {value: success_message_arabic} = useField("success_message_arabic");
 const {value: approval_message} = useField("approval_message");
 const {value: email_message} = useField("email_message");
 const {value: email_message_arabic} = useField("email_message_arabic");
+const {value: invitation_message} = useField("invitation_message");
 
 const onSubmit = handleSubmit(values => {
     router.post(`/event/${props.eventId}/access-levels/${props.accessLevel.id}/customize/general`, values);
@@ -161,7 +162,7 @@ const onSubmit = handleSubmit(values => {
                                 <b-col sm="12">
                                     <div class="form-group">
                                         <label for="descriptionInput">{{ $t('input.description') }}</label>
-                                        <quill-editor theme="snow" v-model:content="description"
+                                        <quill-editor toolbar="full" theme="snow" v-model:content="description"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="description" class="text-danger"/>
                                     </div>
@@ -170,7 +171,7 @@ const onSubmit = handleSubmit(values => {
                                 <b-col v-if="showArabicInputs" sm="12">
                                     <div class="form-group">
                                         <label for="descriptionArabicInput">{{ $t('input.descriptionArabic') }}</label>
-                                        <quill-editor theme="snow" v-model:content="description_arabic"
+                                        <quill-editor toolbar="full" theme="snow" v-model:content="description_arabic"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="description_arabic" class="text-danger"/>
                                     </div>
@@ -183,7 +184,7 @@ const onSubmit = handleSubmit(values => {
                                 <b-col sm="12">
                                     <div class="form-group">
                                         <label for="successMessageInput">{{ $t('input.success_message') }}</label>
-                                        <quill-editor theme="snow" v-model:content="success_message"
+                                        <quill-editor toolbar="full" theme="snow" v-model:content="success_message"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="success_message" class="text-danger"/>
                                     </div>
@@ -194,7 +195,8 @@ const onSubmit = handleSubmit(values => {
                                         <label for="successMessageArabicInput">{{
                                                 $t('input.success_messageArabic')
                                             }}</label>
-                                        <quill-editor theme="snow" v-model:content="success_message_arabic"
+                                        <quill-editor toolbar="full" theme="snow"
+                                                      v-model:content="success_message_arabic"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="success_message_arabic" class="text-danger"/>
                                     </div>
@@ -216,7 +218,7 @@ const onSubmit = handleSubmit(values => {
                                 <b-col sm="12">
                                     <div class="form-group">
                                         <label for="approvalMessage">{{ $t('input.approval_message') }}</label>
-                                        <quill-editor theme="snow" v-model:content="approval_message"
+                                        <quill-editor toolbar="full" theme="snow" v-model:content="approval_message"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="approval_message" class="text-danger"/>
                                     </div>
@@ -239,7 +241,7 @@ const onSubmit = handleSubmit(values => {
                                 <b-col sm="12">
                                     <div class="form-group">
                                         <label for="email_message">{{ $t('input.email_message') }}</label>
-                                        <quill-editor theme="snow" v-model:content="email_message"
+                                        <quill-editor toolbar="full" theme="snow" v-model:content="email_message"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="email_message" class="text-danger"/>
                                     </div>
@@ -248,9 +250,28 @@ const onSubmit = handleSubmit(values => {
                                 <b-col v-if="showArabicInputs" sm="12">
                                     <div class="form-group">
                                         <label for="email_message_arabic">{{ $t('input.email_message_arabic') }}</label>
-                                        <quill-editor theme="snow" v-model:content="email_message_arabic"
+                                        <quill-editor toolbar="full" theme="snow" v-model:content="email_message_arabic"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="email_message_arabic" class="text-danger"/>
+                                    </div>
+                                </b-col>
+
+                                <b-col sm="12">
+                                    <div class="form-group">
+                                        <label for="invitation_title">Invitation Link Title</label>
+                                        <Field type="text" name="invitation_title" id="invitation_title"
+                                               :class="`form-control mb-0`" :validateOnInput="true"/>
+                                        <ErrorMessage name="invitation_title" class="text-danger"/>
+                                    </div>
+                                </b-col>
+
+                                <b-col sm="12">
+                                    <div class="form-group">
+                                        <label for="invitation_message">Invitation Link Message</label>
+                                        <span><small>&nbsp; Copy this placeholder to denote the link - <strong>%invitation_link%</strong></small></span>
+                                        <quill-editor toolbar="full" theme="snow" v-model:content="invitation_message"
+                                                      content-type="html"></quill-editor>
+                                        <ErrorMessage name="invitation_message" class="text-danger"/>
                                     </div>
                                 </b-col>
                             </b-row>
