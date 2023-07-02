@@ -34,6 +34,7 @@ const sortEvents = () => {
 onUpdated(() => {
     answerModalShow.value = false;
     zonesModalShow.value = false;
+    messageModalShow.value = false;
 })
 
 const visit = (link, method = 'get') => {
