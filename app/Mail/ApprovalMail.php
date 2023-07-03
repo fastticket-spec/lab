@@ -15,12 +15,17 @@ class ApprovalMail extends Mailable
 
     public string $title;
     public string $content;
+    public ?string $organiserName;
+    public ?string $organiserLogo;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($settings)
+    public function __construct($settings, $organiser)
     {
+        $this->organiserName = $organiser->name ?? null;
+        $this->organiserLogo = $organiser->logo_url ?? null;
+
         $this->content = $settings->approval_message ?? '<p></p>';
         $this->title = $settings->approval_message_title ?? 'Approval Mail';
     }

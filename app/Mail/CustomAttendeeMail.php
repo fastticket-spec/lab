@@ -13,11 +13,16 @@ class CustomAttendeeMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public ?string $organiserName;
+    public ?string $organiserLogo;
+
     /**
      * Create a new message instance.
      */
-    public function __construct(public array $data)
+    public function __construct(public array $data, $organiser)
     {
+        $this->organiserName = $organiser->name ?? null;
+        $this->organiserLogo = $organiser->logo_url ?? null;
     }
 
     /**
