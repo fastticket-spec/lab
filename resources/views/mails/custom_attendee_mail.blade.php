@@ -1,5 +1,3 @@
-<x-mail::message>
-
-{{ $data['content'] }}
-
-</x-mail::message>
+@component('mail::message', ['headerTitle' => $organiserName, 'headerLogo' => $organiserLogo])
+    {{ $data['content'] }}
+@endcomponent

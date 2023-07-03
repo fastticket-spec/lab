@@ -122,7 +122,7 @@ class AttendeeService extends BaseRepository
 
             $settings = optional($attendee->accessLevel)->generalSettings;
 
-            Mail::to($email)->later(now()->addSeconds(5), new AttendeeMail($settings, $lang));
+            Mail::to($email)->later(now()->addSeconds(5), new AttendeeMail($settings, $lang, $attendee->event->organiser));
 
             $message = $lang === 'arabic' ? optional($settings)->success_message_arabic ?: 'Saved successfully' : (optional($settings)->success_message ?: 'Saved successfully');
 
@@ -145,7 +145,7 @@ class AttendeeService extends BaseRepository
     public function approveAttendee(string $attendeeId, int $status, ?string $eventId = null)
     {
         $attendee = $this->find($attendeeId);
-        $attendee->load(['accessLevel.generalSettings']);
+        $attendee->load(['accessLevel.generalSettings', 'event.organiser']);
 
         $attendee->update([
             'status' => $status
@@ -171,7 +171,7 @@ class AttendeeService extends BaseRepository
             ->update(['status' => $status]);
 
         $attendees = $this->model->query()
-            ->with('accessLevel.generalSettings')
+            ->with(['accessLevel.generalSettings', 'event.organiser'])
             ->whereIn('id', $attendeeIds)
             ->get();
 
@@ -195,7 +195,7 @@ class AttendeeService extends BaseRepository
             $settings = optional($attendee->accessLevel)->generalSettings;
 
             Mail::to($attendee->email)
-                ->later(now()->addSeconds(5), new ApprovalMail($settings));
+                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser));
         }
     }
 
@@ -203,7 +203,7 @@ class AttendeeService extends BaseRepository
     {
         $attendee = $this->find($attendeeId);
 
-        Mail::to($attendee->email)->later(now()->addSeconds(3), new CustomAttendeeMail($data));
+        Mail::to($attendee->email)->later(now()->addSeconds(3), new CustomAttendeeMail($data, $attendee->event->organiser));
 
         $message = 'Email sent successfully';
 
@@ -312,7 +312,7 @@ class AttendeeService extends BaseRepository
 
     private function sendInvitationMail($attendee, $settings, $surveyLink): void
     {
-        Mail::to($attendee->email)
-            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink));
+//        Mail::to($attendee->email)
+//            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink));
     }
 }

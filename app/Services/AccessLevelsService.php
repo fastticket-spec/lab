@@ -239,8 +239,10 @@ class AccessLevelsService extends BaseRepository
         $surveyLink = config('app.url') . '/e/' . $eventId . '/a/' . $accessLevelId;
         $settings = $accessLevel->generalSettings;
 
+        $organiser = $accessLevel->event->organiser;
+
         Mail::to($email)
-            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink));
+            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink, $organiser));
 
         $message = 'Invitation has been sent to ' . $email;
 
