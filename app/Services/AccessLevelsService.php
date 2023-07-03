@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Http\Requests\AccessLevelGeneralRequest;
+use App\Mail\InvitationMail;
 use App\Models\AccessLevel;
 use App\Models\EventSurvey;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class AccessLevelsService extends BaseRepository
 {
@@ -227,5 +229,21 @@ class AccessLevelsService extends BaseRepository
 
             return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
         }
+    }
+
+    public function sendLink(string $email, string $eventId, string $accessLevelId)
+    {
+        $route = "/event/$eventId/access-levels";
+
+        $accessLevel = $this->find($accessLevelId);
+        $surveyLink = config('app.url') . '/e/' . $eventId . '/a/' . $accessLevelId;
+        $settings = $accessLevel->generalSettings;
+
+        Mail::to($email)
+            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink));
+
+        $message = 'Invitation has been sent to ' . $email;
+
+        return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
     }
 }

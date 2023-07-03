@@ -35,10 +35,10 @@
         "view": "View",
         "create": "Create",
         "orders": "Orders",
-        "events": "Events",
+        "events": "Categories",
         "eventCategories": "Event Categories",
         "customize": "Customize",
-        "event": "Event",
+        "event": "Category",
         "general": "General",
         "designPage": "Page Design",
         "serviceFees": "Service Fees & Taxes",
@@ -52,18 +52,18 @@
         "users": "Users",
         "attendees": "Attendees",
         "sales": "Sales",
-        "event_tools": "Event Tools",
+        "event_tools": "Category Tools",
         "affiliates": "Affiliates",
         "seats": "Seats Customisation",
         "checkin_attendee": "Checkin Attendee",
         "access_levels": "Access Levels",
-        "event_surveys": "Event Surveys",
+        "event_surveys": "Category Surveys",
         "zones": "Zones",
         "badges": "Badges"
     },
     "customize": {
         "general": "General",
-        "design": "Event Page Design",
+        "design": "Category Page Design",
         "request_form": "Request Form",
         "socials": "Socials"
     },
@@ -76,8 +76,8 @@
         "edit": "Edit Event Category"
     },
     "event": {
-        "create": "Create Event",
-        "edit": "Edit Event"
+        "create": "Create Category",
+        "edit": "Edit Category"
     },
     "ticket": {
         "create": "Create Ticket",
@@ -142,8 +142,8 @@
         "custom": "Custom",
         "occurrence": "How often does this event occur?",
         "choose_days": "Choose specific days",
-        "eventImage": "EVENT IMAGE (FLYER OR GRAPHIC ETC.)",
-        "eventBanner": "EVENT BANNER",
+        "eventImage": "IMAGE (FLYER OR GRAPHIC ETC.)",
+        "eventBanner": "BANNER",
         "extraAttachment": "UPLOAD EXTRA ATTACHMENT",
         "venueName": "Venue Name",
         "venue_name_arabic": "Venue Name (Arabic)",

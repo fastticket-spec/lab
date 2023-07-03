@@ -28,11 +28,11 @@
                    class="outline-primary ml-2">
                     <i class="ri-arrow-left-line"></i> Back to Account Manager
                 </a>
-                <div v-if="isEvent" class="form-group form-group-sm px-2 mt-2">
+                <!-- <div v-if="isEvent" class="form-group form-group-sm px-2 mt-2">
                     <select @change="onChangeEvent" v-model="currentEvent" class="form-control form-control-sm">
                         <option v-for="event in events" :key="event.id" :value="event.id">{{event.title}}</option>
                     </select>
-                </div>
+                </div> -->
                 <CollapseMenu :items="menu" :open="true" :sidebarGroupTitle="true"/>
             </nav>
             <div class="p-3"></div>

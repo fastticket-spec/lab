@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from "vue";
+import {onUpdated, reactive, ref} from "vue";
 import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -23,16 +23,40 @@ const visit = (link, method = 'get') => {
     }
 }
 
+const invitationModal = ref(false);
+
+const invitation = reactive({
+    email: ''
+});
+
+onUpdated(() => {
+    invitation.email = '';
+    invitationModal.value = false
+})
+
+const selectedAccessLevel = ref('')
+
+const onPaginate = page => {
+    router.get(`/event/${props.event_id}/access-levels?sort=${selectedSort.value}&page=${page}`)
+}
+
+const sendInvite = () => {
+    router.post(`/event/${props.event_id}/access-levels/${selectedAccessLevel.value}/send-invitation`, invitation)
+}
+
 </script>
 
 <template>
     <b-container fluid>
         <b-row>
             <b-col sm="12">
+                <Link :href="`/event/${event_id}/access-levels/create`" class="btn btn-primary mb-3">Add Access Level
+                </Link>
+
                 <no-data v-if="!access_levels.total" title="Access Levels"
                          :link="`/event/${event_id}/access-levels/create`"/>
 
-                <a :href="`/event/${event_id}/access-levels/create`" class="btn btn-primary mb-3">Create Access Level</a>
+                <!-- <a :href="`/event/${event_id}/access-levels/create`" class="btn btn-primary mb-3">Create Access Level</a> -->
 
                 <iq-card v-if="access_levels.total">
                     <template v-slot:headerTitle>
@@ -62,20 +86,26 @@ const visit = (link, method = 'get') => {
                         </div>
 
                         <div class="text-center">
-                            <h5>{{ access_level.quantity_available ? (access_level.quantity_available - access_level.quantity_filled) : 'Unlimited'}}</h5>
+                            <h5>
+                                {{
+                                    access_level.quantity_available ? (access_level.quantity_available - access_level.quantity_filled) : 'Unlimited'
+                                }}</h5>
                             <span>Remaining</span>
                         </div>
                     </b-card-text>
 
-                    <div v-if="access_level.has_surveys" class="card-date d-flex flex-column text-center" :class="{'card-date-ar': locale === 'ar'}">
+                    <div v-if="access_level.has_surveys" class="card-date d-flex flex-column text-center"
+                         :class="{'card-date-ar': locale === 'ar'}">
                         <a :href="`/e/${event_id}/a/${access_level.id}`" target="_blank">View Form</a>
                     </div>
 
                     <div class="d-flex justify-content-around">
-                        <a href="#" @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/edit`)"><i
+                        <a href="#"
+                           @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/edit`)"><i
                             class="ri-edit-line"></i>
                             Edit</a>
-                        <a href="#" @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/customize`)"><i
+                        <a href="#"
+                           @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/customize`)"><i
                             class="ri-settings-2-line"></i>
                             Customize</a>
                         <a href="#"
@@ -83,13 +113,53 @@ const visit = (link, method = 'get') => {
                            :class="access_level.status === 0 ? 'text-success' : 'text-danger'"><i
                             :class="access_level.status === 0 ? 'ri-play-line' : 'ri-pause-line'"></i>
                             {{ access_level.status === 0 ? 'Activate' : 'Pause' }}</a>
+                        <a href="#"
+                           v-if="access_level.has_surveys"
+                           @click.prevent.stop="invitationModal = true; selectedAccessLevel = access_level.id"><i
+                            class="ri-settings-2-line"></i>
+                            Send Invitation</a>
                     </div>
                 </b-card>
             </b-col>
         </b-row>
 
-        <b-pagination v-if="access_levels.data && access_levels.data.length > 0" v-model="access_levels.current_page" @change="onPaginate"
+        <b-pagination v-if="access_levels.data && access_levels.data.length > 0" v-model="access_levels.current_page"
+                      @change="onPaginate"
                       :total-rows="access_levels.total" :per-page="access_levels.per_page" align="center"/>
+
+        <b-modal v-model="invitationModal" id="message-modal" title="Send Invitation">
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <span>Supply the email you want to send invite to.</span>
+                    <div class="form-group">
+                        <label for="subject">Email</label>
+                        <input type="email" v-model="invitation.email"
+                               :class="`form-control mb-0`" required
+                               id="subject"/>
+                    </div>
+
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        @click="sendInvite"
+                        :disabled="!invitation.email"
+                        class="btn btn-primary float-right ml-2">Send Invite
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="danger"
+                        class="float-right ml-2"
+                        @click="invitationModal = false"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
     </b-container>
 </template>
 
