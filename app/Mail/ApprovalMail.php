@@ -36,7 +36,8 @@ class ApprovalMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->title,
+            from: $this->organiserName,
+            subject: $this->title
         );
     }
 
