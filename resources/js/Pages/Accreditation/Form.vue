@@ -71,7 +71,7 @@ export default {
 
                     <form @submit.prevent="onSubmit" class="mx-5" v-if="Object.keys(formData).length > 0">
                         <div class="row justify-content-md-right">
-                            <div v-for="survey in surveys" :key="survey.id" class="col col-md-6 p-2">
+                            <div v-for="survey in surveys" :key="survey.id" class="col  p-2" :class="survey.type === '10' ? 'col-md-12' : 'col-md-6'">
                                 <label :for="survey.id" v-if="survey.type !== '10'">{{ lang === 'arabic' ? survey.title_arabic : survey.title }}:</label>
                                 <template v-if="survey.type === '1'">
                                     <input v-model="formData[survey.id].answer" type="text" :class="{'text-right': lang === 'arabic'}" class="form-control" sm="6" :id="survey.id" :required="survey.required">
