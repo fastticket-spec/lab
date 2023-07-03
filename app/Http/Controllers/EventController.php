@@ -47,7 +47,7 @@ class EventController extends Controller
         if (!$event) {
             return $this->view(
                 data: [
-                    'message' => 'Could not create event'
+                    'message' => 'Could not create category'
                 ], statusCode: Response::HTTP_BAD_REQUEST, flashMessage: 'Event could not be created', messageType: 'danger', component: '/events/create', returnType: 'redirect');
         }
 
@@ -119,7 +119,7 @@ class EventController extends Controller
         $status = $this->eventService->processChangeStatus($eventId);
         return $this->view(flashMessage: "Event {$status} successfully", component: '/events', returnType: 'redirect');
     }
-  
+
     public function destroy(string $eventId): RedirectResponse
     {
         $this->eventService->delete($eventId);

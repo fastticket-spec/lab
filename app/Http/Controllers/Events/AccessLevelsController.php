@@ -126,4 +126,9 @@ class AccessLevelsController extends Controller
     {
         return $this->accessLevelsService->updateSocials($request, $eventId, $accessLevelId);
     }
+
+    public function sendInvitationLink(Request $request, string $eventId, string $accessLevelId)
+    {
+        return $this->accessLevelsService->sendLink($request->email, $eventId, $accessLevelId);
+    }
 }

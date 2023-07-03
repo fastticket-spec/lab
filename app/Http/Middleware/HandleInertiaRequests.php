@@ -42,7 +42,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'app_name' => config('app.name'),
             'app_url' => config('app.url'),
-            'active_organiser' => auth()->check() ? auth()->user()->account->active_organiser : '',
+            'active_organiser' => auth()->check() ? optional(auth()->user()->account)->active_organiser : '',
         ]);
     }
 }
