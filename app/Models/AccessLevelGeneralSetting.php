@@ -25,6 +25,8 @@ class AccessLevelGeneralSetting extends Model
         "email_message_title",
         "email_message",
         "email_message_arabic",
+        "invitation_title",
+        "invitation_message",
         "start_on",
         "end_on",
     ];

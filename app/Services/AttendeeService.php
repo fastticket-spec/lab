@@ -2,12 +2,19 @@
 
 namespace App\Services;
 
+use App\Mail\ApprovalMail;
+use App\Mail\AttendeeMail;
+use App\Mail\CustomAttendeeMail;
+use App\Mail\InvitationMail;
 use App\Models\Attendee;
+use App\Models\AttendeeZone;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -102,7 +109,7 @@ class AttendeeService extends BaseRepository
                 }
             }
 
-            $this->create([
+            $attendee = $this->create([
                 'access_level_id' => $accessLevelId,
                 'event_id' => $eventId,
                 'organiser_id' => $event->organiser_id,
@@ -112,6 +119,10 @@ class AttendeeService extends BaseRepository
             ]);
 
             DB::commit();
+
+            $settings = optional($attendee->accessLevel)->generalSettings;
+
+            Mail::to($email)->later(now()->addSeconds(5), new AttendeeMail($settings, $lang));
 
             $message = $lang === 'arabic' ? optional($settings)->success_message_arabic ?: 'Saved successfully' : (optional($settings)->success_message ?: 'Saved successfully');
 
@@ -134,15 +145,15 @@ class AttendeeService extends BaseRepository
     public function approveAttendee(string $attendeeId, int $status, ?string $eventId = null)
     {
         $attendee = $this->find($attendeeId);
+        $attendee->load(['accessLevel.generalSettings']);
+
         $attendee->update([
             'status' => $status
         ]);
 
-        $email = $attendee->email;
-        $generalSettings = $attendee->accessLevel->generalSettings;
-
-        // TODO: Send approval email to the $attendee->email if status is 1.
-        // Email template can be found in access level $generalSettings->approval_message_title && $approval_message.
+        if ($status == 1) {
+            $this->sendApprovalEmailToAttendees([$attendee]);
+        }
 
         $message = 'Attendee has been ' . ($status === 1 ? 'approved' : ($status === 2 ? 'declined' : 'reinstated'));
         $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
@@ -153,11 +164,55 @@ class AttendeeService extends BaseRepository
         );
     }
 
-    public function sendMessage(array $data, string $attendeeId)
+    public function bulkApproveAttendee(array $attendeeIds, int $status, ?string $eventId = null)
+    {
+        $this->model->query()
+            ->whereIn('id', $attendeeIds)
+            ->update(['status' => $status]);
+
+        $attendees = $this->model->query()
+            ->with('accessLevel.generalSettings')
+            ->whereIn('id', $attendeeIds)
+            ->get();
+
+        if ($status == 1) {
+            $this->sendApprovalEmailToAttendees($attendees);
+        }
+
+        $message = 'Attendees has been ' . ($status === 1 ? 'approved' : ($status === 2 ? 'declined' : 'reinstated'));
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
+    private function sendApprovalEmailToAttendees($attendees): void
+    {
+        foreach ($attendees as $attendee) {
+
+            $settings = optional($attendee->accessLevel)->generalSettings;
+
+            Mail::to($attendee->email)
+                ->later(now()->addSeconds(5), new ApprovalMail($settings));
+        }
+    }
+
+    public function sendMessage(array $data, string $attendeeId, ?string $eventId = null)
     {
         $attendee = $this->find($attendeeId);
 
-        // TODO: Send message to attendee->email
+        Mail::to($attendee->email)->later(now()->addSeconds(3), new CustomAttendeeMail($data));
+
+        $message = 'Email sent successfully';
+
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
     }
 
     public function assignZones(array $zones, string $attendeeId, ?string $eventId = null)
@@ -183,5 +238,81 @@ class AttendeeService extends BaseRepository
             flashMessage: $message,
             component: $route, returnType: 'redirect'
         );
+    }
+
+    public function bulkAssignZones(array $attendeeIds, array $zones, ?string $eventId = null)
+    {
+        $attendees = $this->model->query()
+            ->with('zones')
+            ->whereIn('id', $attendeeIds)
+            ->get();
+
+        foreach ($attendees as $attendee) {
+            $attendee->zones()->delete();
+
+            foreach ($zones as $zone) {
+                AttendeeZone::create([
+                    'attendee_id' => $attendee->id,
+                    'zone_id' => $zone,
+                ]);
+            }
+        }
+
+        $message = 'Zones has been assigned to attendees';
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
+    public function sendInvitation(string $attendeeId)
+    {
+        $attendee = $this->find($attendeeId);
+        $eventId = $attendee->event_id;
+
+        $surveyLink = config('app.url') . '/e/' . $eventId . '/a/' . $attendee->access_level_id;
+        $settings = $attendee->accessLevel->generalSettings;
+
+        $this->sendInvitationMail($attendee, $settings, $surveyLink);
+
+        $message = 'Invitation Link has been sent';
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
+    public function sendBulkInvitations(array $attendeeIds, ?string $event_id = null)
+    {
+        $attendees = $this->model->query()
+            ->whereIn('id', $attendeeIds)
+            ->get();
+
+        foreach ($attendees as $attendee) {
+            $eventId = $attendee->event_id;
+
+            $surveyLink = config('app.url') . '/e/' . $eventId . '/a/' . $attendee->access_level_id;
+            $settings = $attendee->accessLevel->generalSettings;
+
+            $this->sendInvitationMail($attendee, $settings, $surveyLink);
+        }
+
+        $message = 'Invitation Link has been sent to the attendees';
+        $route = $event_id ? "/event/$event_id/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
+    private function sendInvitationMail($attendee, $settings, $surveyLink): void
+    {
+        Mail::to($attendee->email)
+            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink));
     }
 }
