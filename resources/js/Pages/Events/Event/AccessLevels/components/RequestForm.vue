@@ -52,7 +52,7 @@ const onSubmit = handleSubmit(values => {
                                 <b-col sm="6">
                                     <div class="form-group">
                                         <label for="message_before">Message to Display to Attendees before they Complete Their Request.</label>
-                                        <quill-editor theme="snow" v-model:content="message_before"  name="message_before" id="message_before"
+                                        <quill-editor toolbar="full" theme="snow" v-model:content="message_before"  name="message_before" id="message_before"
                                                       content-type="html"></quill-editor>
 
                                         <!-- <Field as="textarea" name="message_before" id="message_before"
@@ -66,7 +66,7 @@ const onSubmit = handleSubmit(values => {
                                     <div class="form-group">
                                         <label for="message_before_arabic">Message to Display to Attendees before they Complete Their Request. (Arabic)</label>
 
-                                        <quill-editor theme="snow" v-model:content="message_before_arabic"  name="message_before_arabic" id="message_before_arabic"
+                                        <quill-editor toolbar="full" theme="snow" v-model:content="message_before_arabic"  name="message_before_arabic" id="message_before_arabic"
                                                       content-type="html"></quill-editor>
 
                                         <!-- <Field as="textarea" name="message_before_arabic" id="message_before_arabic"
@@ -79,9 +79,9 @@ const onSubmit = handleSubmit(values => {
                                     <div class="form-group">
                                         <label for="message_after">Message to Display to Attendees before they Complete Their Request.</label>
 
-                                        <quill-editor theme="snow" v-model:content="message_after"  name="message_after" id="message_after"
+                                        <quill-editor toolbar="full" theme="snow" v-model:content="message_after"  name="message_after" id="message_after"
                                                       content-type="html"></quill-editor>
-                                        
+
                                         <!-- <Field as="textarea" name="message_after" id="message_after"
                                                :class="`form-control mb-0`" :validateOnInput="true" /> -->
 
@@ -94,9 +94,9 @@ const onSubmit = handleSubmit(values => {
                                     <div class="form-group">
                                         <label for="message_after_arabic">Message to Display to Attendees before they Complete Their Request. (Arabic)</label>
 
-                                        <quill-editor theme="snow" v-model:content="message_after_arabic"  name="message_after_arabic" id="message_after_arabic"
+                                        <quill-editor toolbar="full" theme="snow" v-model:content="message_after_arabic"  name="message_after_arabic" id="message_after_arabic"
                                                       content-type="html"></quill-editor>
-                                        
+
                                         <!-- <Field as="textarea" name="message_after_arabic" id="message_after_arabic"
                                                :class="`form-control mb-0`" :validateOnInput="true" /> -->
                                         <ErrorMessage name="message_after_arabic" class="text-danger"/>
