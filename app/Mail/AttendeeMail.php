@@ -36,6 +36,7 @@ class AttendeeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
+            from: $this->organiserName,
             subject: $this->title,
         );
     }
