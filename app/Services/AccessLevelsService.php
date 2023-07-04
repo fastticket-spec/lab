@@ -155,7 +155,6 @@ class AccessLevelsService extends BaseRepository
 
     public function uploadDesignImages(Request $request, string $eventId, string $accessLevelId)
     {
-        $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
         try {
             $event = $this->eventService->find($eventId);
 
@@ -174,6 +173,7 @@ class AccessLevelsService extends BaseRepository
             }
 
             $message = 'Event Images uploaded successfully';
+            $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
 
             return $this->view(
                 data: [
@@ -182,6 +182,8 @@ class AccessLevelsService extends BaseRepository
                 ], flashMessage: $message, component: $route, returnType: 'redirect'
             );
         } catch (\Throwable $th) {
+            $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
+
             \Log::error($th);
 
             $message = 'An error occurred while uploading image!';

@@ -1,6 +1,6 @@
 <script setup>
 import {router} from "@inertiajs/vue3";
-import {onMounted, reactive, watch} from "vue";
+import {onMounted, onUpdated, reactive, watch} from "vue";
 import PagePreview from "./PagePreview.vue";
 
 const props = defineProps({
@@ -24,14 +24,7 @@ watch(() => props.design_images, (value, oldValue) => {
 })
 
 onMounted(() => {
-    if (props.designImages.length > 0) {
-        const imgs = props.designImages.map(image => ({
-            full: image.design_image_url,
-            thumbnail: image.design_image_url
-        }))
-
-        state.backgroundImages = [...state.backgroundImages, ...imgs];
-    }
+    initImages();
 
     if (props.data?.bg_type && props.data?.bg_image) {
         const img = props.data?.bg_image;
@@ -46,7 +39,22 @@ onMounted(() => {
             } : state.background.bgImage = state.backgroundImages[0]
         }
     }
-})
+});
+
+onUpdated(() => {
+    initImages()
+});
+
+const initImages = () => {
+    if (props.designImages.length > 0) {
+        const imgs = props.designImages.map(image => ({
+            full: image.design_image_url,
+            thumbnail: image.design_image_url
+        }))
+
+        state.backgroundImages = [...state.backgroundImages.filter(x => x.type === 'default'), ...imgs];
+    }
+}
 
 const state = reactive({
     btn: {
