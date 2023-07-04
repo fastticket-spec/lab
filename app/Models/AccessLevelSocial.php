@@ -14,6 +14,9 @@ class AccessLevelSocial extends Model
         'access_level_id',
         'email',
         'instagram',
-        'phone_number'
+        'twitter',
+        'linkedin',
+        'youtube',
+        'phone_number',
     ];
 }

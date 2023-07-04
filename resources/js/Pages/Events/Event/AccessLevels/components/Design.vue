@@ -1,8 +1,7 @@
 <script setup>
 import {router} from "@inertiajs/vue3";
-import {onMounted, reactive, watch} from "vue";
+import {onMounted, onUpdated, reactive, watch} from "vue";
 import PagePreview from "./PagePreview.vue";
-import {getFullLogoUrl} from "../../../../../Shared/components/helpers/ImageHelper.js";
 
 const props = defineProps({
     event: Object,
@@ -25,14 +24,7 @@ watch(() => props.design_images, (value, oldValue) => {
 })
 
 onMounted(() => {
-    if (props.designImages.length > 0) {
-        const imgs = props.designImages.map(image => ({
-            full: image.design_image_url,
-            thumbnail: image.design_image_url
-        }))
-
-        state.backgroundImages = [...state.backgroundImages, ...imgs];
-    }
+    initImages();
 
     if (props.data?.bg_type && props.data?.bg_image) {
         const img = props.data?.bg_image;
@@ -47,7 +39,22 @@ onMounted(() => {
             } : state.background.bgImage = state.backgroundImages[0]
         }
     }
-})
+});
+
+onUpdated(() => {
+    initImages()
+});
+
+const initImages = () => {
+    if (props.designImages.length > 0) {
+        const imgs = props.designImages.map(image => ({
+            full: image.design_image_url,
+            thumbnail: image.design_image_url
+        }))
+
+        state.backgroundImages = [...state.backgroundImages.filter(x => x.type === 'default'), ...imgs];
+    }
+}
 
 const state = reactive({
     btn: {
@@ -57,6 +64,10 @@ const state = reactive({
     register: {
         english: props.data?.register_btn_value || 'Register',
         arabic: props.data?.regiser_btn_value_ar || 'يسجل'
+    },
+    formButton: {
+        english: props.data?.form_btn_value || 'Submit',
+        arabic: props.data?.form_btn_value_ar || 'يُقدِّم'
     },
     background: {
         type: props.data?.bg_type || 'image',
@@ -115,6 +126,8 @@ const onSubmit = () => {
         bg_color: state.background.color,
         bg_type: state.background.type,
         bg_image: state.background.bgImage?.full,
+        form_btn_value: state.formButton.english,
+        form_btn_value_ar: state.formButton.arabic,
     }
 
     router.post(`/event/${props.event.id}/access-levels/${props.accessLevel.id}/customize/page-design`, data);
@@ -172,6 +185,27 @@ const onSubmit = () => {
                                                 <b-form-group label="Arabic" label-for="register-arabic">
                                                     <b-form-input v-model="state.register.arabic" type="text" size="sm"
                                                                   id="register-arabic" placeholder=""></b-form-input>
+                                                </b-form-group>
+                                            </b-card-body>
+                                        </b-collapse>
+                                    </b-card>
+
+                                    <b-card no-body class="mb-3">
+                                        <b-card-header header-tag="header" class="p-1" role="tab"
+                                                       header-bg-variant="primary">
+                                            <div v-b-toggle.form-button class="py-1 px-2">Form Button Value</div>
+                                        </b-card-header>
+                                        <b-collapse id="form-button" visible accordion="my-accordion"
+                                                    role="tabpanel">
+                                            <b-card-body>
+                                                <b-form-group label="English" label-for="form-english">
+                                                    <b-form-input v-model="state.formButton.english" type="text" size="sm"
+                                                                  id="form-english" placeholder=""></b-form-input>
+                                                </b-form-group>
+
+                                                <b-form-group label="Arabic" label-for="form-arabic">
+                                                    <b-form-input v-model="state.formButton.arabic" type="text" size="sm"
+                                                                  id="form-arabic" placeholder=""></b-form-input>
                                                 </b-form-group>
                                             </b-card-body>
                                         </b-collapse>

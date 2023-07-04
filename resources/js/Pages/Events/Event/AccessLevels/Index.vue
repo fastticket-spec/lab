@@ -1,6 +1,8 @@
 <script setup>
 import {onUpdated, reactive, ref} from "vue";
 import {router} from "@inertiajs/vue3";
+import VueSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 
 const props = defineProps({
     access_levels: {},
@@ -26,11 +28,11 @@ const visit = (link, method = 'get') => {
 const invitationModal = ref(false);
 
 const invitation = reactive({
-    email: ''
+    emails: []
 });
 
 onUpdated(() => {
-    invitation.email = '';
+    invitation.emails = [];
     invitationModal.value = false
 })
 
@@ -130,12 +132,14 @@ const sendInvite = () => {
         <b-modal v-model="invitationModal" id="message-modal" title="Send Invitation">
             <b-row class="mt-3">
                 <b-col sm="12">
-                    <span>Supply the email you want to send invite to.</span>
+                    <span>Supply the emails you want to send invite to.</span>
                     <div class="form-group">
-                        <label for="subject">Email</label>
-                        <input type="email" v-model="invitation.email"
-                               :class="`form-control mb-0`" required
-                               id="subject"/>
+                        <label for="subject">Emails</label>
+                        <vue-select v-model="invitation.emails"  class="form-control mb-0"
+                                    :options="[]"
+                                    multiple taggable>
+                            <template v-slot:no-options>Type emails and press enter.</template>
+                        </vue-select>
                     </div>
 
                 </b-col>
@@ -146,7 +150,7 @@ const sendInvite = () => {
                     <b-button
                         variant="primary"
                         @click="sendInvite"
-                        :disabled="!invitation.email"
+                        :disabled="invitation.emails.length === 0"
                         class="btn btn-primary float-right ml-2">Send Invite
                     </b-button>
                     <b-button
@@ -185,6 +189,11 @@ const sendInvite = () => {
 .card-date-ar {
     left: 0;
     right: unset;
+}
+
+.vs__dropdown-toggle {
+    border: none;
+    margin: -0.3rem;
 }
 
 </style>

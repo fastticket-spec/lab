@@ -32,6 +32,7 @@ const initialValues = props.event_survey ? {
         ? props.event_survey.surveys.map(x => ({
             ...x,
             required: !!x.required,
+            private: !!x.private,
             options: (x.options).length > 0
                 ? x.options
                 : [{name: '', name_arabic: ''}],
@@ -42,6 +43,7 @@ const initialValues = props.event_survey ? {
             title_arabic: 'Email Address',
             type: emailField.value,
             required: true,
+            private: false,
             options: [
                 {name: '', name_arabic: ''}
             ],
@@ -54,6 +56,7 @@ const initialValues = props.event_survey ? {
             title_arabic: 'Email Address',
             type: emailField.value,
             required: true,
+            private: false,
             options: [
                 {name: '', name_arabic: ''}
             ],
@@ -173,18 +176,34 @@ const onSubmit = handleSubmit((values) => {
                                         </div>
                                     </b-col>
 
-                                    <b-col v-show="field?.value?.open" sm="6">
+                                    <b-col v-show="field?.value?.open" sm="3">
                                         <Field
                                             v-slot="{ field }"
                                             :name="`surveys[${idx}].required`"
                                             type="checkbox"
                                             :value="true"
                                         >
-                                            <label>
+                                            <label class="mt-3">
                                                 <input type="checkbox" :name="`surveys[${idx}].required`"
                                                        v-bind="field"
                                                        :value="true"/>
                                                 Required
+                                            </label>
+                                        </Field>
+                                    </b-col>
+
+                                    <b-col v-show="field?.value?.open" sm="3">
+                                        <Field
+                                            v-slot="{ field }"
+                                            :name="`surveys[${idx}].private`"
+                                            type="checkbox"
+                                            :value="true"
+                                        >
+                                            <label class="mt-3">
+                                                <input type="checkbox" :name="`surveys[${idx}].private`"
+                                                       v-bind="field"
+                                                       :value="true"/>
+                                                Private
                                             </label>
                                         </Field>
                                     </b-col>
@@ -259,7 +278,7 @@ const onSubmit = handleSubmit((values) => {
                                            class="my-3 d-flex justify-content-between">
                                         <div>
                                             <b-btn variant="primary" class="mr-2"
-                                                   @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, options: [{name: '', name_arabic: ''}], open: true})">
+                                                   @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, private: false, options: [{name: '', name_arabic: ''}], open: true})">
                                                 <i class="ri-add-line"/> Add Field
                                             </b-btn>
                                             <b-btn variant="danger" :disabled="field?.value?.type === emailField"
@@ -289,7 +308,7 @@ const onSubmit = handleSubmit((values) => {
                                         <span>{{ field_types[surveys[idx].type].name }}</span>
                                         <div>
                                             <b-btn variant="primary" class="mr-2"
-                                                   @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, options: [{name: '', name_arabic: ''}], open: true})">
+                                                   @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, private: false, options: [{name: '', name_arabic: ''}], open: true})">
                                                 <i class="ri-add-line p-0"/>
                                             </b-btn>
                                             <b-btn :disabled="field?.value?.type === emailField" variant="danger"

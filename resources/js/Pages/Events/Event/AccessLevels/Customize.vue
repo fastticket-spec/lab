@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from "vue";
+import {onUpdated, ref} from "vue";
 import SideLists from './components/SideLists.vue';
 import General from "./components/General.vue";
 import Design from "./components/Design.vue";
