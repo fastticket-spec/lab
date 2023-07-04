@@ -38,8 +38,35 @@ const onSubmit = handleSubmit(values => {
                             <b-row class="mt-3">
                                 <b-col sm="6">
                                     <div class="form-group">
+                                        <label for="twitter">Twitter</label>
+                                        <Field type="text" name="twitter" id="twitter"
+                                               :class="`form-control mb-0`" :validateOnInput="true" />
+                                        <ErrorMessage name="twitter" class="text-danger"/>
+                                    </div>
+                                </b-col>
+
+                                <b-col sm="6">
+                                    <div class="form-group">
+                                        <label for="linkedin">LinkedIn</label>
+                                        <Field type="text" name="linkedin" id="linkedin"
+                                               :class="`form-control mb-0`" :validateOnInput="true" />
+                                        <ErrorMessage name="linkedin" class="text-danger"/>
+                                    </div>
+                                </b-col>
+
+                                <b-col sm="6">
+                                    <div class="form-group">
+                                        <label for="youtube">Youtube</label>
+                                        <Field type="text" name="youtube" id="youtube"
+                                               :class="`form-control mb-0`" :validateOnInput="true" />
+                                        <ErrorMessage name="youtube" class="text-danger"/>
+                                    </div>
+                                </b-col>
+
+                                <b-col sm="6">
+                                    <div class="form-group">
                                         <label for="instagram">Instagram</label>
-                                        <Field as="textarea" name="instagram" id="instagram"
+                                        <Field type="text" name="instagram" id="instagram"
                                                :class="`form-control mb-0`" :validateOnInput="true" />
                                         <ErrorMessage name="instagram" class="text-danger"/>
                                     </div>
@@ -48,7 +75,7 @@ const onSubmit = handleSubmit(values => {
                                 <b-col>
                                     <div class="form-group">
                                         <label for="email">Email</label>
-                                        <Field as="textarea" name="email" id="email"
+                                        <Field type="text" name="email" id="email"
                                                :class="`form-control mb-0`" :validateOnInput="true" />
                                         <ErrorMessage name="email" class="text-danger"/>
                                     </div>
@@ -56,7 +83,7 @@ const onSubmit = handleSubmit(values => {
                                 <b-col sm="6">
                                     <div class="form-group">
                                         <label for="phone_number">Phone Number</label>
-                                        <Field as="textarea" name="phone_number" id="phone_number"
+                                        <Field type="text" name="phone_number" id="phone_number"
                                                :class="`form-control mb-0`" :validateOnInput="true" />
                                         <ErrorMessage name="phone_number" class="text-danger"/>
                                     </div>
