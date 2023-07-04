@@ -146,7 +146,7 @@ const showEdit = answer => {
 
 const saveAnswer = async answerIndex => {
     try {
-        const {data} = await axios.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/update-answers`, {
+        const {data} = await axios.post(`/attendees/${selectedAttendee.value.id}/update-answers`, {
             answers: selectedAttendee.value.answers
         })
 

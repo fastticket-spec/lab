@@ -231,7 +231,7 @@ class AccessLevelsService extends BaseRepository
         }
     }
 
-    public function sendLink(string $email, string $eventId, string $accessLevelId)
+    public function sendLink(array $emails, string $eventId, string $accessLevelId)
     {
         $route = "/event/$eventId/access-levels";
 
@@ -241,10 +241,12 @@ class AccessLevelsService extends BaseRepository
 
         $organiser = $accessLevel->event->organiser;
 
-        Mail::to($email)
-            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink, $organiser));
+        foreach ($emails as $email) {
+            Mail::to($email)
+                ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink, $organiser));
+        }
 
-        $message = 'Invitation has been sent to ' . $email;
+        $message = 'Invitation has been sent to the emails supplied';
 
         return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
     }
