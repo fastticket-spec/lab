@@ -155,7 +155,6 @@ class AccessLevelsService extends BaseRepository
 
     public function uploadDesignImages(Request $request, string $eventId, string $accessLevelId)
     {
-        $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
         try {
             $event = $this->eventService->find($eventId);
 
@@ -174,6 +173,7 @@ class AccessLevelsService extends BaseRepository
             }
 
             $message = 'Event Images uploaded successfully';
+            $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
 
             return $this->view(
                 data: [
@@ -182,6 +182,8 @@ class AccessLevelsService extends BaseRepository
                 ], flashMessage: $message, component: $route, returnType: 'redirect'
             );
         } catch (\Throwable $th) {
+            $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
+
             \Log::error($th);
 
             $message = 'An error occurred while uploading image!';
@@ -231,7 +233,7 @@ class AccessLevelsService extends BaseRepository
         }
     }
 
-    public function sendLink(string $email, string $eventId, string $accessLevelId)
+    public function sendLink(array $emails, string $eventId, string $accessLevelId)
     {
         $route = "/event/$eventId/access-levels";
 
@@ -241,10 +243,12 @@ class AccessLevelsService extends BaseRepository
 
         $organiser = $accessLevel->event->organiser;
 
-        Mail::to($email)
-            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink, $organiser));
+        foreach ($emails as $email) {
+            Mail::to($email)
+                ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink, $organiser));
+        }
 
-        $message = 'Invitation has been sent to ' . $email;
+        $message = 'Invitation has been sent to the emails supplied';
 
         return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
     }
