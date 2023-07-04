@@ -68,16 +68,18 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::get('/', [AccessLevelsController::class, 'index']);
                 Route::get('/create', [AccessLevelsController::class, 'create']);
                 Route::post('/', [AccessLevelsController::class, 'store']);
-                Route::get('{access_level_id}/edit', [AccessLevelsController::class, 'edit']);
-                Route::patch('{access_level_id}/update', [AccessLevelsController::class, 'update']);
-                Route::post('{access_level_id}/change-status', [AccessLevelsController::class, 'updateStatus']);
-                Route::get('{access_level_id}/customize', [AccessLevelsController::class, 'customize']);
-                Route::post('{access_level_id}/customize/general', [AccessLevelsController::class, 'customizeGeneral']);
-                Route::post('{access_level_id}/customize/page-design', [AccessLevelsController::class, 'customizePageDesign']);
-                Route::post('{access_level_id}/customize/design-images', [AccessLevelsController::class, 'designImages']);
-                Route::post('{access_level_id}/customize/request-form', [AccessLevelsController::class, 'requestForm']);
-                Route::post('{access_level_id}/customize/socials', [AccessLevelsController::class, 'socials']);
-                Route::post('{access_level_id}/send-invitation', [AccessLevelsController::class, 'sendInvitationLink']);
+                Route::group(['prefix' => '{access_level_id}'], function () {
+                    Route::get('/edit', [AccessLevelsController::class, 'edit']);
+                    Route::patch('/update', [AccessLevelsController::class, 'update']);
+                    Route::post('/change-status', [AccessLevelsController::class, 'updateStatus']);
+                    Route::get('/customize', [AccessLevelsController::class, 'customize']);
+                    Route::post('/customize/general', [AccessLevelsController::class, 'customizeGeneral']);
+                    Route::post('/customize/page-design', [AccessLevelsController::class, 'customizePageDesign']);
+                    Route::post('/customize/design-images', [AccessLevelsController::class, 'designImages']);
+                    Route::post('/customize/request-form', [AccessLevelsController::class, 'requestForm']);
+                    Route::post('/customize/socials', [AccessLevelsController::class, 'socials']);
+                    Route::post('/send-invitation', [AccessLevelsController::class, 'sendInvitationLink']);
+                });
             });
 
             Route::prefix('/event-surveys')->group(function () {
@@ -99,6 +101,7 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('/send-bulk-invitation', [AttendeesController::class, 'sendBulkEventInvitation']);
                 Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignEventZones']);
                 Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendEventInvitation']);
+                Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateEventAttendeeAnswers']);
             });
 
             Route::prefix('/zones')->group(function () {
@@ -129,6 +132,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/send-bulk-invitation', [AttendeesController::class, 'sendBulkInvitation']);
             Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignZones']);
             Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendInvitation']);
+            Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateAttendeeAnswers']);
         });
     });
 });

@@ -20,6 +20,7 @@
         "bootstrap": "^4.6.0",
         "bootstrap-vue": "^2.23.1",
         "counterup2": "^2.0.2",
+        "lodash.debounce": "^4.0.8",
         "node-snackbar": "^0.1.16",
         "smooth-scrollbar": "^8.8.4",
         "uuid": "^9.0.0",

@@ -16,6 +16,8 @@ class AccessLevelPageDesign extends Model
         'btn_font_color_code',
         'register_btn_value',
         'register_btn_value_ar',
+        'form_btn_value',
+        'form_btn_value_ar',
         'bg_color',
         'bg_type',
         'bg_image',

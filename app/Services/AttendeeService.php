@@ -50,6 +50,10 @@ class AttendeeService extends BaseRepository
                     ->orWhereHas('event', function ($q) use ($searchTerm) {
                         $q->where('title', 'like', "%{$searchTerm}%")
                             ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
+                    })
+                    ->orWhereHas('accessLevel', function ($q) use ($searchTerm) {
+                        $q->where('title', 'like', "%{$searchTerm}%")
+                            ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
                     });
             })
             ->when($request->input('sort'), function ($query) use ($request) {
@@ -60,8 +64,8 @@ class AttendeeService extends BaseRepository
                     case 'sort_by_ref':
                         $query->orderBy('ref');
                         break;
-                    case 'accept_status':
-                        $query->orderBy('accept_status');
+                    case 'status':
+                        $query->orderBy('status');
                         break;
                     default:
                         $query->orderByDesc('created_at');
@@ -74,7 +78,7 @@ class AttendeeService extends BaseRepository
                 return [
                     'id' => $attendee->id,
                     'access_level' => $attendee->accessLevel,
-                    'event' => $attendee->event,
+                    'category' => $attendee->event,
                     'ref' => $attendee->ref,
                     'answers' => $attendee->answers,
                     'email' => $attendee->email,
@@ -90,7 +94,6 @@ class AttendeeService extends BaseRepository
     {
         $lang = $request->lang;
         $event = $this->eventService->find($eventId);
-        $settings = $this->accessLevelsService->find($accessLevelId)->generalSettings;
 
         try {
             DB::beginTransaction();
@@ -314,5 +317,50 @@ class AttendeeService extends BaseRepository
     {
 //        Mail::to($attendee->email)
 //            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink));
+    }
+
+    public function updateAnswer(Request $request, string $attendeeId, ?string $eventId = null)
+    {
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+
+        try {
+            DB::beginTransaction();
+
+            $attendee = $this->find($attendeeId);
+            $email = '';
+            $answers = [];
+            foreach ($request->answers as $answer) {
+                if ($answer['type'] == '5') {
+                    $email = $answer['answer'];
+                }
+                $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => $answer['answer'] ?? ''];
+            }
+
+//            dd($answers);
+
+            $attendee->update([
+                'email' => $email,
+                'answers' => $answers
+            ]);
+
+            DB::commit();
+
+            $attendee->refresh();
+
+            $message = 'Answer updated successfully!';
+
+            return $this->view(
+                data: ['attendee' => $attendee, 'message' => $message]
+            );
+        } catch (\Throwable $th) {
+            \Log::error($th);
+
+            $message = 'An error occurred while updating answer!.';
+            return $this->view(
+                data: ['message' => $message],
+                flashMessage: $message, messageType: 'danger',
+                component: $route, returnType: 'redirect'
+            );
+        }
     }
 }

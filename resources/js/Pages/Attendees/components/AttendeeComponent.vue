@@ -1,12 +1,15 @@
 <script setup>
 import {router} from "@inertiajs/vue3";
 import {ref, onUpdated, reactive, computed} from "vue";
+import SearchBox from '../../../Shared/components/core/SearchBox/Index.vue';
+import axios from "axios";
 
 const props = defineProps({
     attendees: Object,
     eventId: String,
     sort: String,
-    zones: Array
+    zones: Array,
+    q: String
 })
 
 const selectedAttendee = ref({})
@@ -21,11 +24,22 @@ const message = reactive({
 })
 const selectedZones = ref([]);
 
-const fields = ['check', 'access_level', 'event', 'ref', 'email', 'status', 'accept_status', 'date_submitted', 'action']
+const fields = ['check', 'access_level', 'category', 'ref', 'email', 'status', 'accept_status', 'date_submitted', 'action']
 
-const answerFields = ['question', 'answers'];
+const answerFields = ['question', 'answers', '⠀'];
 
 const checkedRows = ref([]);
+
+const searchAttendees = searchString => {
+    goTo(props.attendees.current_page, props.attendees.per_page, searchString);
+}
+
+const goTo = (page, perPage, q) => {
+    router.get(`/attendees?q=${q || ''}&page=${page}&per_page=${perPage}`, {}, {
+        replace: true,
+        preserveState: true
+    })
+}
 
 const sortEvents = () => {
     visit(`/attendees?sort=${selectedSort.value}`)
@@ -107,8 +121,50 @@ const declineAttendees = () => {
 }
 const assignZonesToAttendees = () => {
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/bulk-assign-zones`, {attendee_ids: checkedRows.value, zones: selectedZones.value})
+        ? router.post(`/event/${props.eventId}/attendees/bulk-assign-zones`, {
+            attendee_ids: checkedRows.value,
+            zones: selectedZones.value
+        })
         : router.post(`/attendees/bulk-assign-zones`, {attendee_ids: checkedRows.value, zones: selectedZones.value})
+}
+
+const showEdit = answer => {
+    selectedAttendee.value.answers = selectedAttendee.value.answers.map(x => ({
+        ...x,
+        edit: false,
+        answer: x.prev_answer || x.answer
+    }))
+    const currentAnswerIndex = selectedAttendee.value.answers.findIndex(x => (x.question === answer.question && x.type === answer.type));
+
+    if (currentAnswerIndex !== '-1') {
+        let selectedAnswer = selectedAttendee.value.answers[currentAnswerIndex];
+
+        selectedAnswer.edit = true;
+        selectedAnswer.prev_answer = selectedAnswer.answer;
+    }
+}
+
+const saveAnswer = async answerIndex => {
+    try {
+        const {data} = await axios.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/update-answers`, {
+            answers: selectedAttendee.value.answers
+        })
+
+        console.log(data);
+
+        selectedAttendee.value.answers[answerIndex].edit = false;
+        // answerModalShow.value = false;
+    } catch (e) {
+        console.log(e);
+    }
+
+}
+
+const cancelAnswer = (answerIndex) => {
+    let selectedAnswer = selectedAttendee.value.answers[answerIndex];
+    selectedAnswer.edit = true;
+    selectedAnswer.answer = selectedAnswer.prev_answer || selectedAnswer.answer;
+    selectedAnswer.edit = false;
 }
 </script>
 
@@ -116,20 +172,29 @@ const assignZonesToAttendees = () => {
     <b-container fluid>
         <b-row>
             <b-col sm="12">
-                <no-data v-if="!attendees.total" title="Attendees" link="#" :sub-text="false"/>
+                <no-data v-if="!attendees.total && !q" title="Attendees" link="#" :sub-text="false"/>
 
-                <iq-card v-if="attendees.total">
+                <iq-card v-if="attendees.total || (!attendees.total && q)">
                     <template v-slot:headerTitle>
                         <div class="d-flex justify-content-between">
                             <h4 class="card-title">{{ $t('sidebar.attendees') }}</h4>
-                            <div class="form-group">
-                                <select class="form-control" @change="sortEvents" v-model="selectedSort">
-                                    <option value="">{{ $t('sort.title') }}</option>
-                                    <option value="sort_by_creation">{{ $t('sort.creation_date') }}</option>
-                                    <option value="accept_status">Accept Status</option>
-                                    <option value="sort_by_ref">Ref</option>
-                                </select>
-                            </div>
+                        </div>
+                    </template>
+
+                    <template v-slot:headerAction>
+                        <search-box
+                            placeholder="Search by email, ref, event"
+                            :on-search="searchAttendees"
+                            :default-value="q"
+                        />
+
+                        <div class="form-group ml-4 mt-2">
+                            <select class="form-control" @change="sortEvents" v-model="selectedSort">
+                                <option value="">{{ $t('sort.title') }}</option>
+                                <option value="sort_by_creation">{{ $t('sort.creation_date') }}</option>
+                                <option value="status">Status</option>
+                                <option value="sort_by_ref">Ref</option>
+                            </select>
                         </div>
                     </template>
 
@@ -171,12 +236,12 @@ const assignZonesToAttendees = () => {
                                         </span>
                                     </template>
 
-                                    <template #cell(event)="data">
-                                        <Link :href="`/event/${data.item.event.id}/dashboard`">
+                                    <template #cell(category)="data">
+                                        <Link :href="`/event/${data.item.category.id}/dashboard`">
                                             {{
-                                                data.item.event?.title
+                                                data.item.category?.title
                                             }} {{
-                                                data.item.event?.title_arabic ? `(${data.item.event?.title_arabic})` : ''
+                                                data.item.category?.title_arabic ? `(${data.item.category?.title_arabic})` : ''
                                             }}
                                         </Link>
                                     </template>
@@ -224,10 +289,29 @@ const assignZonesToAttendees = () => {
                     <b-table :items="selectedAttendee.answers" :fields="answerFields"
                              class="table-responsive-sm table-borderless">
                         <template #cell(answers)="data">
-                            <span v-if="data.item.type !== '4'">
-                                {{ Array.isArray(data.item.answer) ? data.item.answer.join(', ') : data.item.answer }}
-                            </span>
-                            <a v-else-if="data.item.type === '4'" :href="data.item.answer" target="_blank">View File</a>
+                            <div v-if="data.item.edit">
+                                <input v-model="data.item.answer" :type="data.item.type === '3' ? 'datetime-local' : 'text'">
+                                <b-btn @click="saveAnswer(data.index)" class="ml-2" size="sm"
+                                       variant="primary"><i
+                                    class="ri-save-2-line p-0"></i></b-btn>
+                                <b-btn @click="cancelAnswer(data.index)" class="ml-2" size="sm"
+                                       variant="danger"><i
+                                    class="ri-close-line p-0"></i></b-btn>
+                            </div>
+
+                            <template v-else>
+                                <span v-if="data.item.type !== '4'">
+                                    {{
+                                        Array.isArray(data.item.answer) ? data.item.answer.join(', ') : data.item.answer
+                                    }}
+                                </span>
+                                <a v-else-if="data.item.type === '4'" :href="data.item.answer" target="_blank">View
+                                    File</a>
+                            </template>
+                        </template>
+                        <template #cell(⠀)="data">
+                            <b-btn v-if="data.item.type !== '10' && !data.item.edit" @click="showEdit(data.item)" size="sm" variant="primary"><i
+                                class="ri-edit-2-line p-0"></i></b-btn>
                         </template>
                     </b-table>
                 </b-col>
