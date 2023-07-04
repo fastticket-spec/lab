@@ -19,7 +19,8 @@ class AttendeesController extends Controller
         return Inertia::render('Attendees/Index', [
             'attendees' => $this->attendeeService->fetchAttendees($request),
             'zones' => $this->zoneService->allZones(),
-            'sort' => $request->sort
+            'sort' => $request->sort,
+            'q' => $request->q
         ]);
     }
 
@@ -29,7 +30,8 @@ class AttendeesController extends Controller
             'eventId' => $eventId,
             'zones' => $this->zoneService->allZones($eventId),
             'attendees' => $this->attendeeService->fetchAttendees($request, $eventId),
-            'sort' => $request->sort
+            'sort' => $request->sort,
+            'q' => $request->q
         ]);
     }
 
@@ -117,5 +119,15 @@ class AttendeesController extends Controller
         $request->validate(['attendee_ids' => 'array|required']);
 
         return $this->attendeeService->sendBulkInvitations($request->attendee_ids, $eventId);
+    }
+
+    public function updateAttendeeAnswers(Request $request, string $attendeeId)
+    {
+        return $this->attendeeService->updateAnswer($request, $attendeeId);
+    }
+
+    public function updateEventAttendeeAnswers(Request $request, string $eventId, string $attendeeId)
+    {
+        return $this->attendeeService->updateAnswer($request, $attendeeId, $eventId);
     }
 }

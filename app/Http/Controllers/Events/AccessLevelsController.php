@@ -129,6 +129,6 @@ class AccessLevelsController extends Controller
 
     public function sendInvitationLink(Request $request, string $eventId, string $accessLevelId)
     {
-        return $this->accessLevelsService->sendLink($request->email, $eventId, $accessLevelId);
+        return $this->accessLevelsService->sendLink($request->emails, $eventId, $accessLevelId);
     }
 }
