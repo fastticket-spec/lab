@@ -25,4 +25,9 @@ class Badge extends Model
     {
         return $this->hasMany(BadgeAccessLevel::class);
     }
+
+    public function badgeColumns(): HasMany
+    {
+        return $this->hasMany(BadgeColumn::class);
+    }
 }
