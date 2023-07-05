@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Endroid\QrCode\QrCode;
 
 class AttendeeService extends BaseRepository
 {
@@ -36,7 +37,7 @@ class AttendeeService extends BaseRepository
         $account = auth()->user()->account;
 
         return $this->model->query()
-            ->with(['event', 'accessLevel', 'zones.zone'])
+            ->with(['event', 'accessLevel.accessLevelBadge.badge', 'zones.zone'])
             ->when($account->active_organiser, function ($query) use ($account) {
                 $query->where('organiser_id', $account->active_organiser);
             })
@@ -85,7 +86,8 @@ class AttendeeService extends BaseRepository
                     'status' => Attendee::STATUS_READABLE[$attendee->status],
                     'accept_status' => Attendee::ACCEPT_STATUS_READABLE[$attendee->accept_status],
                     'date_submitted' => $attendee->created_at->format('jS M, Y H:i'),
-                    'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id)
+                    'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id),
+                    'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge
                 ];
             });
     }
@@ -362,5 +364,155 @@ class AttendeeService extends BaseRepository
                 component: $route, returnType: 'redirect'
             );
         }
+    }
+
+    public function downloadAttendeeBadge(Request $request, string $attendeeId, string $badgeId, ?string $eventId = null)
+    {
+        $getAttendee = $this->find($attendeeId);
+        $event = $getAttendee->event;
+        $getBadge = $event->eventBadges()->whereBadgeId($badgeId)->first();
+        $badge = $event->badges()->whereId($badgeId)->first();
+        $badgeColumn = $badge->badgeColumns;
+
+
+//        $badgeColumn = BadgeColumn::where('badge_id', $badgeId)->get();
+//        $badge = Badges::where('id', $badgeId)->first();
+//        $getBadge = Event_badge::where('badge_id', $badgeId)->first();
+//        $badgeDatas = BadgeData::where('event_id', $eventId)->where('badge_id', $badgeId)->where('attendee_id', $attendeeId)->get()->toArray() ?? [];
+//        $surveyAnswer = $getAttendee->answers;
+        $badgeDatas = [];
+        $survey = $getAttendee->answers;
+//        dd($survey);
+
+
+        foreach ($badgeColumn as $k => $col) {
+            foreach ($survey as $i => $question) {
+                if ($answer = $question['answer']) {
+                    $badgeDatas[] = (object)['column_title' => strtolower(str_replace(' ', '_', $question['question'])), 'column_value' => $answer];
+                }
+//                if ($question->question_type_id != 8) {
+//                    $answer = QuestionAnswer::where('question_id', $question->id)->where('attendee_id', $getAttendee->id)->first();
+//                    if ($answer) {
+//                        // $badgeDatas[$k] = (object) [
+//                        //     'column_value' => $answer->answer_text,
+//                        //     'column_title' => strtolower(str_replace(' ', '_', $question->title))
+//                        // ];
+//
+//                        array_push($badgeDatas, (object)['column_title' => strtolower(str_replace(' ', '_', $question->title)), 'column_value' => $answer->answer_text]);
+//                    }
+//                }
+
+
+//                if ($question->question_type_id == 8) {
+//                    $answer = QuestionAnswer::where('question_id', $question->id)->where('attendee_id', $getAttendee->id)->first();
+//                    if ($answer) {
+//                        if (is_image(public_path() . '/user_content/' . $answer->answer_text)) {
+//                            $getAttendee->user_photo = public_path() . '/user_content/' . $answer->answer_text;
+//                        }
+//                    }
+//                }
+            }
+        }
+
+        $badgeDatas[] = (object)['column_title' => 'function', 'column_value' => $event->title];
+//        $badgeDatas[] = (object)['column_title' => 'registration_reference', 'column_value' => $getAttendee->order->order_reference];
+        $badgeDatas[] = (object)['column_title' => 'first_name', 'column_value' => $getAttendee->email];
+//        $badgeDatas[] = (object)['column_title' => 'last_name', 'column_value' => $getAttendee->last_name];
+        $badgeDatas[] = (object)['column_title' => 'full_name', 'column_value' => $getAttendee->email];
+
+//        if (!$getAttendee) {
+//            abort(404);
+//        }
+
+//        $getAttendee->download_num = $getAttendee->download_num + 1;
+//        $getAttendee->save();
+        $badge_html = $getBadge->html;
+
+//        $path = config('attendize.event_images_path');
+        $filename = $getAttendee->ref . '.png';
+        $file_full_path = storage_path() . '/app/public/badge_qrs/' . $filename;
+//        if ($event->organiser_id == 53) {
+//            $mobile = $getAttendee->answers->wherein('question_id', 898, 896, 894, 891)->first()->answer_text;
+//            $d = "BEGIN:VCARD
+//            VERSION:4.0
+//            FN:$getAttendee->first_name  $getAttendee->last_name
+//            EMAIL;TYPE=work:$getAttendee->email
+//            TEL:
+//            END:VCARD";
+//            $d = "BEGIN:VCARD
+//VERSION:2.1
+//N:$getAttendee->first_name $getAttendee->last_name
+//EMAIL:$getAttendee->email
+//TEL;HOME;VOICE:$mobile
+//END:VCARD";
+//
+//            Card::encoding('UTF-8')->format('png')->generate($d, $file_full_path);
+//        } else {
+            $qrCode = new QrCode($getAttendee->ref);
+            $qrCode->setSize(300);
+            $qrCode->setForegroundColor(array('r' => 0, 'g' => 0, 'b' => 0, 'a' => 0));
+            $qrCode->setBackgroundColor(array('r' => 255, 'g' => 255, 'b' => 255, 'a' => 0));
+            $qrCode->setLabelFontSize(16);
+
+            // dd($file_full_path);
+            // Save it to a file
+            $qrCode->writeFile($file_full_path);
+//        }
+        libxml_use_internal_errors(true);
+        $doc = new \DOMDocument();
+        $doc->loadHTML($badge_html);
+        $tags = $doc->getElementsByTagName("img");
+        foreach ($tags as $tag) {
+            if ($tag->getAttribute('class') === 'barcode') {
+                $old_src = $tag->getAttribute('src');
+                $tag->setAttribute('src', asset('/badge_qrs/' . $filename));
+                $tag->setAttribute('data-src', $old_src);
+            }
+
+            if ($tag->getAttribute('class') === 'user_photo' && !is_null($getAttendee->user_photo)) {
+//                Log::info($getAttendee->user_photo);
+//                $old_src = $tag->getAttribute('src');
+//                $new_src_url = (strpos($getAttendee->user_photo, 'https') !== false || strpos($getAttendee->user_photo, 'question_files') !== false) ? $getAttendee->user_photo : env('DO_URL') . config('attendize.event_images_path') . '/' . $getAttendee->user_photo;
+//                $type = pathinfo($new_src_url, PATHINFO_EXTENSION);
+//                $data = file_get_contents($new_src_url);
+//                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+//                // $urlparts = parse_url($new_src_url);
+//                // $extracted = $urlparts['path'];
+//                $tag->setAttribute('src', $base64);
+//                $tag->setAttribute('data-src', $old_src);
+            }
+        }
+
+
+        foreach ($badgeDatas as $data) {
+            // dd($badgeDatas);
+            foreach ($doc->getElementsByTagName('*') as $element) {
+                if (!empty($element->getAttribute('key') && $element->getAttribute('key') == $data->column_title)) {
+                    $element->nodeValue = $data->column_value;
+                }
+
+                if ($element->getAttribute('id') == 'order_ref') {
+                    $element->nodeValue = $getAttendee->order->order_reference;
+                }
+
+                if (!empty($element->getAttribute('key')) && $element->getAttribute('key') == 'zone') {
+//                    $attXone = [];
+//                    foreach ($getAttendee->zones as $att_zone) {
+//                        $attXone[] = optional(BadgesZone::where('zone_id', $att_zone->zone_id)->first())->zone_id;
+//                    }
+//
+//
+//                    if (!in_array($element->getAttribute('id'), $attXone)) {
+//                        $element->setAttribute('style', 'display: none;');
+//                    }
+                }
+            }
+        }
+
+        $html_data = $doc->saveHTML();
+
+        $data = ['html_data' => $html_data, 'badge' => $badge, 'type' => $request->type];
+
+        return view('badge_display', $data);
     }
 }

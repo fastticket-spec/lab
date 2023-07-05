@@ -130,4 +130,14 @@ class AttendeesController extends Controller
     {
         return $this->attendeeService->updateAnswer($request, $attendeeId, $eventId);
     }
+
+    public function downloadBadge(Request $request, string $attendeeId, string $badgeId)
+    {
+        return $this->attendeeService->downloadAttendeeBadge($request, $attendeeId, $badgeId);
+    }
+
+    public function downloadEventBadge(Request $request, string $eventId, string $attendeeId, string $badgeId)
+    {
+        return $this->attendeeService->downloadAttendeeBadge($request, $attendeeId, $badgeId, $eventId);
+    }
 }
