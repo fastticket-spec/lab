@@ -28,7 +28,7 @@ class BadgeController extends Controller
     {
         return Inertia::render('Events/Event/Badges/Create', [
             'eventId' => $eventId,
-            'accessLevels' => $this->accessLevelsService->allAccessLevels($eventId)
+            'accessLevels' => $this->accessLevelsService->allAccessLevels($eventId, true)
         ]);
     }
 
@@ -56,7 +56,7 @@ class BadgeController extends Controller
             'badge' => $badge,
             'editMode' => true,
             'accessLevelIds' => $accessLevelIds,
-            'accessLevels' => $this->accessLevelsService->allAccessLevels($eventId)
+            'accessLevels' => $this->accessLevelsService->allAccessLevels($eventId, true, $accessLevelIds->toArray())
         ]);
     }
 
