@@ -45,6 +45,11 @@ class Event extends Model
         return $this->hasMany(Zone::class);
     }
 
+    public function eventBadges(): HasMany
+    {
+        return $this->hasMany(EventBadge::class);
+    }
+
     public function badges(): HasMany
     {
         return $this->hasMany(Badge::class);

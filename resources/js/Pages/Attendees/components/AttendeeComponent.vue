@@ -85,6 +85,12 @@ const reinstateAttendee = (attendeeId) => {
         : router.post(`/attendees/${attendeeId}/approval/0`)
 }
 
+const downloadBadge = (attendeeId, badgeId) => {
+    props.eventId
+        ? router.get(`/event/${props.eventId}/attendees/${attendeeId}/download-badge/${badgeId}?type=full`)
+        : router.get(`/attendees/${attendeeId}/download-badge/${badgeId}?type=full`)
+}
+
 const onSubmitMessage = () => {
     props.eventId
         ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/send-message`, message)
@@ -265,7 +271,7 @@ const cancelAnswer = (answerIndex) => {
                                                 @click.prevent="selectedAttendee = data.item; checkedRows = []; zonesModalShow = true; zonesForBulk = false; selectedZones = (data.item.zones || [])">Assign Zones</b-dropdown-item>
                                             <b-dropdown-item
                                                 v-if="data.item.badge"
-                                                @click.prevent="downloadBadge">Download Badge</b-dropdown-item>
+                                                @click.prevent="downloadBadge(data.item.id, data.item.badge.id)">Download Badge</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>

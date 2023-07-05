@@ -102,6 +102,7 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignEventZones']);
                 Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendEventInvitation']);
                 Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateEventAttendeeAnswers']);
+                Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadEventBadge']);
             });
 
             Route::prefix('/zones')->group(function () {
@@ -133,6 +134,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignZones']);
             Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendInvitation']);
             Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateAttendeeAnswers']);
+            Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadBadge']);
         });
     });
 });
