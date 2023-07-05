@@ -36,7 +36,7 @@ class AttendeeService extends BaseRepository
         $account = auth()->user()->account;
 
         return $this->model->query()
-            ->with(['event', 'accessLevel', 'zones.zone'])
+            ->with(['event', 'accessLevel.accessLevelBadge.badge', 'zones.zone'])
             ->when($account->active_organiser, function ($query) use ($account) {
                 $query->where('organiser_id', $account->active_organiser);
             })
@@ -85,7 +85,8 @@ class AttendeeService extends BaseRepository
                     'status' => Attendee::STATUS_READABLE[$attendee->status],
                     'accept_status' => Attendee::ACCEPT_STATUS_READABLE[$attendee->accept_status],
                     'date_submitted' => $attendee->created_at->format('jS M, Y H:i'),
-                    'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id)
+                    'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id),
+                    'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge
                 ];
             });
     }

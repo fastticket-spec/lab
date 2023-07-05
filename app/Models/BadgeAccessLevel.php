@@ -18,4 +18,9 @@ class BadgeAccessLevel extends Model
     {
         return $this->belongsTo(AccessLevel::class);
     }
+
+    public function badge(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Badge::class);
+    }
 }

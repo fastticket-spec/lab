@@ -53,10 +53,26 @@ class AccessLevelsService extends BaseRepository
             });
     }
 
-    public function allAccessLevels(string $eventId): \Illuminate\Database\Eloquent\Collection|array
+    public function allAccessLevels(string $eventId, ?bool $excludeExisting = false, ?array $showIds = null): \Illuminate\Database\Eloquent\Collection|array
     {
+        $excludeIds = [];
+        if ($excludeExisting) {
+            $event = $this->eventService->find($eventId);
+            $badges = array_merge(...$event->badges()
+                ->with('badgeAccessLevels')
+                ->get()
+                ->map(fn($badge) => $badge->badgeAccessLevels)->toArray());
+
+            $excludeIds = collect($badges)->pluck('access_level_id')->toArray();
+
+            if ($showIds) {
+                $excludeIds = array_diff($excludeIds, $showIds);
+            }
+        }
+
         return $this->model->query()
             ->whereEventId($eventId)
+            ->whereNotIn('id', $excludeIds)
             ->latest()
             ->get();
     }

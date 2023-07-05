@@ -263,6 +263,9 @@ const cancelAnswer = (answerIndex) => {
                                                              @click.prevent="reinstateAttendee(data.item.id)">Reinstate</b-dropdown-item>
                                             <b-dropdown-item
                                                 @click.prevent="selectedAttendee = data.item; checkedRows = []; zonesModalShow = true; zonesForBulk = false; selectedZones = (data.item.zones || [])">Assign Zones</b-dropdown-item>
+                                            <b-dropdown-item
+                                                v-if="data.item.badge"
+                                                @click.prevent="downloadBadge">Download Badge</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>

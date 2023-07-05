@@ -51,4 +51,9 @@ class AccessLevel extends Model
     {
         return $this->hasMany(Attendee::class);
     }
+
+    public function accessLevelBadge(): HasOne
+    {
+        return $this->hasOne(BadgeAccessLevel::class);
+    }
 }
