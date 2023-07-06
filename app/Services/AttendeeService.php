@@ -465,7 +465,7 @@ class AttendeeService extends BaseRepository
         foreach ($tags as $tag) {
             if ($tag->getAttribute('class') === 'barcode') {
                 $old_src = $tag->getAttribute('src');
-                $tag->setAttribute('src', asset('/badge_qrs/' . $filename));
+                $tag->setAttribute('src', config('app.url') . '/storage/badge_qrs/' . $filename);
                 $tag->setAttribute('data-src', $old_src);
             }
 
