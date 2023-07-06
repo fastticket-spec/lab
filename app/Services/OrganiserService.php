@@ -142,4 +142,14 @@ class OrganiserService extends BaseRepository
 
         return $organiser;
     }
+
+    public function count(bool $all = false): int
+    {
+        return $this->model->query()
+            ->when(!$all, function ($query) {
+                $accountId = auth()->user()->account->id;
+                $query->whereAccountId($accountId);
+            })
+            ->count();
+    }
 }

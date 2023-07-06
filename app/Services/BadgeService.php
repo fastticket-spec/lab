@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class BadgeService extends BaseRepository
 {
-    public function __construct(Badge $model)
+    public function __construct(Badge $model, private EventService $eventService)
     {
         parent::__construct($model);
     }
@@ -86,5 +86,32 @@ class BadgeService extends BaseRepository
             component: "/event/$eventId/badges",
             returnType: 'redirect'
         );
+    }
+
+    public function count(?string $eventId = null): int
+    {
+        $user = auth()->user();
+        $account = $user->account;
+        $activeOrganiser = $account->active_organiser;
+
+        if ($eventId) {
+            $eventIds = [$eventId];
+        } else {
+            $eventIds = $this->eventService->model->query()
+                ->when(!$activeOrganiser, function ($query) use ($user) {
+                    $query->whereIn('organiser_id', $user->organiserIds());
+                })
+                ->when($activeOrganiser, function ($query) use ($activeOrganiser) {
+                    $query->where('organiser_id', $activeOrganiser);
+                })
+                ->when($eventId, function ($query) use ($eventId) {
+                    $query->where('event_id', $eventId);
+                })
+                ->pluck('id');
+        }
+
+        return $this->model->query()
+            ->whereIn('event_id', $eventIds)
+            ->count();
     }
 }

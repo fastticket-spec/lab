@@ -59,7 +59,10 @@
         "access_levels": "Access Levels",
         "event_surveys": "Event Surveys",
         "zones": "Zones",
-        "badges": "Badges"
+        "badges": "Badges",
+        "accepted": "Accepted",
+        "declined": "Declined",
+        "downloads": "Downloads"
     },
     "customize": {
         "general": "General",
