@@ -368,8 +368,8 @@ class AttendeeService extends BaseRepository
 
     public function downloadAttendeeBadge(Request $request, string $attendeeId, string $badgeId, ?string $eventId = null)
     {
-        $getAttendee = $this->find($attendeeId);
-        $event = $getAttendee->event;
+        $attendee = $this->find($attendeeId);
+        $event = $attendee->event;
         $getBadge = $event->eventBadges()->whereBadgeId($badgeId)->first();
         $badge = $event->badges()->whereId($badgeId)->first();
         $badgeColumn = $badge->badgeColumns;
@@ -379,9 +379,9 @@ class AttendeeService extends BaseRepository
 //        $badge = Badges::where('id', $badgeId)->first();
 //        $getBadge = Event_badge::where('badge_id', $badgeId)->first();
 //        $badgeDatas = BadgeData::where('event_id', $eventId)->where('badge_id', $badgeId)->where('attendee_id', $attendeeId)->get()->toArray() ?? [];
-//        $surveyAnswer = $getAttendee->answers;
+//        $surveyAnswer = $attendee->answers;
         $badgeDatas = [];
-        $survey = $getAttendee->answers;
+        $survey = $attendee->answers;
 //        dd($survey);
 
 
@@ -391,7 +391,7 @@ class AttendeeService extends BaseRepository
                     $badgeDatas[] = (object)['column_title' => strtolower(str_replace(' ', '_', $question['question'])), 'column_value' => $answer];
                 }
 //                if ($question->question_type_id != 8) {
-//                    $answer = QuestionAnswer::where('question_id', $question->id)->where('attendee_id', $getAttendee->id)->first();
+//                    $answer = QuestionAnswer::where('question_id', $question->id)->where('attendee_id', $attendee->id)->first();
 //                    if ($answer) {
 //                        // $badgeDatas[$k] = (object) [
 //                        //     'column_value' => $answer->answer_text,
@@ -404,10 +404,10 @@ class AttendeeService extends BaseRepository
 
 
 //                if ($question->question_type_id == 8) {
-//                    $answer = QuestionAnswer::where('question_id', $question->id)->where('attendee_id', $getAttendee->id)->first();
+//                    $answer = QuestionAnswer::where('question_id', $question->id)->where('attendee_id', $attendee->id)->first();
 //                    if ($answer) {
 //                        if (is_image(public_path() . '/user_content/' . $answer->answer_text)) {
-//                            $getAttendee->user_photo = public_path() . '/user_content/' . $answer->answer_text;
+//                            $attendee->user_photo = public_path() . '/user_content/' . $answer->answer_text;
 //                        }
 //                    }
 //                }
@@ -415,48 +415,48 @@ class AttendeeService extends BaseRepository
         }
 
         $badgeDatas[] = (object)['column_title' => 'function', 'column_value' => $event->title];
-//        $badgeDatas[] = (object)['column_title' => 'registration_reference', 'column_value' => $getAttendee->order->order_reference];
-        $badgeDatas[] = (object)['column_title' => 'first_name', 'column_value' => $getAttendee->email];
-//        $badgeDatas[] = (object)['column_title' => 'last_name', 'column_value' => $getAttendee->last_name];
-        $badgeDatas[] = (object)['column_title' => 'full_name', 'column_value' => $getAttendee->email];
+//        $badgeDatas[] = (object)['column_title' => 'registration_reference', 'column_value' => $attendee->order->order_reference];
+        $badgeDatas[] = (object)['column_title' => 'first_name', 'column_value' => $attendee->email];
+//        $badgeDatas[] = (object)['column_title' => 'last_name', 'column_value' => $attendee->last_name];
+        $badgeDatas[] = (object)['column_title' => 'full_name', 'column_value' => $attendee->email];
 
-//        if (!$getAttendee) {
+//        if (!$attendee) {
 //            abort(404);
 //        }
 
-//        $getAttendee->download_num = $getAttendee->download_num + 1;
-//        $getAttendee->save();
+        $attendee->downloads = $attendee->downloads + 1;
+        $attendee->save();
         $badge_html = $getBadge->html;
 
 //        $path = config('attendize.event_images_path');
-        $filename = $getAttendee->ref . '.png';
+        $filename = $attendee->ref . '.png';
         $file_full_path = storage_path() . '/app/public/badge_qrs/' . $filename;
 //        if ($event->organiser_id == 53) {
-//            $mobile = $getAttendee->answers->wherein('question_id', 898, 896, 894, 891)->first()->answer_text;
+//            $mobile = $attendee->answers->wherein('question_id', 898, 896, 894, 891)->first()->answer_text;
 //            $d = "BEGIN:VCARD
 //            VERSION:4.0
-//            FN:$getAttendee->first_name  $getAttendee->last_name
-//            EMAIL;TYPE=work:$getAttendee->email
+//            FN:$attendee->first_name  $attendee->last_name
+//            EMAIL;TYPE=work:$attendee->email
 //            TEL:
 //            END:VCARD";
 //            $d = "BEGIN:VCARD
 //VERSION:2.1
-//N:$getAttendee->first_name $getAttendee->last_name
-//EMAIL:$getAttendee->email
+//N:$attendee->first_name $attendee->last_name
+//EMAIL:$attendee->email
 //TEL;HOME;VOICE:$mobile
 //END:VCARD";
 //
 //            Card::encoding('UTF-8')->format('png')->generate($d, $file_full_path);
 //        } else {
-            $qrCode = new QrCode($getAttendee->ref);
-            $qrCode->setSize(300);
-            $qrCode->setForegroundColor(array('r' => 0, 'g' => 0, 'b' => 0, 'a' => 0));
-            $qrCode->setBackgroundColor(array('r' => 255, 'g' => 255, 'b' => 255, 'a' => 0));
-            $qrCode->setLabelFontSize(16);
+        $qrCode = new QrCode($attendee->ref);
+        $qrCode->setSize(300);
+        $qrCode->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0]);
+        $qrCode->setBackgroundColor(['r' => 255, 'g' => 255, 'b' => 255, 'a' => 0]);
+        $qrCode->setLabelFontSize(16);
 
-            // dd($file_full_path);
-            // Save it to a file
-            $qrCode->writeFile($file_full_path);
+        // dd($file_full_path);
+        // Save it to a file
+        $qrCode->writeFile($file_full_path);
 //        }
         libxml_use_internal_errors(true);
         $doc = new \DOMDocument();
@@ -469,10 +469,10 @@ class AttendeeService extends BaseRepository
                 $tag->setAttribute('data-src', $old_src);
             }
 
-            if ($tag->getAttribute('class') === 'user_photo' && !is_null($getAttendee->user_photo)) {
-//                Log::info($getAttendee->user_photo);
+            if ($tag->getAttribute('class') === 'user_photo' && !is_null($attendee->user_photo)) {
+//                Log::info($attendee->user_photo);
 //                $old_src = $tag->getAttribute('src');
-//                $new_src_url = (strpos($getAttendee->user_photo, 'https') !== false || strpos($getAttendee->user_photo, 'question_files') !== false) ? $getAttendee->user_photo : env('DO_URL') . config('attendize.event_images_path') . '/' . $getAttendee->user_photo;
+//                $new_src_url = (strpos($attendee->user_photo, 'https') !== false || strpos($attendee->user_photo, 'question_files') !== false) ? $attendee->user_photo : env('DO_URL') . config('attendize.event_images_path') . '/' . $attendee->user_photo;
 //                $type = pathinfo($new_src_url, PATHINFO_EXTENSION);
 //                $data = file_get_contents($new_src_url);
 //                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
@@ -492,12 +492,12 @@ class AttendeeService extends BaseRepository
                 }
 
                 if ($element->getAttribute('id') == 'order_ref') {
-                    $element->nodeValue = $getAttendee->order->order_reference;
+                    $element->nodeValue = $attendee->order->order_reference;
                 }
 
                 if (!empty($element->getAttribute('key')) && $element->getAttribute('key') == 'zone') {
 //                    $attXone = [];
-//                    foreach ($getAttendee->zones as $att_zone) {
+//                    foreach ($attendee->zones as $att_zone) {
 //                        $attXone[] = optional(BadgesZone::where('zone_id', $att_zone->zone_id)->first())->zone_id;
 //                    }
 //
@@ -514,5 +514,51 @@ class AttendeeService extends BaseRepository
         $data = ['html_data' => $html_data, 'badge' => $badge, 'type' => $request->type];
 
         return view('badge_display', $data);
+    }
+
+    public function count(bool $all = false, ?bool $approved = false, ?bool $declined = false, ?string $eventId = null): int
+    {
+        if ($all) return $this->model->query()->count();
+
+        $user = auth()->user();
+        $account = $user->account;
+        $activeOrganiser = $account->active_organiser;
+
+        return $this->model->query()
+            ->when(!$activeOrganiser, function ($query) use ($user) {
+                $query->whereIn('organiser_id', $user->organiserIds());
+            })
+            ->when($activeOrganiser, function ($query) use ($activeOrganiser) {
+                $query->where('organiser_id', $activeOrganiser);
+            })
+            ->when($approved, function ($query) {
+                $query->where('status', Attendee::STATUS['APPROVED']);
+            })
+            ->when($declined, function ($query) {
+                $query->where('status', Attendee::STATUS['DECLINED']);
+            })
+            ->when($eventId, function ($query) use($eventId) {
+                $query->where('event_id', $eventId);
+            })
+            ->count();
+    }
+
+    public function countDownloads(?string $eventId = null): int
+    {
+        $user = auth()->user();
+        $account = $user->account;
+        $activeOrganiser = $account->active_organiser;
+
+        return $this->model->query()
+            ->when(!$activeOrganiser, function ($query) use ($user) {
+                $query->whereIn('organiser_id', $user->organiserIds());
+            })
+            ->when($activeOrganiser, function ($query) use ($activeOrganiser) {
+                $query->where('organiser_id', $activeOrganiser);
+            })
+            ->when($eventId, function ($query) use ($eventId) {
+                $query->where('event_id', $eventId);
+            })
+            ->sum('downloads');
     }
 }

@@ -1,17 +1,12 @@
 <script setup>
+import DashboardView from "./components/DashboardView.vue";
 
-</script>
-<script>
-// import Swiper from '../../components/core/slider/Swiper'
-// import SwiperNav from '../../components/core/slider/SwiperNav'
-// import { Calendar } from '@toast-ui/vue-calendar'
-
-
-
+defineProps({
+    data: Array,
+    attendees: Array
+})
 </script>
 
 <template>
-    <b-container>
-    hello
-  </b-container>
+    <dashboard-view :data="data" :attendees="attendees"/>
 </template>

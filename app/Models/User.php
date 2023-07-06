@@ -36,4 +36,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(Account::class, 'owner', 'id');
     }
+
+    public function organiserIds()
+    {
+        $account = $this->account;
+        return $account ? optional($account->organiser)->pluck('id') : [];
+    }
 }
