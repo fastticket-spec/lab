@@ -149,4 +149,22 @@ class EventService extends BaseRepository
         $event->refresh();
         return $event['status'] ? "activated" : "deactivated";
     }
+
+    public function count(bool $all = false): int
+    {
+        if ($all) return $this->model->query()->count();
+
+        $user = auth()->user();
+        $account = $user->account;
+        $activeOrganiser = $account->active_organiser;
+
+        return $this->model->query()
+            ->when(!$activeOrganiser, function ($query) use ($user) {
+                $query->whereIn('organiser_id', $user->organiserIds());
+            })
+            ->when($activeOrganiser, function ($query) use ($activeOrganiser) {
+                $query->where('organiser_id', $activeOrganiser);
+            })
+            ->count();
+    }
 }

@@ -1,6 +1,12 @@
 <script setup>
+import DashboardView from "../../Dashboard/components/DashboardView.vue";
+
+defineProps({
+    data: Array,
+    attendees: Array
+})
 </script>
 
 <template>
-    asdf
+    <dashboard-view :data="data" :attendees="attendees"/>
 </template>
