@@ -11,7 +11,7 @@ git add .
 
 git commit -m "Local changes" || true
 
-git pull origin development
+git pull origin staging
 
 # Install composer dependencies
 composer install  --no-interaction
