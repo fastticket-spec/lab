@@ -50,6 +50,8 @@ export default {
 </script>
 
 <style>
+input.form-control, .form-control {background: #f2f2f2;}
+
 .form-control {
     display: block;
     width: 100%;
