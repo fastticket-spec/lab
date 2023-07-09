@@ -64,7 +64,7 @@ export default {
                 }">
         <div class="row no-gutters accreditation-form" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
-                <div class="bg-div bg-white">
+                <div class="bg-div bg-white" style="background-color: #7d4f4c61 !important;">
                     <div class="text-center">
                         <img class="my-3 text-center img-fluid logo" :src="accessLevel?.event?.event_image_url" alt="">
                     </div>
