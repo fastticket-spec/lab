@@ -49,6 +49,30 @@ export default {
 }
 </script>
 
+<style>
+.form-control {
+    display: block;
+    width: 100%;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #ffffff;
+    background-color: #fff0;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.bg-white {
+    background-color: #7d4f4c61 !important;
+}
+label {
+    color: #ffffff;
+}
+</style>
+
 <template>
     <b-container fluid :style="{
                     backgroundColor: accessLevel?.page_design?.bg_type === 'color' && accessLevel?.page_design?.bg_color,
@@ -64,7 +88,7 @@ export default {
                 }">
         <div class="row no-gutters accreditation-form" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
-                <div class="bg-div bg-white" style="background-color: #7d4f4c61 !important;">
+                <div class="bg-div bg-white" >
                     <div class="text-center">
                         <img class="my-3 text-center img-fluid logo" :src="accessLevel?.event?.event_image_url" alt="">
                     </div>
