@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\File\File;
 
 trait HasFile
 {
@@ -18,7 +19,7 @@ trait HasFile
         return $request->file($fileName);
     }
 
-    protected function uploadFile(UploadedFile $file, string $name, string $type, int $resize = null): ?string
+    protected function uploadFile(UploadedFile|File $file, string $name, string $type, int $resize = null): ?string
     {
         $filename = strtolower(Str::slug(($name) . $type . strtotime(now())) . '.' . ($file->getClientOriginalExtension() ?: 'png'));
         return $this->file->upload($file, $this->images_path, $filename, $resize);
