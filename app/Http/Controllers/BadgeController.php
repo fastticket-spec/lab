@@ -7,13 +7,21 @@ use App\Models\EventBadge;
 use App\Models\EventSurveyAccessLevel;
 use App\Services\AccessLevelsService;
 use App\Services\BadgeService;
+use App\Services\FileService;
+use App\Services\traits\HasFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class BadgeController extends Controller
 {
-    public function __construct(public BadgeService $badgeService, public AccessLevelsService $accessLevelsService)
+    use HasFile;
+
+    protected $images_path;
+
+    public function __construct(public BadgeService $badgeService, public AccessLevelsService $accessLevelsService, private FileService $file)
     {
+        $this->images_path = config('filesystems.directory') . "badges/";
     }
 
     public function index(Request $request, string $eventId): \Inertia\Response
@@ -92,5 +100,27 @@ class BadgeController extends Controller
             'questions' => $questions
         ];
         return view('badge_customize', $data);
+    }
+
+    public function imageUpload()
+    {
+        request()->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
+        ]);
+        $imageName = time() . '.' . request()->file->getClientOriginalExtension();
+        $imagePath = request()->file->move(public_path('images'), $imageName);
+        Storage::disk(config('filesystems.default'))->put('user_content/event_images/' . $imageName, file_get_contents($imagePath), 'public');
+
+        $fileName = env('DO_URL')  . 'user_content/event_images/' . $imageName;
+        $type = pathinfo($fileName, PATHINFO_EXTENSION);
+        $data = file_get_contents($fileName);
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+        return response()->json(
+            [
+                'danger' => false,
+                'details' => $base64
+            ]
+        );
     }
 }
