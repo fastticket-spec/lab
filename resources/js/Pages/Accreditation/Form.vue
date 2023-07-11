@@ -4,8 +4,6 @@ import "vue-select/dist/vue-select.css";
 import {onMounted, reactive, ref} from "vue";
 import {router} from "@inertiajs/vue3";
 import {ErrorMessage, Field, FieldArray, useForm} from "vee-validate";
-import * as yup from "yup";
-import {array} from "yup";
 import {accreditationFormSchema} from "../../Shared/components/helpers/Validators.js";
 
 const props = defineProps({
@@ -234,12 +232,14 @@ label {
                                         </b-col>
                                     </template>
                                 </FieldArray>
-
-                                <b-btn type="submit" size="lg" class="px-5 py-2">Submit
-                                </b-btn>
-
                             </div>
                         </div>
+                        <div class="col-12 pb-5 text-center">
+                            <b-btn type="submit" size="lg" class="px-5 py-2"
+                                   :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
+                                {{ accessLevel?.page_design?.form_btn_value || 'Submit' }}
+                            </b-btn>
+º                        </div>
                     </form>
                 </div>
             </div>
