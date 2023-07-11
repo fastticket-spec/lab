@@ -117,3 +117,33 @@ export const createBadgeSchema = yup.object({
     height: yup.number().required(),
 })
 
+export const accreditationFormSchema = yup.object({
+    surveys: array().of(
+        yup.object().shape({
+            required: yup.number().required(),
+            type: yup.string().required(),
+            is_private: yup.number().required(),
+            answer: yup.string()
+                .when(['required', 'type', 'is_private'], {
+                    is: (required, type, is_private) => {
+                        return required === 1 && type !== '10' && !is_private;
+                    },
+                    then: () => yup.string().required('This field is required')
+                })
+                .when('type', {
+                    is: '5',
+                    then: () => yup.string().email('A valid email address is needed').required('This field is required')
+                })
+                .when('type', {
+                    is: '8',
+                    then: () => yup.array().required('This field is required')
+                })
+                .when('type', {
+                    is: '7',
+                    then: () => yup.array().required('This field is required')
+                })
+                .nullable()
+        })
+    )
+})
+
