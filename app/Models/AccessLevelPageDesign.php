@@ -21,5 +21,6 @@ class AccessLevelPageDesign extends Model
         'bg_color',
         'bg_type',
         'bg_image',
+        'form_bg_color'
     ];
 }
