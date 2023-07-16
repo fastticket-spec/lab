@@ -69,6 +69,9 @@ const state = reactive({
         english: props.data?.form_btn_value || 'Submit',
         arabic: props.data?.form_btn_value_ar || 'يُقدِّم'
     },
+    formBackground: {
+        color: props.data?.form_bg_color || '#ffffff',
+    },
     background: {
         type: props.data?.bg_type || 'image',
         color: props.data?.bg_color || '#1682d4',
@@ -123,6 +126,7 @@ const onSubmit = () => {
         btn_font_color_code: state.btn.font_color,
         register_btn_value: state.register.english,
         register_btn_value_ar: state.register.arabic,
+        form_bg_color: state.formBackground.color,
         bg_color: state.background.color,
         bg_type: state.background.type,
         bg_image: state.background.bgImage?.full,
@@ -251,6 +255,23 @@ const onSubmit = () => {
                                                               v-if="state.background.type === 'image'">
                                                     <b-form-file type="file" size="sm" id="upload-file"
                                                                  accept="image/*" multiple @change="uploadFiles"/>
+                                                </b-form-group>
+                                            </b-card-body>
+                                        </b-collapse>
+                                    </b-card>
+
+                                    <b-card no-body class="mb-3">
+                                        <b-card-header header-tag="header" class="p-1" role="tab"
+                                                       header-bg-variant="primary">
+                                            <div v-b-toggle.formBgColor class="py-1 px-2">Form Background Color</div>
+                                        </b-card-header>
+                                        <b-collapse id="formBgColor" visible accordion="my-accordion"
+                                                    role="tabpanel">
+                                            <b-card-body>
+                                                <b-form-group label="Background Color" label-for="form-background-color">
+                                                    <b-form-input v-model="state.formBackground.color" type="color"
+                                                                  size="sm" id="form-background-color"
+                                                                  placeholder=""></b-form-input>
                                                 </b-form-group>
                                             </b-card-body>
                                         </b-collapse>
