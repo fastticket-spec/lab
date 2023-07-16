@@ -4,7 +4,7 @@
             backgroundImage: data.background.type === 'image' ? 'url(' + data.background.bgImage?.full + ')' : '',
 
         }">
-        <div class="bg-div bg-white m-5">
+        <div class="bg-div m-5" :style="{backgroundColor: data.formBackground.color}">
             <div class="text-center">
                 <img class="my-3 text-center img-fluid logo" :src="event.event_image_url" alt="">
             </div>

@@ -38,7 +38,7 @@ export default {
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 .bg-white {
-    background-color: #7d4f4c61 !important;
+    //background-color: #7d4f4c61 !important;
 }
 label {
     color: #ffffff;
@@ -60,7 +60,7 @@ label {
                 }">
         <div class="row no-gutters">
             <div class="col-12 align-self-center">
-                <div class="bg-div bg-white" :style="{ backgroundColor: accessLevel?.id === '99a9048c-c682-4e88-9020-0ad13d809c4c' ? '#3d346a91 !important' : accessLevel?.id === '99a9245f-c493-4575-b02f-83f1d4bdc527' ? '#d9c098a1 !important' : ''}" >
+                <div class="bg-div" :style="{backgroundColor: accessLevel?.page_design?.form_bg_color}">
                     <div class="text-center">
                         <img class="my-3 text-center img-fluid logo" :src="accessLevel?.event?.event_image_url" alt="">
                     </div>
