@@ -99,7 +99,7 @@ const onSubmitMessage = () => {
 
 const eventZones = computed(() => {
     if (selectedAttendee.value) {
-        return props.zones.filter(zone => zone.event_id === selectedAttendee.value.event.id)
+        return props.zones.filter(zone => zone.event_id === selectedAttendee.value.category.id)
     }
 
     if (checkedRows.value.length > 0 && props.eventId) {
