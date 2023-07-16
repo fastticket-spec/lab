@@ -93,7 +93,7 @@ input.form-control, .form-control {
 }
 
 .bg-white {
-    background-color: #7d4f4c61 !important;
+    //background-color: #7d4f4c61 !important;
 }
 
 label {
@@ -116,7 +116,7 @@ label {
                 }">
         <div class="row no-gutters accreditation-form" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
-                <div class="bg-div bg-white">
+                <div class="bg-div" :style="{backgroundColor: accessLevel?.page_design?.form_bg_color}">
                     <div class="text-center">
                         <img class="my-3 text-center img-fluid logo" :src="accessLevel?.event?.event_image_url" alt="">
                     </div>
