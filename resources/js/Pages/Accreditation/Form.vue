@@ -116,7 +116,7 @@ label {
                 }">
         <div class="row no-gutters accreditation-form" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
-                <div class="bg-div bg-white" :style="{ backgroundColor: accessLevel?.id === '99a9048c-c682-4e88-9020-0ad13d809c4c'}">
+                <div class="bg-div bg-white" :style="{ backgroundColor: accessLevel.id === '99a9048c-c682-4e88-9020-0ad13d809c4c'}">
                     <div class="text-center">
                         <img class="my-3 text-center img-fluid logo" :src="accessLevel?.event?.event_image_url" alt="">
                     </div>
