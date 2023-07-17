@@ -3,16 +3,20 @@ import {router} from "@inertiajs/vue3";
 import {ref, onUpdated, reactive, computed} from "vue";
 import SearchBox from '../../../Shared/components/core/SearchBox/Index.vue';
 import axios from "axios";
+import * as XLSX from "xlsx";
 
 const props = defineProps({
     attendees: Object,
     eventId: String,
     sort: String,
     zones: Array,
-    q: String
+    q: String,
+    accessLevels: Array,
+    errors: Object
 })
 
 const selectedAttendee = ref({})
+const uploadModalShow = ref(false)
 const answerModalShow = ref(false)
 const messageModalShow = ref(false)
 const zonesModalShow = ref(false)
@@ -29,6 +33,11 @@ const fields = ['check', 'access_level', 'category', 'ref', 'email', 'status', '
 const answerFields = ['question', 'answers', '⠀'];
 
 const checkedRows = ref([]);
+
+const upload = reactive({
+    access_level_id: '',
+    approve: false
+});
 
 const searchAttendees = searchString => {
     goTo(props.attendees.current_page, props.attendees.per_page, searchString);
@@ -49,6 +58,9 @@ onUpdated(() => {
     answerModalShow.value = false;
     zonesModalShow.value = false;
     messageModalShow.value = false;
+    if (Object.keys(props.errors).length === 0) {
+        uploadModalShow.value = false;
+    }
 })
 
 const visit = (link, method = 'get') => {
@@ -172,6 +184,37 @@ const cancelAnswer = (answerIndex) => {
     selectedAnswer.answer = selectedAnswer.prev_answer || selectedAnswer.answer;
     selectedAnswer.edit = false;
 }
+
+const uploadedAttendees = ref([]);
+
+const onUploadFile = e => {
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const bstr = e.target.result;
+            const wb = XLSX.read(bstr, {type: 'binary'});
+            const wsName = wb.SheetNames[0];
+            const ws = wb.Sheets[wsName];
+            let data = XLSX.utils.sheet_to_json(ws, {header: 1});
+            data.splice(0, 1);
+            uploadedAttendees.value = data.map(x => {
+                return {first_name: x[0], 'last_name': x[1], 'email': x[2]}
+            })
+        }
+
+        reader.readAsBinaryString(file);
+    }
+}
+
+const onUploadAttendees = () => {
+    router.post(`/event/${props.eventId}/attendees/upload-attendees`, {
+        attendees: uploadedAttendees.value,
+        access_level_id: upload.access_level_id,
+        approve: upload.approve
+    })
+}
 </script>
 
 <template>
@@ -205,6 +248,12 @@ const cancelAnswer = (answerIndex) => {
                     </template>
 
                     <template v-slot:body>
+                        <b-row v-if="eventId">
+                            <b-col sm="12">
+                                <a href="#" @click="uploadModalShow = true" class="btn btn-outline-primary"><i
+                                    class="ri-upload-2-line"></i>Upload Attendees</a>
+                            </b-col>
+                        </b-row>
                         <b-row class="mt-3">
                             <b-col sm="12" class="mb-3" v-show="checkedRows.length > 0">
                                 <b-btn @click="approveAttendees"
@@ -299,7 +348,8 @@ const cancelAnswer = (answerIndex) => {
                              class="table-responsive-sm table-borderless">
                         <template #cell(answers)="data">
                             <div v-if="data.item.edit">
-                                <input v-model="data.item.answer" :type="data.item.type === '3' ? 'datetime-local' : 'text'">
+                                <input v-model="data.item.answer"
+                                       :type="data.item.type === '3' ? 'datetime-local' : 'text'">
                                 <b-btn @click="saveAnswer(data.index)" class="ml-2" size="sm"
                                        variant="primary"><i
                                     class="ri-save-2-line p-0"></i></b-btn>
@@ -319,7 +369,8 @@ const cancelAnswer = (answerIndex) => {
                             </template>
                         </template>
                         <template #cell(⠀)="data">
-                            <b-btn v-if="data.item.type !== '10' && !data.item.edit" @click="showEdit(data.item)" size="sm" variant="primary"><i
+                            <b-btn v-if="data.item.type !== '10' && !data.item.edit" @click="showEdit(data.item)"
+                                   size="sm" variant="primary"><i
                                 class="ri-edit-2-line p-0"></i></b-btn>
                         </template>
                     </b-table>
@@ -421,5 +472,54 @@ const cancelAnswer = (answerIndex) => {
                 </div>
             </template>
         </b-modal>
+
+        <b-modal v-model="uploadModalShow" id="upload-modal" title="Upload Attendees">
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <div class="form-group">
+                        <label for="access-level">Access Level</label>
+                        <select class="form-control" v-model="upload.access_level_id" id="access-level">
+                            <option value="">Select Access level</option>
+                            <option v-for="level in accessLevels" :key="level.id" :value="level.id">{{ level.title }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="upload-content">Upload File (.xlsx, .xls, .csv)</label>
+                        <input type="file" class="form-control" @change="onUploadFile" id="upload-content"
+                               accept=".xlsx, .xls, .csv">
+                        <span class="text-danger" v-if="Object.keys(errors).length > 0">Ensure all fields are filled correctly.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <b-checkbox v-model="upload.approve" class="custom-checkbox-color"
+                                    name="approve-check" inline>
+                            Approve Attendees
+                        </b-checkbox>
+                    </div>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        @click="onUploadAttendees"
+                        :disabled="uploadedAttendees.length === 0 || !upload.access_level_id"
+                        class="btn btn-primary float-right ml-2">Upload
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="danger"
+                        class="float-right ml-2"
+                        @click="uploadModalShow = false"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
     </b-container>
 </template>
