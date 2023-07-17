@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AttendeeMessageRequest;
+use App\Http\Requests\AttendeeUploadRequest;
+use App\Services\AccessLevelsService;
 use App\Services\AttendeeService;
 use App\Services\ZoneService;
 use Illuminate\Http\Request;
@@ -10,7 +12,7 @@ use Inertia\Inertia;
 
 class AttendeesController extends Controller
 {
-    public function __construct(public AttendeeService $attendeeService, private ZoneService $zoneService)
+    public function __construct(public AttendeeService $attendeeService, private ZoneService $zoneService, private AccessLevelsService $accessLevelsService)
     {
     }
 
@@ -20,7 +22,8 @@ class AttendeesController extends Controller
             'attendees' => $this->attendeeService->fetchAttendees($request),
             'zones' => $this->zoneService->allZones(),
             'sort' => $request->sort,
-            'q' => $request->q
+            'q' => $request->q,
+            'accessLevels' => []
         ]);
     }
 
@@ -31,7 +34,8 @@ class AttendeesController extends Controller
             'zones' => $this->zoneService->allZones($eventId),
             'attendees' => $this->attendeeService->fetchAttendees($request, $eventId),
             'sort' => $request->sort,
-            'q' => $request->q
+            'q' => $request->q,
+            'accessLevels' => $this->accessLevelsService->allAccessLevels($eventId)
         ]);
     }
 
@@ -139,5 +143,10 @@ class AttendeesController extends Controller
     public function downloadEventBadge(Request $request, string $eventId, string $attendeeId, string $badgeId)
     {
         return $this->attendeeService->downloadAttendeeBadge($request, $attendeeId, $badgeId, $eventId);
+    }
+
+    public function uploadAttendees(AttendeeUploadRequest $request, string $eventId)
+    {
+        return $this->attendeeService->uploadAttendees($eventId, $request->attendees, $request->access_level_id, $request->approve);
     }
 }

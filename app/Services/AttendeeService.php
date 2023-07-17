@@ -537,7 +537,7 @@ class AttendeeService extends BaseRepository
             ->when($declined, function ($query) {
                 $query->where('status', Attendee::STATUS['DECLINED']);
             })
-            ->when($eventId, function ($query) use($eventId) {
+            ->when($eventId, function ($query) use ($eventId) {
                 $query->where('event_id', $eventId);
             })
             ->count();
@@ -560,5 +560,36 @@ class AttendeeService extends BaseRepository
                 $query->where('event_id', $eventId);
             })
             ->sum('downloads');
+    }
+
+    public function uploadAttendees(string $eventId, array $attendees, string $accessLevelId, bool $approve)
+    {
+        $organiserId = auth()->user()->account->active_organiser;
+
+        foreach ($attendees as $attendee) {
+            $this->create([
+                'access_level_id' => $accessLevelId,
+                'organiser_id' => $organiserId,
+                'event_id' => $eventId,
+                'ref' => Str::random('8'),
+                'email' => $attendee['email'],
+                'answers' => [
+                    ['type' => '5', 'answer' => $attendee['email'], 'question' => 'Email Address'],
+                    ['type' => '1', 'answer' => $attendee['first_name'], 'question' => 'First Name'],
+                    ['type' => '1', 'answer' => $attendee['last_name'], 'question' => 'Last Name'],
+                ],
+                'status' => $approve,
+                'accept_status' => $approve
+            ]);
+        }
+
+        $message = 'Attendees uploaded successfully!';
+
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: "/event/$eventId/attendees",
+            returnType: "redirect"
+        );
     }
 }
