@@ -119,3 +119,8 @@ body.sidebar-main .content-page.ar, body.two-sidebar.sidebar-main .content-page,
     max-height: 250px;
     overflow: auto;
 }
+
+.vc-color-wrap {
+    width: 100%!important;
+    border: 1px solid;
+}

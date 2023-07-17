@@ -1,7 +1,9 @@
 <script setup>
 import {router} from "@inertiajs/vue3";
-import {onMounted, onUpdated, reactive, watch} from "vue";
+import {onMounted, onUpdated, reactive, ref, watch} from "vue";
 import PagePreview from "./PagePreview.vue";
+import { ColorPicker } from "vue3-colorpicker";
+import "vue3-colorpicker/style.css";
 
 const props = defineProps({
     event: Object,
@@ -22,6 +24,8 @@ watch(() => props.design_images, (value, oldValue) => {
         state.backgroundImages = [...defImages, ...imgs];
     }
 })
+
+const gradientColor = ref("linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 100%)");
 
 onMounted(() => {
     initImages();
@@ -269,9 +273,13 @@ const onSubmit = () => {
                                                     role="tabpanel">
                                             <b-card-body>
                                                 <b-form-group label="Background Color" label-for="form-background-color">
-                                                    <b-form-input v-model="state.formBackground.color" type="color"
-                                                                  size="sm" id="form-background-color"
-                                                                  placeholder=""></b-form-input>
+                                                    <color-picker
+                                                        class="form-control"
+                                                        v-model:pureColor="state.formBackground.color"
+                                                        v-model:gradientColor="gradientColor"
+                                                        format="hex8"
+                                                        picker-type="chrome"
+                                                    />
                                                 </b-form-group>
                                             </b-card-body>
                                         </b-collapse>
