@@ -37,6 +37,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Account::class, 'owner', 'id');
     }
 
+    public function userRole()
+    {
+        $account = $this->account;
+        return $account ? optional($account->role)->role : '';
+    }
+
     public function organiserIds()
     {
         $account = $this->account;

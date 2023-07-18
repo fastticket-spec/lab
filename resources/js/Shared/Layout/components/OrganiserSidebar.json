@@ -64,5 +64,41 @@
         "component": ["Attendees/Index", "Attendees/Create"],
         "icon": "ri-user-line",
         "type": "account manager"
+    },
+    {
+        "title": "Users",
+        "name": "sidebar.users",
+        "is_heading": false,
+        "is_active": false,
+        "link": "#",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": ["Users/Index", "Users/Create"],
+        "icon": "ri-user-line",
+        "type": "account manager",
+        "children": [
+            {
+                "title": "View",
+                "name": "sidebar.view",
+                "is_active": false,
+                "link": "/users",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Users/Index",
+                "icon": "",
+                "type": "account manager"
+            },
+            {
+                "title": "Create",
+                "name": "sidebar.create",
+                "is_active": false,
+                "link": "/users/create",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Users/Create",
+                "icon": "",
+                "type": "account manager"
+            }
+        ]
     }
 ]

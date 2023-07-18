@@ -147,3 +147,12 @@ export const accreditationFormSchema = yup.object({
     )
 })
 
+export const createUserSchema = yup.object({
+    first_name: yup.string().required(),
+    last_name: yup.string().required(),
+    email: yup.string().email().required(),
+    role_id: yup.string().required(),
+    events: yup.array().nullable(),
+    all_events: yup.boolean().nullable()
+})
+
