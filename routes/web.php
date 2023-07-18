@@ -12,6 +12,7 @@ use App\Http\Controllers\Events\DashboardController as EventDashboardController;
 use App\Http\Controllers\EventSurveyController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrganiserController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ZonesController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,14 +54,17 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['middleware' => 'active-organiser'], function () {
         Route::group(['prefix' => 'events'], function () {
             Route::get('/', [EventController::class, 'index']);
-            Route::get('/create', [EventController::class, 'create']);
-            Route::post('/', [EventController::class, 'store']);
-            Route::post('/{id}/duplicate', [EventController::class, 'duplicateEvent']);
-            Route::get('/{id}/edit', [EventController::class, 'edit']);
-            Route::post('/{id}/update', [EventController::class, 'update']);
-            Route::delete('/{id}', [EventController::class, 'destroy']);
-            Route::post('/{id}/change-status', [EventController::class, 'changeStatus']);
-            Route::get('/organiser-events', [EventController::class, 'fetchOrganiserEvents']);
+
+            Route::middleware('only-admin')->group(function () {
+                Route::get('/create', [EventController::class, 'create']);
+                Route::post('/', [EventController::class, 'store']);
+                Route::post('/{id}/duplicate', [EventController::class, 'duplicateEvent']);
+                Route::get('/{id}/edit', [EventController::class, 'edit']);
+                Route::post('/{id}/update', [EventController::class, 'update']);
+                Route::delete('/{id}', [EventController::class, 'destroy']);
+                Route::post('/{id}/change-status', [EventController::class, 'changeStatus']);
+                Route::get('/organiser-events', [EventController::class, 'fetchOrganiserEvents']);
+            });
         });
 
         Route::group(['prefix' => 'event/{id}'], function () {
@@ -68,30 +72,36 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::group(['prefix' => 'access-levels'], function () {
                 Route::get('/', [AccessLevelsController::class, 'index']);
-                Route::get('/create', [AccessLevelsController::class, 'create']);
-                Route::post('/', [AccessLevelsController::class, 'store']);
-                Route::group(['prefix' => '{access_level_id}'], function () {
-                    Route::get('/edit', [AccessLevelsController::class, 'edit']);
-                    Route::patch('/update', [AccessLevelsController::class, 'update']);
-                    Route::post('/change-status', [AccessLevelsController::class, 'updateStatus']);
-                    Route::get('/customize', [AccessLevelsController::class, 'customize']);
-                    Route::post('/customize/general', [AccessLevelsController::class, 'customizeGeneral']);
-                    Route::post('/customize/page-design', [AccessLevelsController::class, 'customizePageDesign']);
-                    Route::post('/customize/design-images', [AccessLevelsController::class, 'designImages']);
-                    Route::post('/customize/request-form', [AccessLevelsController::class, 'requestForm']);
-                    Route::post('/customize/socials', [AccessLevelsController::class, 'socials']);
-                    Route::post('/send-invitation', [AccessLevelsController::class, 'sendInvitationLink']);
+
+                Route::middleware('can-edit')->group(function () {
+                    Route::get('/create', [AccessLevelsController::class, 'create']);
+                    Route::post('/', [AccessLevelsController::class, 'store']);
+                    Route::group(['prefix' => '{access_level_id}'], function () {
+                        Route::get('/edit', [AccessLevelsController::class, 'edit']);
+                        Route::patch('/update', [AccessLevelsController::class, 'update']);
+                        Route::post('/change-status', [AccessLevelsController::class, 'updateStatus']);
+                        Route::get('/customize', [AccessLevelsController::class, 'customize']);
+                        Route::post('/customize/general', [AccessLevelsController::class, 'customizeGeneral']);
+                        Route::post('/customize/page-design', [AccessLevelsController::class, 'customizePageDesign']);
+                        Route::post('/customize/design-images', [AccessLevelsController::class, 'designImages']);
+                        Route::post('/customize/request-form', [AccessLevelsController::class, 'requestForm']);
+                        Route::post('/customize/socials', [AccessLevelsController::class, 'socials']);
+                    });
                 });
+
+                Route::post('{access_level_id}/send-invitation', [AccessLevelsController::class, 'sendInvitationLink']);
             });
 
             Route::prefix('/event-surveys')->group(function () {
                 Route::get('/', [EventSurveyController::class, 'index']);
-                Route::post('/{event_survey_id}/status', [EventSurveyController::class, 'status']);
 
-                Route::get('/create', [SurveyController::class, 'create']);
-                Route::post('/', [SurveyController::class, 'store']);
-                Route::get('/{event_survey_id}/surveys', [SurveyController::class, 'index']);
-                Route::patch('/{event_survey_id}/edit-surveys', [SurveyController::class, 'update']);
+                Route::middleware('can-edit')->group(function () {
+                    Route::post('/{event_survey_id}/status', [EventSurveyController::class, 'status']);
+                    Route::get('/create', [SurveyController::class, 'create']);
+                    Route::post('/', [SurveyController::class, 'store']);
+                    Route::get('/{event_survey_id}/surveys', [SurveyController::class, 'index']);
+                    Route::patch('/{event_survey_id}/edit-surveys', [SurveyController::class, 'update']);
+                });
             });
 
             Route::prefix('attendees')->group(function () {
@@ -117,11 +127,14 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::prefix('/badges')->group(function () {
                 Route::get('/', [BadgeController::class, 'index']);
-                Route::get('/create', [BadgeController::class, 'create']);
-                Route::post('/', [BadgeController::class, 'store']);
-                Route::get('/{badge_id}/edit', [BadgeController::class, 'edit']);
-                Route::patch('/{badge_id}/update', [BadgeController::class, 'update']);
-                Route::get('/{badge_id}/customize', [BadgeController::class, 'customize']);
+
+                Route::middleware('can-edit')->group(function () {
+                    Route::get('/create', [BadgeController::class, 'create']);
+                    Route::post('/', [BadgeController::class, 'store']);
+                    Route::get('/{badge_id}/edit', [BadgeController::class, 'edit']);
+                    Route::patch('/{badge_id}/update', [BadgeController::class, 'update']);
+                    Route::get('/{badge_id}/customize', [BadgeController::class, 'customize']);
+                });
             });
 
             Route::post('/event-badges/{badge_id}', [EventBadgeController::class, 'saveEventBadge']);
@@ -139,5 +152,14 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateAttendeeAnswers']);
             Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadBadge']);
         });
+    });
+
+    Route::group(['prefix' => 'users'], function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::get('/create', [UserController::class, 'create']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::get('/{user_id}/edit', [UserController::class, 'edit']);
+        Route::patch('/{user_id}', [UserController::class, 'update']);
+        Route::delete('/{user_id}', [UserController::class, 'destroy']);
     });
 });

@@ -1,12 +1,15 @@
 <script setup>
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
+import {computed} from "vue";
 
 const props = defineProps({
     badges: Object,
     eventId: String
 });
 
-const fields = ['title', 'event', 'description', 'width', 'height', 'status', 'access_levels', 'date_created', 'action']
+const userRole = computed(() => usePage().props.user_role);
+
+const fields = ['title', {event: 'category'}, 'description', 'width', 'height', 'status', 'access_levels', 'date_created', ((!userRole.value || userRole.value === 'Admin Users' || userRole.value === 'Editors') && 'action')]
 
 const visit = (link, method = 'get', useInertia = true) => {
     if (method === 'get') {
@@ -25,9 +28,17 @@ const onPaginate = page => {
     <b-container fluid>
         <b-row>
             <b-col sm="12">
-                <Link :href="`/event/${eventId}/badges/create`" class="btn btn-primary mb-3">Add Badge</Link>
-                <no-data v-if="!badges.total" title="Badges" :link="`/event/${eventId}/badges/create`"
+                <Link v-if="(userRole !== 'Operations' && userRole !== 'Viewers')" :href="`/event/${eventId}/badges/create`" class="btn btn-primary mb-3">Add Badge</Link>
+
+                <no-data v-if="!badges.total" title="Badges" :link="(userRole !== 'Operations' && userRole !== 'Viewers') ? `/event/${eventId}/badges/create` : '#'"
                          :sub-text="true"/>
+
+
+                <iq-card v-if="badges.total">
+                    <template v-slot:headerTitle>
+                        <h4 class="card-title mb-2">{{ $t('sidebar.badges') }}</h4>
+                    </template>
+                </iq-card>
 
                 <iq-card v-if="badges.total">
                     <template v-slot:body>

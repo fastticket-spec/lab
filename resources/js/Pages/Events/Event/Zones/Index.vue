@@ -1,5 +1,6 @@
 <script setup>
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
+import {computed} from "vue";
 
 const props = defineProps({
     eventId: String,
@@ -7,6 +8,8 @@ const props = defineProps({
 })
 
 const fields = ['zone', 'event', 'status', 'date_created'];
+
+const userRole = computed(() => usePage().props.user_role);
 
 const onPaginate = page => {
     router.get(`/event/${props.eventId}/zones?page=${page}`);
@@ -17,9 +20,19 @@ const onPaginate = page => {
     <b-container fluid>
         <b-row>
             <b-col sm="12">
-                <Link :href="`/event/${eventId}/zones/create`" class="btn btn-primary mb-3">{{zones.total === 0 ? 'Create' : 'Update'}} Zones</Link>
+                <Link v-if="userRole !== 'Operations' && userRole !== 'Viewers'" :href="`/event/${eventId}/zones/create`"
+                      class="btn btn-primary mb-3">{{ zones.total === 0 ? 'Create' : 'Update' }} Zones
+                </Link>
 
                 <no-data v-if="!zones.total" title="Zones" :link="`/event/${eventId}/zones/create`" :sub-text="true"/>
+
+                <iq-card v-if="zones.total">
+                    <template v-slot:headerTitle>
+                        <div class="d-flex justify-content-between">
+                            <h4 class="card-title">{{ $t('sidebar.zones') }}</h4>
+                        </div>
+                    </template>
+                </iq-card>
 
                 <iq-card v-if="zones.total">
                     <template v-slot:body>

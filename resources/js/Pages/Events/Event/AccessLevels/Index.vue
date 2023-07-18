@@ -1,6 +1,6 @@
 <script setup>
-import {onUpdated, reactive, ref} from "vue";
-import {router} from "@inertiajs/vue3";
+import {computed, onUpdated, reactive, ref} from "vue";
+import {router, usePage} from "@inertiajs/vue3";
 import VueSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
@@ -14,6 +14,8 @@ const selectedSort = ref('');
 const sortAccessLevels = () => {
     visit(`/event/${props.event_id}/access-levels?sort=${selectedSort.value}`)
 }
+
+const userRole = computed(() => usePage().props.user_role);
 
 const visit = (link, method = 'get') => {
     if (method === 'get') {
@@ -52,13 +54,11 @@ const sendInvite = () => {
     <b-container fluid>
         <b-row>
             <b-col sm="12">
-                <Link :href="`/event/${event_id}/access-levels/create`" class="btn btn-primary mb-3">Add Access Level
+                <Link v-if="(userRole !== 'Operations' && userRole !== 'Viewers')" :href="`/event/${event_id}/access-levels/create`" class="btn btn-primary mb-3">Add Access Level
                 </Link>
 
                 <no-data v-if="!access_levels.total" title="Access Levels"
-                         :link="`/event/${event_id}/access-levels/create`"/>
-
-                <!-- <a :href="`/event/${event_id}/access-levels/create`" class="btn btn-primary mb-3">Create Access Level</a> -->
+                         :link="(userRole !== 'Operations' && userRole !== 'Viewers') ? `/event/${event_id}/access-levels/create` : '#'"/>
 
                 <iq-card v-if="access_levels.total">
                     <template v-slot:headerTitle>
@@ -102,24 +102,28 @@ const sendInvite = () => {
                     </div>
 
                     <div class="d-flex justify-content-around">
+                        <template v-if="(userRole !== 'Operations' && userRole !== 'Viewers')">
+                            <a href="#"
+                               @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/edit`)"><i
+                                class="ri-edit-line"></i>
+                                Edit</a>
+                            <a href="#"
+                               @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/customize`)"><i
+                                class="ri-settings-2-line"></i>
+                                Customize</a>
+                            <a href="#"
+                               @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/change-status`, 'post')"
+                               :class="access_level.status === 0 ? 'text-success' : 'text-danger'"><i
+                                :class="access_level.status === 0 ? 'ri-play-line' : 'ri-pause-line'"></i>
+                                {{ access_level.status === 0 ? 'Activate' : 'Pause' }}</a>
+                        </template>
+
                         <a href="#"
-                           @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/edit`)"><i
-                            class="ri-edit-line"></i>
-                            Edit</a>
-                        <a href="#"
-                           @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/customize`)"><i
-                            class="ri-settings-2-line"></i>
-                            Customize</a>
-                        <a href="#"
-                           @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/change-status`, 'post')"
-                           :class="access_level.status === 0 ? 'text-success' : 'text-danger'"><i
-                            :class="access_level.status === 0 ? 'ri-play-line' : 'ri-pause-line'"></i>
-                            {{ access_level.status === 0 ? 'Activate' : 'Pause' }}</a>
-                        <a href="#"
-                           v-if="access_level.has_surveys"
+                           v-if="access_level.has_surveys && userRole !== 'Viewers'"
                            @click.prevent.stop="invitationModal = true; selectedAccessLevel = access_level.id"><i
                             class="ri-settings-2-line"></i>
                             Send Invitation</a>
+
                     </div>
                 </b-card>
             </b-col>
