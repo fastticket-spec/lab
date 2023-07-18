@@ -16,6 +16,14 @@ class RolesSeeder extends Seeder
         $roles = [
             [
                 'id' => Str::uuid(),
+                'role' => 'Admin Users',
+//                'type' => 'dashboard',
+                'access' => json_encode([]),
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => Str::uuid(),
                 'role' => 'Editors',
 //                'type' => 'dashboard',
                 'access' => json_encode([]),

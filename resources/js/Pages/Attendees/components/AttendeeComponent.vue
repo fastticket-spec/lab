@@ -1,5 +1,5 @@
 <script setup>
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import {ref, onUpdated, reactive, computed} from "vue";
 import SearchBox from '../../../Shared/components/core/SearchBox/Index.vue';
 import axios from "axios";
@@ -28,7 +28,9 @@ const message = reactive({
 })
 const selectedZones = ref([]);
 
-const fields = ['check', 'access_level', 'category', 'ref', 'email', 'status', 'accept_status', 'date_submitted', 'action']
+const userRole = computed(() => usePage().props.user_role);
+
+const fields = [(userRole.value !== 'Viewers' && 'check'), 'access_level', 'category', 'ref', 'email', 'status', 'accept_status', 'date_submitted', (userRole.value !== 'Viewers' && 'action')]
 
 const answerFields = ['question', 'answers', '⠀'];
 
@@ -248,12 +250,13 @@ const onUploadAttendees = () => {
                     </template>
 
                     <template v-slot:body>
-                        <b-row v-if="eventId">
+                        <b-row v-if="eventId && userRole !== 'Viewers'">
                             <b-col sm="12">
                                 <a href="#" @click="uploadModalShow = true" class="btn btn-outline-primary"><i
                                     class="ri-upload-2-line"></i>Upload Attendees</a>
                             </b-col>
                         </b-row>
+
                         <b-row class="mt-3">
                             <b-col sm="12" class="mb-3" v-show="checkedRows.length > 0">
                                 <b-btn @click="approveAttendees"

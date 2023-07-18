@@ -45,7 +45,25 @@
                                    @click.prevent.stop="visit(`/events/${event.id}`, 'delete')">Yes, Delete
                             </b-btn>
                         </b-popover>
-                        <a href="#" @click.prevent.stop="visit(`/event/${event.id}/surveys`)"><i class="ri-ticket-line"></i>
+                    </template>
+
+                    <template v-if="userRole === 'Editors' || userRole === 'Operations' || userRole === 'Viewers'">
+                        <a href="#" @click.prevent.stop="visit(`/event/${event.id}/access-levels`)"><i
+                            class="ri-sound-module-line"></i>
+                            Access Levels</a>
+
+                        <a href="#" @click.prevent.stop="visit(`/event/${event.id}/attendees`)"><i
+                            class="ri-group-2-line"></i>
+                            Attendees</a>
+
+                        <a href="#" @click.prevent.stop="visit(`/event/${event.id}/badges`)"><i
+                            class="ri-pencil-ruler-line"></i>
+                            Badges</a>
+                    </template>
+
+                    <template v-if="(!userRole || userRole === 'Admin Users' || userRole === 'Editors' || userRole === 'Operations')">
+                        <a href="#" @click.prevent.stop="visit(`/event/${event.id}/event-surveys`)"><i
+                            class="ri-ticket-line"></i>
                             Surveys</a>
                     </template>
                 </div>

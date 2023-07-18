@@ -1,7 +1,7 @@
 <script setup>
 import {ErrorMessage, Field, FieldArray, useField, useForm} from 'vee-validate';
 import {createSurveySchema} from '../../../../Shared/components/helpers/Validators';
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import {computed, onMounted, ref} from "vue";
 
 const props = defineProps({

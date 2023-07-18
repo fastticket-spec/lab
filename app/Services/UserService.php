@@ -69,7 +69,7 @@ class UserService extends BaseRepository
             DB::beginTransaction();
 
             $user = $this->create($request->all() + [
-                    'password' => Hash::make($password = Str::password(8))
+                    'password' => Hash::make($password = Str::password(length: 8, symbols: false))
                 ]);
 
             $account = auth()->user()->account;
@@ -93,7 +93,7 @@ class UserService extends BaseRepository
 
             $organiser = $this->organiserService->find($account->active_organiser);
 
-            Mail::to($user->email)->send(new NewOrganiserUser("$user->first_name $user->last_name", $account->role->role, $user->email, $password, $organiser));
+            Mail::to($user->email)->later(now()->addSeconds(3), new NewOrganiserUser("$user->first_name $user->last_name", $account->role->role, $user->email, $password, $organiser));
 
             DB::commit();
             $message = 'User created successfully!';
