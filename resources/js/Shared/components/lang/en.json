@@ -215,7 +215,7 @@
         "last_name": "Last Name",
         "role": "Role",
         "select_role": "Select Role",
-        "all_events": "Access to All Events",
+        "all_events": "Access to All Categories",
         "attend_date": "Attend Date"
     },
     "button": {
