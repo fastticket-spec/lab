@@ -9,7 +9,9 @@ import {accreditationFormSchema} from "../../Shared/components/helpers/Validator
 const props = defineProps({
     accessLevel: Object,
     lang: String,
-    surveys: Array
+    surveys: Array,
+    reference: String,
+    answers: Array
 })
 
 const formData = reactive({});
@@ -26,7 +28,24 @@ onMounted(() => {
 });
 
 const {handleSubmit, isSubmitting} = useForm({
-    initialValues: {
+    initialValues: (props.reference && props.answers)
+        ? {
+            surveys: props.surveys.map(x => {
+                const answer = props.answers.find(y => y.question === x.title)?.answer || '';
+                return {
+                    type: x.type,
+                    answer: answer || ((x.type === '8' || x.type === '7') ? null : ''),
+                    title: x.title,
+                    title_arabic: x.title_arabic,
+                    id: x.id,
+                    question: x.title,
+                    is_private: x.private,
+                    options: x.options,
+                    required: x.required
+                }
+            })
+        }
+        : {
         surveys: props.surveys.map(x => ({
             type: x.type,
             answer: (x.type === '8' || x.type === '7') ? null : '',
@@ -45,14 +64,20 @@ const {handleSubmit, isSubmitting} = useForm({
 const onSubmit = handleSubmit(values => {
     const answers = values.surveys.map(d => {
         if (d.type === '7') {
-            d.answer = d.answer.map(x => x.name);
+            d.answer = d.answer.map(x => {
+                if (typeof x !== 'string') {
+                    return x.name;
+                }
+                return x
+            });
         }
         return d;
     });
 
     const data = {
         answers,
-        lang: props.lang
+        lang: props.lang,
+        reference: props.reference
     };
 
     router.post(`/form/${props.accessLevel.event_id}/${props.accessLevel.id}/submit`, data, {

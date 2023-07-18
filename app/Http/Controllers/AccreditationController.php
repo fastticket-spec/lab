@@ -22,7 +22,8 @@ class AccreditationController extends Controller
         $accessLevel->load(['event', 'pageDesign', 'generalSettings']);
 
         return Inertia::render('Accreditation/Index', [
-            'accessLevel' => $accessLevel
+            'accessLevel' => $accessLevel,
+            'reference' => request()->ref
         ]);
     }
 
@@ -33,10 +34,18 @@ class AccreditationController extends Controller
 
         $accessLevel->load(['pageDesign', 'event', 'generalSettings']);
 
+        $reference = $request->ref;
+        $answers = null;
+        if ($reference) {
+            $answers = optional($this->attendeeService->findOneBy(['ref' => $reference]))->answers;
+        }
+
         return Inertia::render('Accreditation/Form', [
             'accessLevel' => $accessLevel,
             'surveys' => $surveys,
-            'lang' => $request->lang
+            'lang' => $request->lang,
+            'reference' => $reference,
+            'answers' => $answers
         ]);
     }
 
