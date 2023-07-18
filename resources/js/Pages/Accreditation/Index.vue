@@ -3,13 +3,14 @@ import {ref} from "vue";
 import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
-    accessLevel: Object
+    accessLevel: Object,
+    reference: String
 })
 
 const lang = ref('english');
 
 const goToForm = () => {
-    router.get(`/form/${props.accessLevel.id}?lang=${lang.value}`)
+    router.get(`/form/${props.accessLevel.id}?ref=${props.reference || ''}&lang=${lang.value}`)
 }
 </script>
 
