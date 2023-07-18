@@ -95,6 +95,8 @@ class AttendeeService extends BaseRepository
     public function createAttendee(Request $request, string $eventId, string $accessLevelId)
     {
         $lang = $request->lang;
+        $ref = $request->reference;
+
         $event = $this->eventService->find($eventId);
 
         try {
@@ -114,14 +116,28 @@ class AttendeeService extends BaseRepository
                 }
             }
 
-            $attendee = $this->create([
-                'access_level_id' => $accessLevelId,
-                'event_id' => $eventId,
-                'organiser_id' => $event->organiser_id,
-                'ref' => Str::random('8'),
-                'email' => $email,
-                'answers' => $answers
-            ]);
+            if ($ref) {
+                $attendee = $this->findOneBy(['ref' => $ref]);
+                $answersCollection = collect($answers);
+                foreach ($attendee->answers as $answer) {
+                    if (!($answersCollection->search(function ($a) use ($answer) {
+                        return $a['question'] == $answer['question'];
+                    }))) {
+                        $answersCollection[] = $answer;
+                    }
+                }
+
+                $attendee->update(['email' => $email, 'answers' => $answersCollection->toArray()]);
+            } else {
+                $attendee = $this->create([
+                    'access_level_id' => $accessLevelId,
+                    'event_id' => $eventId,
+                    'organiser_id' => $event->organiser_id,
+                    'ref' => Str::random('8'),
+                    'email' => $email,
+                    'answers' => $answers
+                ]);
+            }
 
             DB::commit();
 
@@ -565,22 +581,32 @@ class AttendeeService extends BaseRepository
     public function uploadAttendees(string $eventId, array $attendees, string $accessLevelId, bool $approve)
     {
         $organiserId = auth()->user()->account->active_organiser;
+        $accessLevel = $this->accessLevelsService->find($accessLevelId);
+        $surveyLink = config('app.url') . '/e/' . $eventId . '/a/' . $accessLevelId;
+        $settings = $accessLevel->generalSettings;
+
+        $organiser = $accessLevel->event->organiser;
 
         foreach ($attendees as $attendee) {
+            $email = $attendee['email'];
+            $ref = Str::random('8');
+
             $this->create([
                 'access_level_id' => $accessLevelId,
                 'organiser_id' => $organiserId,
                 'event_id' => $eventId,
-                'ref' => Str::random('8'),
-                'email' => $attendee['email'],
+                'ref' => $ref,
+                'email' => $email,
                 'answers' => [
-                    ['type' => '5', 'answer' => $attendee['email'], 'question' => 'Email Address'],
+                    ['type' => '5', 'answer' => $email, 'question' => 'Email Address'],
                     ['type' => '1', 'answer' => $attendee['first_name'], 'question' => 'First Name'],
                     ['type' => '1', 'answer' => $attendee['last_name'], 'question' => 'Last Name'],
                 ],
                 'status' => $approve,
                 'accept_status' => $approve
             ]);
+
+            Mail::to($email)->later(now()->addSeconds(3), new InvitationMail($settings, "$surveyLink?ref=$ref", $organiser));
         }
 
         $message = 'Attendees uploaded successfully!';
