@@ -1,8 +1,11 @@
 <script setup>
 
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
+import {computed} from "vue";
 
 let props = defineProps({event_surveys: {}, event_id: String})
+
+const userRole = computed(() => usePage().props.user_role);
 
 const visit = (link, method = 'get') => {
     if (method === 'get') {
@@ -20,11 +23,11 @@ const onPaginate = page => {
 <template>
     <b-container fluid>
         <b-row>
-            <b-col sm="12">
+            <b-col sm="12" v-if="(userRole !== 'Operations' && userRole !== 'Viewers')">
                 <b-btn variant="primary" class="mb-3" @click="visit(`/event/${event_id}/event-surveys/create/`)">Add Survey</b-btn>
             </b-col>
             <b-col sm="12">
-                <no-data v-if="!event_surveys.total" title="Event Surveys" link="/event_surveys/create" />
+                <no-data v-if="!event_surveys.total" title="Event Surveys" :link="(userRole !== 'Operations' && userRole !== 'Viewers') ? '/event_surveys/create' : '#'" />
 
                 <iq-card v-if="event_surveys.total">
                     <template v-slot:headerTitle>
@@ -42,11 +45,15 @@ const onPaginate = page => {
                         <div><small>{{event_survey.access_levels.join(' | ')}}</small></div>
                     </b-card-sub-title>
 
-                    <div class="d-flex justify-content-around mt-5">
+                    <div class="d-flex justify-content-around mt-5" v-if="(userRole !== 'Operations' && userRole !== 'Viewers')">
                         <a href="#" :class="{'text-primary': !event_survey.status, 'text-danger': event_survey.status }" @click.prevent="visit(`/event/${event_id}/event-surveys/${event_survey.id}/status`, 'post')"><i
                             class="ri-key-2-line"></i> {{ event_survey.status ? 'Deactivate' : 'Activate' }} </a>
                         <a href="#" @click.prevent.stop="visit(`/event/${event_id}/event-surveys/${event_survey.id}/surveys`)" class="text-primary"><i class="ri-edit-line"></i>
                             {{ $t('button.edit') }}</a>
+                    </div>
+                    <div class="d-flex justify-content-around mt-5" v-else>
+                        <span href="#" :class="{'badge': true, 'badge-primary': event_survey.status, 'badge-danger': !event_survey.status }"><i
+                            class="ri-key-2-line"></i> {{ event_survey.status ? 'Activated' : 'Deactivated' }} </span>
                     </div>
                 </b-card>
             </b-col>

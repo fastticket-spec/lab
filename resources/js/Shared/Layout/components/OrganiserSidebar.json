@@ -38,10 +38,11 @@
                 "class_name": "",
                 "is_icon_class": true,
                 "component": "Events/Index",
-                "icon": ""
+                "icon": "",
+                "disabled_for": ["Checkin Users"]
             },
             {
-                "title": "View",
+                "title": "Create",
                 "name": "sidebar.create",
                 "is_active": false,
                 "link": "/events/create",
@@ -49,7 +50,7 @@
                 "is_icon_class": true,
                 "component": "Events/Create",
                 "icon": "",
-                "disabled_for": ["Editors", "Ticket Sellers", "Report Users", "Checkin Users", "Checkout Users", "Verify Users", "Customer Support Users"]
+                "disabled_for": ["Editors", "Operations", "Checkin Users", "Viewers"]
             }
         ]
     },
@@ -63,6 +64,44 @@
         "is_icon_class": true,
         "component": ["Attendees/Index", "Attendees/Create"],
         "icon": "ri-user-line",
-        "type": "account manager"
+        "type": "account manager",
+        "disabled_for": ["Editors", "Operations", "Viewers"]
+    },
+    {
+        "title": "Users",
+        "name": "sidebar.users",
+        "is_heading": false,
+        "is_active": false,
+        "link": "#",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": ["Users/Index", "Users/Create"],
+        "icon": "ri-user-line",
+        "type": "account manager",
+        "disabled_for": ["Editors", "Operations", "Viewers"],
+        "children": [
+            {
+                "title": "View",
+                "name": "sidebar.view",
+                "is_active": false,
+                "link": "/users",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Users/Index",
+                "icon": "",
+                "type": "account manager"
+            },
+            {
+                "title": "Create",
+                "name": "sidebar.create",
+                "is_active": false,
+                "link": "/users/create",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "Users/Create",
+                "icon": "",
+                "type": "account manager"
+            }
+        ]
     }
 ]
