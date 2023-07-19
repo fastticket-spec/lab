@@ -4,6 +4,7 @@ namespace App\Http;
 
 use App\Http\Middleware\ActiveOrganiser;
 use App\Http\Middleware\CanEdit;
+use App\Http\Middleware\CheckIn;
 use App\Http\Middleware\OnlyAdmin;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -71,5 +72,6 @@ class Kernel extends HttpKernel
         'active-organiser' => ActiveOrganiser::class,
         'only-admin' => OnlyAdmin::class,
         'can-edit' => CanEdit::class,
+        'checkin' => CheckIn::class,
     ];
 }
