@@ -9,6 +9,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class EventService extends BaseRepository
@@ -17,7 +18,7 @@ class EventService extends BaseRepository
 
     protected string $images_path;
 
-    public function __construct(Event $model, private OrganiserService $organiserService, public FileService $file)
+    public function __construct(Event $model, private OrganiserService $organiserService, public FileService $file, private AccountEventAccessService $accountEventAccessService)
     {
         parent::__construct($model);
         $this->images_path = config('filesystems.directory') . "event_images/";
@@ -26,14 +27,23 @@ class EventService extends BaseRepository
     public function fetchEvents(Request $request): LengthAwarePaginator
     {
         $account = auth()->user()->account;
+        $roleId = $account->role_id;
+
+        $eventsAccessID = null;
+        if ($roleId) {
+            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn($access) => $access->event_id);
+        }
 
         return $this->model->query()
-            ->with('organiser')
+            ->with(['organiser', 'attendees'])
             ->when($account->active_organiser, function ($query) use ($account) {
                 $query->where('organiser_id', $account->active_organiser);
             })
             ->when($request->input('organiser_id'), function (Builder $query) use ($request) {
                 $query->where('organiser_id', $request->organiser_id);
+            })
+            ->when($eventsAccessID, function ($query) use ($eventsAccessID) {
+                $query->whereIn('id', $eventsAccessID);
             })
             ->when($request->input('q'), function ($query) use ($request) {
                 $searchTerm = $request->q;
@@ -59,6 +69,7 @@ class EventService extends BaseRepository
             ->paginate($request->per_page ?: 10)
             ->withQueryString()
             ->through(function ($event) {
+                $attendeesQuery = $event->attendees();
                 return [
                     'id' => $event->id,
                     'title' => $event->title,
@@ -70,7 +81,9 @@ class EventService extends BaseRepository
                     'event_banner_url' => $event->event_banner_url,
                     'status' => Event::EVENT_STATUS_READABLE[$event->status],
                     'month' => $event->created_at->format('M'),
-                    'day' => $event->created_at->format('d')
+                    'day' => $event->created_at->format('d'),
+                    'no_of_attendees' => $attendeesQuery->count(),
+                    'downloads' => $attendeesQuery->sum('downloads')
                 ];
             });
     }
@@ -150,7 +163,7 @@ class EventService extends BaseRepository
         return $event['status'] ? "activated" : "deactivated";
     }
 
-    public function count(bool $all = false): int
+    public function count(bool $all = false, array|Collection|null $allowedEventIds = null): int
     {
         if ($all) return $this->model->query()->count();
 
@@ -164,6 +177,9 @@ class EventService extends BaseRepository
             })
             ->when($activeOrganiser, function ($query) use ($activeOrganiser) {
                 $query->where('organiser_id', $activeOrganiser);
+            })
+            ->when($allowedEventIds, function ($query) use ($allowedEventIds) {
+                $query->whereIn('id', $allowedEventIds);
             })
             ->count();
     }
