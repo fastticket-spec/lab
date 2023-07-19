@@ -8,12 +8,12 @@
 
                 <b-card-text class="d-flex w-100 justify-content-around my-5">
                     <div class="text-center">
-                        <h5>0</h5>
+                        <h5>{{ event.downloads }}</h5>
                         <span>Downloads</span>
                     </div>
 
                     <div class="text-center">
-                        <h5>0</h5>
+                        <h5>{{ event.no_of_attendees }}</h5>
                         <span>Attendees</span>
                     </div>
                 </b-card-text>

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Badge;
 use App\Repositories\BaseRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class BadgeService extends BaseRepository
 {
@@ -88,7 +89,7 @@ class BadgeService extends BaseRepository
         );
     }
 
-    public function count(?string $eventId = null): int
+    public function count(?string $eventId = null, array|Collection|null $allowedEventIds = null): int
     {
         $user = auth()->user();
         $account = $user->account;
@@ -96,6 +97,8 @@ class BadgeService extends BaseRepository
 
         if ($eventId) {
             $eventIds = [$eventId];
+        } else if ($allowedEventIds) {
+            $eventIds = $allowedEventIds;
         } else {
             $eventIds = $this->eventService->model->query()
                 ->when(!$activeOrganiser, function ($query) use ($user) {
@@ -105,7 +108,7 @@ class BadgeService extends BaseRepository
                     $query->where('organiser_id', $activeOrganiser);
                 })
                 ->when($eventId, function ($query) use ($eventId) {
-                    $query->where('event_id', $eventId);
+                    $query->where('id', $eventId);
                 })
                 ->pluck('id');
         }

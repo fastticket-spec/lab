@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Events;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendee;
+use App\Services\AccountEventAccessService;
 use App\Services\AttendeeService;
 use App\Services\BadgeService;
 use App\Services\EventService;
@@ -18,6 +19,7 @@ class DashboardController extends Controller
         private AttendeeService $attendeeService,
         private BadgeService    $badgeService,
         private ZoneService     $zoneService,
+        private AccountEventAccessService $accountEventAccessService
     )
     {
     }
