@@ -11,5 +11,7 @@
 </head>
 <body class="antialiased">
 @inertia
+
+<script src="https://unpkg.com/html5-qrcode"></script>
 </body>
 </html>
