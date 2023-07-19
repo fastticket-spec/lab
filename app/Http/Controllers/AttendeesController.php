@@ -149,4 +149,11 @@ class AttendeesController extends Controller
     {
         return $this->attendeeService->uploadAttendees($eventId, $request->attendees, $request->access_level_id, $request->approve);
     }
+
+    public function checkAttendee(Request $request)
+    {
+        $request->validate(['attendee_ref' => 'required']);
+
+        return $this->attendeeService->checkAttendee($request->attendee_ref);
+    }
 }
