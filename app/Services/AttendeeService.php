@@ -10,7 +10,6 @@ use App\Models\Attendee;
 use App\Models\AttendeeZone;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +24,7 @@ class AttendeeService extends BaseRepository
 
     protected string $images_path;
 
-    public function __construct(Attendee $model, public FileService $file, public EventService $eventService, public AccessLevelsService $accessLevelsService)
+    public function __construct(Attendee $model, public FileService $file, public EventService $eventService, public AccessLevelsService $accessLevelsService, private AccountEventAccessService $accountEventAccessService)
     {
         parent::__construct($model);
 
@@ -35,6 +34,12 @@ class AttendeeService extends BaseRepository
     public function fetchAttendees(Request $request, ?string $eventId = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $account = auth()->user()->account;
+        $roleId = $account->role_id;
+
+        $eventsAccessID = null;
+        if ($roleId) {
+            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn($access) => $access->event_id);
+        }
 
         return $this->model->query()
             ->with(['event', 'accessLevel.accessLevelBadge.badge', 'zones.zone'])
@@ -43,6 +48,9 @@ class AttendeeService extends BaseRepository
             })
             ->when($eventId, function ($query) use ($eventId) {
                 $query->where('event_id', $eventId);
+            })
+            ->when($eventsAccessID, function ($query) use ($eventsAccessID) {
+                $query->whereIn('event_id', $eventsAccessID);
             })
             ->when($request->input('q'), function ($query) use ($request) {
                 $searchTerm = $request->q;
@@ -532,7 +540,7 @@ class AttendeeService extends BaseRepository
         return view('badge_display', $data);
     }
 
-    public function count(bool $all = false, ?bool $approved = false, ?bool $declined = false, ?string $eventId = null): int
+    public function count(bool $all = false, ?bool $approved = false, ?bool $declined = false, ?string $eventId = null, array|Collection|null $allowedEventIds = null): int
     {
         if ($all) return $this->model->query()->count();
 
@@ -556,10 +564,13 @@ class AttendeeService extends BaseRepository
             ->when($eventId, function ($query) use ($eventId) {
                 $query->where('event_id', $eventId);
             })
+            ->when($allowedEventIds, function ($query) use ($allowedEventIds) {
+                $query->whereIn('event_id', $allowedEventIds);
+            })
             ->count();
     }
 
-    public function countDownloads(?string $eventId = null): int
+    public function countDownloads(?string $eventId = null, array|Collection|null $allowedEventIds = null): int
     {
         $user = auth()->user();
         $account = $user->account;
@@ -574,6 +585,9 @@ class AttendeeService extends BaseRepository
             })
             ->when($eventId, function ($query) use ($eventId) {
                 $query->where('event_id', $eventId);
+            })
+            ->when($allowedEventIds, function ($query) use ($allowedEventIds) {
+                $query->whereIn('event_id', $allowedEventIds);
             })
             ->sum('downloads');
     }

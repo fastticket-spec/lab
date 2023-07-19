@@ -55,6 +55,11 @@ class Event extends Model
         return $this->hasMany(Badge::class);
     }
 
+    public function attendees(): HasMany
+    {
+        return $this->hasMany(Attendee::class);
+    }
+
     public function getEventImageUrlAttribute()
     {
         return $this->logo ? Storage::disk(config('filesystems.default'))->url($this->logo) : null;
