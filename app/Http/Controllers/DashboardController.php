@@ -25,6 +25,7 @@ class DashboardController extends Controller
     public function index(): \Inertia\Response
     {
         $user = auth()->user();
+        $userRole = $user->userRole();
         $account = $user->account;
         $active_organiser = $account->active_organiser;
 
@@ -33,6 +34,10 @@ class DashboardController extends Controller
         $eventsAccessID = null;
         if ($roleId) {
             $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn($access) => $access->event_id);
+        }
+
+        if ($userRole === 'Checkin Users') {
+            return Inertia::render('Dashboard/CheckInUserDashboard');
         }
 
         $organiserData = [

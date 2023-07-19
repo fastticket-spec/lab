@@ -10,6 +10,7 @@ use App\Models\Attendee;
 use App\Models\AttendeeZone;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -631,5 +632,34 @@ class AttendeeService extends BaseRepository
             component: "/event/$eventId/attendees",
             returnType: "redirect"
         );
+    }
+
+    public function checkAttendee(string $attendeeRef)
+    {
+        try {
+            $attendee = $this->model->query()
+                ->whereRef($attendeeRef)
+                ->with(['accessLevel', 'event'])
+                ->firstOrFail();
+
+            return $this->view(
+                data: $attendee,
+                flashMessage: 'Attendee fetched',
+                component: '/dashboard',
+                returnType: 'redirect'
+            );
+        } catch (\Throwable $th) {
+            if ($th instanceof ModelNotFoundException) {
+                return $this->view(
+                    data: ['message' => 'Attendee not found'],
+                    statusCode: 400,
+                    flashMessage: 'Attendee not found',
+                    component: '/dashboard',
+                    returnType: 'redirect'
+                );
+            }
+            throw $th;
+        }
+
     }
 }

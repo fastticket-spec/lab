@@ -163,3 +163,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::delete('/{user_id}', [UserController::class, 'destroy']);
     });
 });
+
+Route::prefix('checkin-user')->group(function () {
+    Route::group(['middleware' => ['checkin']], function () {
+        Route::post('verify-attendee', [AttendeesController::class, 'checkAttendee']);
+    });
+});
