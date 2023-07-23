@@ -9,6 +9,7 @@ use App\Services\AttendeeService;
 use App\Services\ZoneService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Throwable;
 
 class AttendeesController extends Controller
 {
@@ -150,10 +151,55 @@ class AttendeesController extends Controller
         return $this->attendeeService->uploadAttendees($eventId, $request->attendees, $request->access_level_id, $request->approve);
     }
 
+    /**
+     * @throws Throwable
+     */
     public function checkAttendee(Request $request)
     {
         $request->validate(['attendee_ref' => 'required']);
 
         return $this->attendeeService->checkAttendee($request->attendee_ref);
+    }
+
+    public function markAsPrinted(Request $request)
+    {
+        $request->validate(['attendee_ids' => 'required|array']);
+
+        return $this->attendeeService->togglePrinted(
+            attendee_ids: $request->attendee_ids,
+            printed: $request->printed
+        );
+    }
+
+    public function markAsPrintedEvent(Request $request, string $eventId)
+    {
+        $request->validate(['attendee_ids' => 'required|array']);
+
+        return $this->attendeeService->togglePrinted(
+            attendee_ids: $request->attendee_ids,
+            printed: $request->printed,
+            eventId: $eventId
+        );
+    }
+
+    public function markAsCollected(Request $request)
+    {
+        $request->validate(['attendee_ids' => 'required|array']);
+
+        return $this->attendeeService->toggleCollected(
+            attendee_ids: $request->attendee_ids,
+            collected: $request->collected
+        );
+    }
+
+    public function markAsCollectedEvent(Request $request, string $eventId)
+    {
+        $request->validate(['attendee_ids' => 'required|array']);
+
+        return $this->attendeeService->toggleCollected(
+            attendee_ids: $request->attendee_ids,
+            collected: $request->collected,
+            eventId: $eventId
+        );
     }
 }

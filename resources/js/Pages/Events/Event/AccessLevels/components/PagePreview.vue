@@ -6,7 +6,7 @@
         }">
         <div class="bg-div m-5" :style="{backgroundColor: data.formBackground.color}">
             <div class="text-center">
-                <img class="my-3 text-center img-fluid logo" :src="event.event_image_url" alt="">
+                <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo || event.event_image_url" alt="">
             </div>
 
             <p class="pt-3 px-4" v-html="accessLevel?.general_settings?.description"/>

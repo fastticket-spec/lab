@@ -187,6 +187,18 @@ const cancelAnswer = (answerIndex) => {
     selectedAnswer.edit = false;
 }
 
+const markAsPrinted = (printed = true) => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/mark-as-printed`, {attendee_ids: checkedRows.value, printed})
+        : router.post(`/attendees/mark-as-printed`, {attendee_ids: checkedRows.value, printed})
+}
+
+const markAsCollected = (collected = true) => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/mark-as-collected`, {attendee_ids: checkedRows.value, collected})
+        : router.post(`/attendees/mark-as-collected`, {attendee_ids: checkedRows.value, collected})
+}
+
 const uploadedAttendees = ref([]);
 
 const onUploadFile = e => {
@@ -265,7 +277,7 @@ const onUploadAttendees = () => {
                                     }}
                                 </b-btn>
 
-                                <b-btn @click="declineAttendees"
+                                <b-btn @click="declineAttendees" v-if="!userRole || (!userRole === 'Admin Users')"
                                        variant="outline-danger" class="mr-2">Decline attendee{{
                                         checkedRows.length !== 1 ? 's' : ''
                                     }}
@@ -276,6 +288,13 @@ const onUploadAttendees = () => {
                                         checkedRows.length !== 1 ? 's' : ''
                                     }}
                                 </b-btn>
+
+                                <b-dropdown id="dropdown-right-2" right text="More Actions" variant="primary">
+                                    <b-dropdown-item @click.prevent="markAsPrinted()">Mark as Printed</b-dropdown-item>
+                                    <b-dropdown-item @click.prevent="markAsPrinted(false)">Mark as Not Printed</b-dropdown-item>
+                                    <b-dropdown-item @click.prevent="markAsCollected()">Mark as Collected</b-dropdown-item>
+                                    <b-dropdown-item @click.prevent="markAsCollected(false)">Mark as Not Collected</b-dropdown-item>
+                                </b-dropdown>
                             </b-col>
 
                             <b-col sm="12" class="table-responsive">
@@ -307,6 +326,15 @@ const onUploadAttendees = () => {
                                     <template #cell(email)="data">
                                         <a :href="`mailto:${data.item.email}`">{{ data.item.email }}</a>
                                     </template>
+
+                                    <template #cell(status)="data">
+                                        <div class="d-flex flex-column">
+                                            <div>{{ data.item.status }}</div>
+                                            <div v-if="data.item.printed" :class="{'mb-1': true, badge: true, 'badge-success' : data.item.printed}">Printed</div>
+                                            <div v-if="data.item.collected" :class="{'mb-1': true, badge: true, 'badge-success' : data.item.collected}">Collected</div>
+                                        </div>
+                                    </template>
+
                                     <template #cell(action)="data">
                                       <span>
                                           <b-dropdown id="dropdown-right" right text="Actions" size="sm"

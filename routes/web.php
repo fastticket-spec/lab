@@ -84,6 +84,7 @@ Route::group(['middleware' => 'auth'], function () {
                         Route::post('/customize/general', [AccessLevelsController::class, 'customizeGeneral']);
                         Route::post('/customize/page-design', [AccessLevelsController::class, 'customizePageDesign']);
                         Route::post('/customize/design-images', [AccessLevelsController::class, 'designImages']);
+                        Route::post('/customize/logo', [AccessLevelsController::class, 'logo']);
                         Route::post('/customize/request-form', [AccessLevelsController::class, 'requestForm']);
                         Route::post('/customize/socials', [AccessLevelsController::class, 'socials']);
                     });
@@ -107,6 +108,8 @@ Route::group(['middleware' => 'auth'], function () {
             Route::prefix('attendees')->group(function () {
                 Route::get('/', [AttendeesController::class, 'eventAttendees']);
                 Route::post('/bulk-approval/{status}', [AttendeesController::class, 'bulkEventApproval']);
+                Route::post('/mark-as-printed', [AttendeesController::class, 'markAsPrintedEvent']);
+                Route::post('/mark-as-collected', [AttendeesController::class, 'markAsCollectedEvent']);
                 Route::post('/upload-attendees', [AttendeesController::class, 'uploadAttendees']);
                 Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveEventAttendee']);
                 Route::post('/{attendee_id}/send-message', [AttendeesController::class, 'sendEventAttendeeMessage']);
@@ -143,6 +146,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::prefix('attendees')->group(function () {
             Route::get('/', [AttendeesController::class, 'index']);
             Route::post('/bulk-approval/{status}', [AttendeesController::class, 'bulkApproval']);
+            Route::post('/mark-as-printed', [AttendeesController::class, 'markAsPrinted']);
+            Route::post('/mark-as-collected', [AttendeesController::class, 'markAsCollected']);
             Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveAttendee']);
             Route::post('/{attendee_id}/send-message', [AttendeesController::class, 'sendAttendeeMessage']);
             Route::post('/bulk-assign-zones', [AttendeesController::class, 'bulkAssignZones']);
