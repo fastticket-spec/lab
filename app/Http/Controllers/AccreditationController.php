@@ -19,10 +19,12 @@ class AccreditationController extends Controller
     public function index(string $eventId, string $accessLevelId): \Inertia\Response
     {
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
+        $status = $accessLevel->status;
         $accessLevel->load(['event', 'pageDesign', 'generalSettings']);
 
         return Inertia::render('Accreditation/Index', [
             'accessLevel' => $accessLevel,
+            'status' => !!$status,
             'reference' => request()->ref
         ]);
     }
@@ -30,6 +32,7 @@ class AccreditationController extends Controller
     public function form(Request $request, string $accessLevelId): \Inertia\Response
     {
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
+        $status = $accessLevel->status;
         $surveys = $accessLevel->surveyAccessLevels->eventSurvey->surveys;
 
         $accessLevel->load(['pageDesign', 'event', 'generalSettings']);
@@ -42,6 +45,7 @@ class AccreditationController extends Controller
 
         return Inertia::render('Accreditation/Form', [
             'accessLevel' => $accessLevel,
+            'status' => !!$status,
             'surveys' => $surveys,
             'lang' => $request->lang,
             'reference' => $reference,

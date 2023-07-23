@@ -96,7 +96,9 @@ class AttendeeService extends BaseRepository
                     'accept_status' => Attendee::ACCEPT_STATUS_READABLE[$attendee->accept_status],
                     'date_submitted' => $attendee->created_at->format('jS M, Y H:i'),
                     'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id),
-                    'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge
+                    'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge,
+                    'printed' => !!$attendee->printed,
+                    'collected' => !!$attendee->collected
                 ];
             });
     }
@@ -661,5 +663,43 @@ class AttendeeService extends BaseRepository
             throw $th;
         }
 
+    }
+
+    public function togglePrinted(array $attendee_ids, bool $printed = true, ?string $eventId = null)
+    {
+        $this->model->query()
+            ->whereIn('id', $attendee_ids)
+            ->update([
+                'printed' => $printed
+            ]);
+
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $message = (count($attendee_ids) > 1 ? "Attendees" : "Attendee") . " print status updated.";
+
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route,
+            returnType: 'redirect'
+        );
+    }
+
+    public function toggleCollected(array $attendee_ids, bool $collected, ?string $eventId = null)
+    {
+        $this->model->query()
+            ->whereIn('id', $attendee_ids)
+            ->update([
+                'collected' => $collected
+            ]);
+
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $message = (count($attendee_ids) > 1 ? "Attendees" : "Attendee") . " collection status updated.";
+
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route,
+            returnType: 'redirect'
+        );
     }
 }
