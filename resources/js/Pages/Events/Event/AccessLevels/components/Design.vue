@@ -4,12 +4,14 @@ import {onMounted, onUpdated, reactive, ref, watch} from "vue";
 import PagePreview from "./PagePreview.vue";
 import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
+import Cropper from "../../../../../Shared/components/core/images/Cropper.vue";
 
 const props = defineProps({
     event: Object,
     accessLevel: Object,
     data: Object,
-    designImages: Array
+    designImages: Array,
+    logoUpdated: String
 })
 
 watch(() => props.design_images, (value, oldValue) => {
@@ -45,8 +47,14 @@ onMounted(() => {
     }
 });
 
+const showCropperModal = ref(false);
+
 onUpdated(() => {
     initImages()
+
+    // if (props.logoUpdated === 'true') {
+    //     showCropperModal.value = false;
+    // }
 });
 
 const initImages = () => {
@@ -116,12 +124,37 @@ const state = reactive({
 });
 
 const uploadFiles = ({target: {files}}) => {
-
     router.post(`/event/${props.event.id}/access-levels/${props.accessLevel.id}/customize/design-images`, {
         design_images: files
     }, {
-        preserveScroll: true
+        preserveScroll: true,
+        preserveState: true
     })
+}
+
+const selectedImageType = reactive({
+    type: '',
+    croppedImage: '',
+    image: null,
+    aspectRatio: 1
+})
+
+const uploadLogo = ({target: {files}}) => {
+    selectedImageType.type = 'logo'
+    selectedImageType.image = files[0];
+    selectedImageType.aspectRatio = null;
+    showCropperModal.value = true;
+}
+
+const onCropped = async () => {
+    await router.post(`/event/${props.event.id}/access-levels/${props.accessLevel.id}/customize/logo`, {
+        logo: selectedImageType.croppedImage
+    }, {
+        preserveScroll: true,
+        preserveState: true
+    })
+
+    showCropperModal.value = false;
 }
 
 const onSubmit = () => {
@@ -135,7 +168,7 @@ const onSubmit = () => {
         bg_type: state.background.type,
         bg_image: state.background.bgImage?.full,
         form_btn_value: state.formButton.english,
-        form_btn_value_ar: state.formButton.arabic,
+        form_btn_value_ar: state.formButton.arabic
     }
 
     router.post(`/event/${props.event.id}/access-levels/${props.accessLevel.id}/customize/page-design`, data);
@@ -285,6 +318,22 @@ const onSubmit = () => {
                                         </b-collapse>
                                     </b-card>
 
+                                    <b-card no-body class="mb-3">
+                                        <b-card-header header-tag="header" class="p-1" role="tab"
+                                                       header-bg-variant="primary">
+                                            <div v-b-toggle.logo class="py-1 px-2">Logo</div>
+                                        </b-card-header>
+
+                                        <b-collapse id="logo" visible accordion="my-accordion"
+                                                    role="tabpanel">
+                                            <b-card-body>
+                                                <b-form-group label="Upload Logo" label-for="upload-logo">
+                                                    <b-form-file type="file" size="sm" id="upload-logo"
+                                                                 accept="image/*" multiple @change="uploadLogo"/>
+                                                </b-form-group>
+                                            </b-card-body>
+                                        </b-collapse>
+                                    </b-card>
                                 </div>
 
                                 <b-row class="mt-3">
@@ -306,6 +355,30 @@ const onSubmit = () => {
             </iq-card>
         </b-col>
     </b-row>
+
+    <b-modal v-model="showCropperModal" size="lg" title="Crop Image">
+        <Cropper
+            v-if="selectedImageType.image"
+            :image="selectedImageType.image"
+            :aspect-ratio="selectedImageType.aspectRatio"
+            @change="x => selectedImageType.croppedImage = x"
+            :resizable="true"
+        />
+
+        <template #modal-footer>
+            <div class="w-100">
+                <p class="float-left">Event Image</p>
+                <b-button
+                    variant="primary"
+                    size="sm"
+                    class="float-right"
+                    @click="onCropped"
+                >
+                    Done
+                </b-button>
+            </div>
+        </template>
+    </b-modal>
 </template>
 
 <style>

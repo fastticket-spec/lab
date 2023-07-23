@@ -328,9 +328,11 @@ const onUploadAttendees = () => {
                                     </template>
 
                                     <template #cell(status)="data">
-                                        <span>{{ data.item.status }}</span>
-                                        <div v-if="data.item.printed" :class="{badge: true, 'badge-success' : data.item.printed}">Printed</div>
-                                        <div v-if="data.item.collected" :class="{badge: true, 'badge-success' : data.item.collected}">Collected</div>
+                                        <div class="d-flex flex-column">
+                                            <div>{{ data.item.status }}</div>
+                                            <div v-if="data.item.printed" :class="{'mb-1': true, badge: true, 'badge-success' : data.item.printed}">Printed</div>
+                                            <div v-if="data.item.collected" :class="{'mb-1': true, badge: true, 'badge-success' : data.item.collected}">Collected</div>
+                                        </div>
                                     </template>
 
                                     <template #cell(action)="data">

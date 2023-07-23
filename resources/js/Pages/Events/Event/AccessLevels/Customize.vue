@@ -13,7 +13,8 @@ const props = defineProps({
     currentMenu: String,
     event: Object,
     data: [],
-    design_images: []
+    design_images: [],
+    logoUploaded: String
 })
 
 const selectedListName = ref(props.currentMenu);
@@ -38,7 +39,7 @@ const selectList = item => {
 
             <b-col lg="12">
                 <general :list="selectedList" :event-id="event.id" :data="data" :access-level="access_level" v-if="currentMenu === 'general'"/>
-                <design :list="selectedList" :event="event" :data="data" :access-level="access_level" :design-images="design_images" v-if="currentMenu === 'design'"/>
+                <design :list="selectedList" :event="event" :data="data" :access-level="access_level" :design-images="design_images" v-if="currentMenu === 'design'" :logo-updated="logoUploaded"/>
                 <request-form :list="selectedList" :event-id="event.id" :data="data" :access-level-id="access_level.id" v-if="currentMenu === 'request_form'"/>
                 <socials :list="selectedList" :event-id="event.id" :data="data" :access-level-id="access_level.id" v-if="currentMenu === 'socials'"/>
             </b-col>
