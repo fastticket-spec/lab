@@ -126,7 +126,7 @@ class AccessLevelsController extends Controller
             'logo' => 'required|mimes:jpeg,jpg,png|max:4000',
         ]);
 
-        return $this->accessLevelsService->uploadDesignImages($request, $eventId, $accessLevelId);
+        return $this->accessLevelsService->uploadLogo($request, $eventId, $accessLevelId);
     }
 
     public function requestForm(Request $request, string $eventId, string $accessLevelId)
