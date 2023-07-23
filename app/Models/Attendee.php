@@ -40,7 +40,7 @@ class Attendee extends Model
     ];
 
     protected $fillable = [
-        'access_level_id', 'event_id', 'organiser_id', 'ref', 'email', 'answers', 'status', 'accept_status', 'downloads'
+        'access_level_id', 'event_id', 'organiser_id', 'ref', 'email', 'answers', 'status', 'accept_status', 'downloads', 'printed', 'collected'
     ];
 
     public function event(): BelongsTo

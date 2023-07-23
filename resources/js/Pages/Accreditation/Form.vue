@@ -8,6 +8,7 @@ import {accreditationFormSchema} from "../../Shared/components/helpers/Validator
 
 const props = defineProps({
     accessLevel: Object,
+    status: Boolean,
     lang: String,
     surveys: Array,
     reference: String,
@@ -142,11 +143,17 @@ label {
         <div class="row no-gutters accreditation-form" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
                 <div class="bg-div" :style="{backgroundColor: accessLevel?.page_design?.form_bg_color}">
-                    <div class="text-center">
-                        <img class="my-3 text-center img-fluid logo" :src="accessLevel?.event?.event_image_url" alt="">
+                    <div class="text-center p-5" v-if="!status">
+                        <h3 class="p-5" v-if="lang === 'english'">Event is not active. Please contact administrator.</h3>
+                        <h3 class="p-5" v-else>الحدث غير نشط. يرجى الاتصال بالمسؤول</h3>
                     </div>
 
-                    <form @submit.prevent="onSubmit" class="mx-5">
+                    <template v-else>
+                        <div class="text-center">
+                            <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo" alt="">
+                        </div>
+
+                        <form @submit.prevent="onSubmit" class="mx-5">
                         <div class="col-12 m-0 p-0">
                             <div class="row m-0">
                                 <FieldArray name="surveys" v-slot="{ fields, insert, remove, swap }">
@@ -266,6 +273,7 @@ label {
                             </b-btn>
 º                        </div>
                     </form>
+                    </template>
                 </div>
             </div>
         </div>
