@@ -175,6 +175,45 @@ class AccessLevelsService extends BaseRepository
         try {
             $event = $this->eventService->find($eventId);
 
+            foreach ($request->design_images as $img) {
+                if (!is_uploaded_file($img)) {
+                    continue;
+                }
+
+                $path = $this->uploadFile($img, 'event-', '-bg-', 1400);
+
+                if (!$path) {
+                    return false;
+                }
+
+                $event->organiser->designImages()->create(['event_id' => $event->id, 'design_image' => $path]);
+            }
+
+            $message = 'Event Images uploaded successfully';
+            $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
+
+            return $this->view(
+                data: [
+                    'message' => $message,
+                    'data' => $event
+                ], flashMessage: $message, component: $route, returnType: 'redirect'
+            );
+        } catch (\Throwable $th) {
+            $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
+
+            \Log::error($th);
+
+            $message = 'An error occurred while uploading image!';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
+        }
+    }
+
+    public function uploadLogo(Request $request, string $eventId, string $accessLevelId)
+    {
+        try {
+            $event = $this->eventService->find($eventId);
+
             $img = $request->file('logo');
 
             $path = $this->uploadFile($img, 'event-', '-logo-', 1400);
@@ -200,7 +239,7 @@ class AccessLevelsService extends BaseRepository
 
             \Log::error($th);
 
-            $message = 'An error occurred while uploading image!';
+            $message = 'An error occurred while uploading logo!';
 
             return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
         }
