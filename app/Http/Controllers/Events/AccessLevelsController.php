@@ -7,6 +7,7 @@ use App\Http\Requests\AccessLevelGeneralRequest;
 use App\Services\AccessLevelsService;
 use App\Services\EventService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class AccessLevelsController extends Controller
@@ -73,6 +74,7 @@ class AccessLevelsController extends Controller
         $event = $this->eventService->find($eventId);
 
         $page = request()->page ?? 'general';
+        $logo = $event->event_image_url;
 
         $designImages = [];
         if ($page == 'general') {
@@ -93,7 +95,8 @@ class AccessLevelsController extends Controller
             'menuLists' => $this->menuLists,
             'currentMenu' => $page,
             'data' => $data,
-            'design_images' => $designImages
+            'design_images' => $designImages,
+            'logoUploaded' => request()->logouploaded
         ]);
     }
 
@@ -112,6 +115,15 @@ class AccessLevelsController extends Controller
         $request->validate([
             'design_images' => 'required|array',
             'design_images.*' => 'mimes:jpeg,jpg,png|max:4000'
+        ]);
+
+        return $this->accessLevelsService->uploadDesignImages($request, $eventId, $accessLevelId);
+    }
+
+    public function logo(Request $request, string $eventId, string $accessLevelId)
+    {
+        $request->validate([
+            'logo' => 'required|mimes:jpeg,jpg,png|max:4000',
         ]);
 
         return $this->accessLevelsService->uploadDesignImages($request, $eventId, $accessLevelId);

@@ -4,6 +4,7 @@ import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
     accessLevel: Object,
+    status: Boolean,
     reference: String
 })
 
@@ -62,19 +63,26 @@ label {
         <div class="row no-gutters">
             <div class="col-12 align-self-center">
                 <div class="bg-div" :style="{backgroundColor: accessLevel?.page_design?.form_bg_color}">
-                    <div class="text-center">
-                        <img class="my-3 text-center img-fluid logo" :src="accessLevel?.event?.event_image_url" alt="">
+                    <div class="text-center p-5" v-if="!status">
+                        <h3 class="p-5" v-if="lang === 'english'">Event is not active. Please contact administrator.</h3>
+                        <h3 class="p-5" v-else>الحدث غير نشط. يرجى الاتصال بالمسؤول</h3>
                     </div>
 
-                    <p class="pt-3 px-4" :class="{rtl: lang === 'arabic'}"
-                       v-html="lang === 'english' ? accessLevel?.general_settings?.description : accessLevel?.general_settings?.description_arabic"/>
+                    <template v-else>
+                        <div class="text-center">
+                            <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo" alt="">
+                        </div>
 
-                    <div class="py-4 text-center">
+                        <p class="pt-3 px-4" :class="{rtl: lang === 'arabic'}"
+                           v-html="lang === 'english' ? accessLevel?.general_settings?.description : accessLevel?.general_settings?.description_arabic"/>
+
+                        <div class="py-4 text-center">
                         <b-btn @click="goToForm" size="lg" class="px-5 py-2"
                                :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
                             {{ accessLevel?.page_design?.register_btn_value || 'Register' }}
                         </b-btn>
                     </div>
+                    </template>
 
                     <div class="lang-container">
                         <select v-model="lang">

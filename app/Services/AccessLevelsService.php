@@ -10,6 +10,7 @@ use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class AccessLevelsService extends BaseRepository
 {
@@ -174,22 +175,19 @@ class AccessLevelsService extends BaseRepository
         try {
             $event = $this->eventService->find($eventId);
 
-            foreach ($request->design_images as $img) {
-                if (!is_uploaded_file($img)) {
-                    continue;
-                }
+            $img = $request->file('logo');
 
-                $path = $this->uploadFile($img, 'event-', '-bg-', 1400);
+            $path = $this->uploadFile($img, 'event-', '-logo-', 1400);
 
-                if (!$path) {
-                    return false;
-                }
-
-                $event->organiser->designImages()->create(['event_id' => $event->id, 'design_image' => $path]);
+            if (!$path) {
+                return false;
             }
 
+            $accessLevel = $this->find($accessLevelId);
+            $accessLevel->pageDesign()->updateOrCreate(['access_level_id' => $accessLevelId], ['logo' => Storage::disk(config('filesystems.default'))->url($path)]);
+
             $message = 'Event Images uploaded successfully';
-            $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
+            $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design&logouploaded=true";
 
             return $this->view(
                 data: [
