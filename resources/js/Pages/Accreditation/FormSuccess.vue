@@ -53,7 +53,7 @@ label {
             <div class="col-12 align-self-center">
                 <div class="bg-div bg-white">
                     <div class="text-center">
-                        <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo" alt="">
+                        <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                     </div>
                     <p
                         v-html="lang === 'arabic' ? accessLevel?.general_settings?.success_message_arabic : accessLevel?.general_settings?.success_message"

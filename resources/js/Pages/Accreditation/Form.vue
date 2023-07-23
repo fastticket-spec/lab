@@ -150,7 +150,7 @@ label {
 
                     <template v-else>
                         <div class="text-center">
-                            <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo" alt="">
+                            <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                         </div>
 
                         <form @submit.prevent="onSubmit" class="mx-5">
