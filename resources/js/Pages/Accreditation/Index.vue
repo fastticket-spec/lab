@@ -70,7 +70,7 @@ label {
 
                     <template v-else>
                         <div class="text-center">
-                            <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo" alt="">
+                            <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                         </div>
 
                         <p class="pt-3 px-4" :class="{rtl: lang === 'arabic'}"
