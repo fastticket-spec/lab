@@ -48,6 +48,11 @@ const sendInvite = () => {
     router.post(`/event/${props.event_id}/access-levels/${selectedAccessLevel.value}/send-invitation`, invitation)
 }
 
+const quantityAvailable = computed(() => (quantityAvailable, quantityFilled) => {
+    const available = quantityAvailable - quantityFilled;
+    return available >= 0 ? available : 0
+})
+
 </script>
 
 <template>
@@ -90,7 +95,7 @@ const sendInvite = () => {
                         <div class="text-center">
                             <h5>
                                 {{
-                                    access_level.quantity_available ? (access_level.quantity_available - access_level.quantity_filled) : 'Unlimited'
+                                    access_level.quantity_available ? quantityAvailable(access_level.quantity_available, access_level.quantity_filled) : 'Unlimited'
                                 }}</h5>
                             <span>Remaining</span>
                         </div>
