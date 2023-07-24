@@ -143,4 +143,9 @@ class AccessLevelsController extends Controller
     {
         return $this->accessLevelsService->sendLink($request->emails, $eventId, $accessLevelId);
     }
+
+    public function getSurveys(string $eventId, string $accessLevelId)
+    {
+        return $this->accessLevelsService->getSurveys($accessLevelId);
+    }
 }
