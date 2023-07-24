@@ -8,6 +8,7 @@ use App\Mail\CustomAttendeeMail;
 use App\Mail\InvitationMail;
 use App\Models\Attendee;
 use App\Models\AttendeeZone;
+use App\Models\Zone;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -522,15 +523,15 @@ class AttendeeService extends BaseRepository
                 }
 
                 if (!empty($element->getAttribute('key')) && $element->getAttribute('key') == 'zone') {
-//                    $attXone = [];
-//                    foreach ($attendee->zones as $att_zone) {
-//                        $attXone[] = optional(BadgesZone::where('zone_id', $att_zone->zone_id)->first())->zone_id;
-//                    }
-//
-//
-//                    if (!in_array($element->getAttribute('id'), $attXone)) {
-//                        $element->setAttribute('style', 'display: none;');
-//                    }
+                    $attXone = [];
+                    foreach ($attendee->zones as $att_zone) {
+                        $attXone[] = optional(Zone::where('id', $att_zone->zone_id)->first())->id;
+                    }
+
+
+                    if (!in_array($element->getAttribute('id'), $attXone)) {
+                        $element->setAttribute('style', 'display: none;');
+                    }
                 }
             }
         }
