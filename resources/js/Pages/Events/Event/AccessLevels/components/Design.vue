@@ -4,7 +4,6 @@ import {onMounted, onUpdated, reactive, ref, watch} from "vue";
 import PagePreview from "./PagePreview.vue";
 import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
-import Cropper from "../../../../../Shared/components/core/images/Cropper.vue";
 
 const props = defineProps({
     event: Object,
@@ -47,14 +46,8 @@ onMounted(() => {
     }
 });
 
-const showCropperModal = ref(false);
-
 onUpdated(() => {
     initImages()
-
-    // if (props.logoUpdated === 'true') {
-    //     showCropperModal.value = false;
-    // }
 });
 
 const initImages = () => {
@@ -132,29 +125,13 @@ const uploadFiles = ({target: {files}}) => {
     })
 }
 
-const selectedImageType = reactive({
-    type: '',
-    croppedImage: '',
-    image: null,
-    aspectRatio: 1
-})
-
-const uploadLogo = ({target: {files}}) => {
-    selectedImageType.type = 'logo'
-    selectedImageType.image = files[0];
-    selectedImageType.aspectRatio = null;
-    showCropperModal.value = true;
-}
-
-const onCropped = async () => {
+const uploadLogo = async ({target: {files}}) => {
     await router.post(`/event/${props.event.id}/access-levels/${props.accessLevel.id}/customize/logo`, {
-        logo: selectedImageType.croppedImage
+        logo: files[0]
     }, {
         preserveScroll: true,
         preserveState: true
     })
-
-    showCropperModal.value = false;
 }
 
 const onSubmit = () => {
@@ -355,30 +332,6 @@ const onSubmit = () => {
             </iq-card>
         </b-col>
     </b-row>
-
-    <b-modal v-model="showCropperModal" size="lg" title="Crop Image">
-        <Cropper
-            v-if="selectedImageType.image"
-            :image="selectedImageType.image"
-            :aspect-ratio="selectedImageType.aspectRatio"
-            @change="x => selectedImageType.croppedImage = x"
-            :resizable="true"
-        />
-
-        <template #modal-footer>
-            <div class="w-100">
-                <p class="float-left">Event Image</p>
-                <b-button
-                    variant="primary"
-                    size="sm"
-                    class="float-right"
-                    @click="onCropped"
-                >
-                    Done
-                </b-button>
-            </div>
-        </template>
-    </b-modal>
 </template>
 
 <style>

@@ -98,7 +98,8 @@ class AttendeeService extends BaseRepository
                     'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id),
                     'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge,
                     'printed' => !!$attendee->printed,
-                    'collected' => !!$attendee->collected
+                    'collected' => !!$attendee->collected,
+                    'downloads' => $attendee->downloads
                 ];
             });
     }
@@ -451,8 +452,6 @@ class AttendeeService extends BaseRepository
 //            abort(404);
 //        }
 
-        $attendee->downloads = $attendee->downloads + 1;
-        $attendee->save();
         $badge_html = $getBadge->html;
 
 //        $path = config('attendize.event_images_path');
@@ -538,7 +537,9 @@ class AttendeeService extends BaseRepository
 
         $html_data = $doc->saveHTML();
 
-        $data = ['html_data' => $html_data, 'badge' => $badge, 'type' => $request->type];
+        $data = ['html_data' => $html_data, 'badge' => $badge, 'type' => $request->type, 'downloads' => $attendee->downloads, 'downloaded' => $attendee->printed, 'collected' => $attendee->collected];
+
+        return response()->json($data);
 
         return view('badge_display', $data);
     }
@@ -608,17 +609,23 @@ class AttendeeService extends BaseRepository
             $email = $attendee['email'];
             $ref = Str::random('8');
 
+            $answers = [];
+
+            foreach ($attendee as $key => $value) {
+                if ($key == 'email') {
+                    $answers[] = ['type' => '5', 'answer' => $value, 'question' => $key];
+                } else {
+                    $answers[] = ['type' => '1', 'answer' => $value, 'question' => $key];
+                }
+            }
+
             $this->create([
                 'access_level_id' => $accessLevelId,
                 'organiser_id' => $organiserId,
                 'event_id' => $eventId,
                 'ref' => $ref,
                 'email' => $email,
-                'answers' => [
-                    ['type' => '5', 'answer' => $email, 'question' => 'Email Address'],
-                    ['type' => '1', 'answer' => $attendee['first_name'], 'question' => 'First Name'],
-                    ['type' => '1', 'answer' => $attendee['last_name'], 'question' => 'Last Name'],
-                ],
+                'answers' => $answers,
                 'status' => $approve,
                 'accept_status' => $approve
             ]);
@@ -700,6 +707,19 @@ class AttendeeService extends BaseRepository
             flashMessage: $message,
             component: $route,
             returnType: 'redirect'
+        );
+    }
+
+    public function incrementDownloads(string $attendeeId)
+    {
+        $attendee = $this->find($attendeeId);
+
+        $attendee->update([
+            'downloads' => $attendee->downloads + 1
+        ]);
+
+        return $this->view(
+            data: ['message' => 'Updated downloads'],
         );
     }
 }

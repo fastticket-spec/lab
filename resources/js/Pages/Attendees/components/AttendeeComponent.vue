@@ -1,6 +1,6 @@
 <script setup>
 import {router, usePage} from "@inertiajs/vue3";
-import {ref, onUpdated, reactive, computed} from "vue";
+import {ref, onUpdated, reactive, computed, watch} from "vue";
 import SearchBox from '../../../Shared/components/core/SearchBox/Index.vue';
 import axios from "axios";
 import * as XLSX from "xlsx";
@@ -17,8 +17,11 @@ const props = defineProps({
 
 const selectedAttendee = ref({})
 const uploadModalShow = ref(false)
+const exportModalShow = ref(false)
 const answerModalShow = ref(false)
 const messageModalShow = ref(false)
+const badgeModalShow = ref(false)
+const collectedModalShow = ref(false)
 const zonesModalShow = ref(false)
 const zonesForBulk = ref(false)
 const selectedSort = ref(props.sort || '');
@@ -27,10 +30,25 @@ const message = reactive({
     content: ''
 })
 const selectedZones = ref([]);
+const badgeData = ref(null)
+
+watch(badgeData, (val) => {
+    if (val) {
+        setTimeout(() => {
+            let collection = document.querySelectorAll("#badgeContainer p");
+
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].innerHTML = collection[i].innerHTML.replace('&nbsp;', ' ');
+                collection[i].style.wordWrap = 'normal';
+                collection[i].style.letterSpacing = 'normal';
+            }
+        }, 500)
+    }
+})
 
 const userRole = computed(() => usePage().props.user_role);
 
-const fields = [(userRole.value !== 'Viewers' && 'check'), 'access_level', 'category', 'ref', 'email', 'status', 'accept_status', 'date_submitted', (userRole.value !== 'Viewers' && 'action')]
+const fields = [(userRole.value !== 'Viewers' && 'check'), 'access_level', 'category', 'ref', 'email', 'downloads', 'status', 'accept_status', 'date_submitted', (userRole.value !== 'Viewers' && 'action')]
 
 const answerFields = ['question', 'answers', '⠀'];
 
@@ -39,6 +57,11 @@ const checkedRows = ref([]);
 const upload = reactive({
     access_level_id: '',
     approve: false
+});
+
+const exportData = reactive({
+    access_level_id: '',
+    message: ''
 });
 
 const searchAttendees = searchString => {
@@ -99,10 +122,48 @@ const reinstateAttendee = (attendeeId) => {
         : router.post(`/attendees/${attendeeId}/approval/0`)
 }
 
-const downloadBadge = (attendeeId, badgeId) => {
-    props.eventId
-        ? router.get(`/event/${props.eventId}/attendees/${attendeeId}/download-badge/${badgeId}?type=full`)
-        : router.get(`/attendees/${attendeeId}/download-badge/${badgeId}?type=full`)
+const viewBadge = async (attendeeId, badgeId) => {
+    selectedAttendee.value = attendeeId
+    try {
+        const {data} = await axios.get(`/attendees/${attendeeId}/download-badge/${badgeId}?type=full`);
+
+        badgeData.value = data;
+        badgeModalShow.value = true;
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+const downloadBadge = () => {
+    try {
+        let source = document.getElementById('badgeContainer')
+        source.classList.remove("container");
+
+        html2canvas(source, {useCORS: true, allowTaint: true, scale: 5}).then(async canvas => {
+            const imgWidth = badgeData.value.badge.width;
+            const imgHeight = badgeData.value.badge.height
+
+            const contentDataURL = canvas.toDataURL('image/jpeg')
+
+            document.body.appendChild(canvas);
+            const {jsPDF} = window.jspdf;
+
+            let pdf = new jsPDF('p', 'cm', [imgWidth, imgHeight]); // A4 size page of PDF
+            pdf.addImage(contentDataURL, 'JPEG', 0, 0, imgWidth, imgHeight)
+
+            pdf.save('MYPdf.pdf');
+
+            await axios.post(`/attendees/${selectedAttendee.value}/download-badge-increment`)
+
+            const attendeeIndex = props.attendees.data.findIndex(x => x.id === selectedAttendee.value);
+
+            if (attendeeIndex >= 0) {
+                props.attendees.data[attendeeIndex].downloads = props.attendees.data[attendeeIndex].downloads + 1
+            }
+        });
+    } catch (e) {
+        console.log(e);
+    }
 }
 
 const onSubmitMessage = () => {
@@ -199,6 +260,38 @@ const markAsCollected = (collected = true) => {
         : router.post(`/attendees/mark-as-collected`, {attendee_ids: checkedRows.value, collected})
 }
 
+const markBadgeAsPrinted = async () => {
+    try {
+        await axios.post(`/attendees/mark-as-printed`, {attendee_ids: [selectedAttendee.value], printed: true})
+        badgeData.value.downloaded = 1;
+
+        const attendeeIndex = props.attendees.data.findIndex(x => x.id === selectedAttendee.value);
+
+        if (attendeeIndex >= 0) {
+            props.attendees.data[attendeeIndex].printed = 1
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+const markBadgeAsCollected = async () => {
+    try {
+        await axios.post(`/attendees/mark-as-collected`, {attendee_ids: [selectedAttendee.value], collected: true})
+        badgeData.value.collected = 1;
+
+        const attendeeIndex = props.attendees.data.findIndex(x => x.id === selectedAttendee.value);
+
+        if (attendeeIndex >= 0) {
+            props.attendees.data[attendeeIndex].collected = 1
+        }
+
+        collectedModalShow.value = false;
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 const uploadedAttendees = ref([]);
 
 const onUploadFile = e => {
@@ -211,10 +304,14 @@ const onUploadFile = e => {
             const wb = XLSX.read(bstr, {type: 'binary'});
             const wsName = wb.SheetNames[0];
             const ws = wb.Sheets[wsName];
-            let data = XLSX.utils.sheet_to_json(ws, {header: 1});
-            data.splice(0, 1);
-            uploadedAttendees.value = data.map(x => {
-                return {first_name: x[0], 'last_name': x[1], 'email': x[2]}
+            uploadedAttendees.value = XLSX.utils.sheet_to_json(ws).map((x) => {
+                const email = x['Email Address'];
+                delete x['Email Address'];
+
+                return {
+                    ...x,
+                    email
+                };
             })
         }
 
@@ -228,6 +325,30 @@ const onUploadAttendees = () => {
         access_level_id: upload.access_level_id,
         approve: upload.approve
     })
+}
+
+const onExportTemplate = async () => {
+    exportData.message = '';
+
+    try {
+        let {data: {surveys}} = await axios.get(`/event/${props.eventId}/access-levels/${exportData.access_level_id}/surveys`)
+        if (!surveys) {
+            exportData.message = 'There are no surveys for selected access level!';
+            setTimeout(() => {exportData.message = ''}, 3000);
+            return;
+        }
+
+        surveys = surveys.filter(x => x.type !== '10').map(x => x.title);
+        const worksheet = XLSX.utils.json_to_sheet([]);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Survey Template");
+        XLSX.utils.sheet_add_aoa(worksheet, [surveys], { origin: "A1" });
+
+        XLSX.writeFile(workbook, "template.xlsx", { compression: true });
+        exportModalShow.value = false;
+    } catch (e) {
+        console.log(e);
+    }
 }
 </script>
 
@@ -266,6 +387,8 @@ const onUploadAttendees = () => {
                             <b-col sm="12">
                                 <a href="#" @click="uploadModalShow = true" class="btn btn-outline-primary"><i
                                     class="ri-upload-2-line"></i>Upload Attendees</a>
+                                <a href="#" @click="exportModalShow = true" class="btn btn-outline-primary ml-2"><i
+                                    class="ri-upload-2-line"></i>Export Template</a>
                             </b-col>
                         </b-row>
 
@@ -351,7 +474,7 @@ const onUploadAttendees = () => {
                                                 @click.prevent="selectedAttendee = data.item; checkedRows = []; zonesModalShow = true; zonesForBulk = false; selectedZones = (data.item.zones || [])">Assign Zones</b-dropdown-item>
                                             <b-dropdown-item
                                                 v-if="data.item.badge"
-                                                @click.prevent="downloadBadge(data.item.id, data.item.badge.id)">Download Badge</b-dropdown-item>
+                                                @click.prevent="viewBadge(data.item.id, data.item.badge.id)">View Badge</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>
@@ -551,6 +674,102 @@ const onUploadAttendees = () => {
                 </div>
             </template>
         </b-modal>
+
+        <b-modal v-model="exportModalShow" id="export-modal" title="Export Survey Template">
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <div class="form-group">
+                        <label for="access-level">Access Level</label>
+                        <select class="form-control" v-model="exportData.access_level_id" id="access-level">
+                            <option value="">Select Access level</option>
+                            <option v-for="level in accessLevels" :key="level.id" :value="level.id">{{ level.title }}
+                            </option>
+                        </select>
+                        <span v-if="exportData.message" class="text-danger">{{exportData.message}}</span>
+                    </div>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        @click="onExportTemplate"
+                        :disabled="!exportData.access_level_id"
+                        class="btn btn-primary float-right ml-2">Export
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="danger"
+                        class="float-right ml-2"
+                        @click="exportModalShow = false"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="badgeModalShow" id="badge-modal" size="xl" title="Badge" :scrollable="true">
+            <b-row class="mt-3 badge-view" v-if="badgeData">
+                <b-col sm="12" v-html="badgeData.html_data" :style="{height: `${badgeData.badge.height * 38}px`}" />
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        type="button"
+                        variant="primary"
+                        class="float-right ml-2"
+                        :disabled="badgeData.collected === 1"
+                        @click="collectedModalShow = true;"
+                    >
+                        Collected
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="primary"
+                        class="float-right ml-2"
+                        :disabled="badgeData.downloaded === 1"
+                        @click="markBadgeAsPrinted"
+                    >
+                        Downloaded
+                    </b-button>
+                    <b-button
+                        variant="primary"
+                        @click="downloadBadge"
+                        :disabled="badgeData.downloaded === 1"
+                        class="btn btn-primary float-right ml-2">Download
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="collectedModalShow" id="collected-modal" title="Collected">
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <p>Are you sure the badge has been downloaded and collected?</p>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        @click="markBadgeAsCollected"
+                        class="btn btn-primary float-right ml-2">Yes
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="danger"
+                        class="float-right ml-2"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
 
     </b-container>
 </template>

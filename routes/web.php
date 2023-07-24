@@ -78,6 +78,7 @@ Route::group(['middleware' => 'auth'], function () {
                     Route::post('/', [AccessLevelsController::class, 'store']);
                     Route::group(['prefix' => '{access_level_id}'], function () {
                         Route::get('/edit', [AccessLevelsController::class, 'edit']);
+                        Route::get('/surveys', [AccessLevelsController::class, 'getSurveys']);
                         Route::patch('/update', [AccessLevelsController::class, 'update']);
                         Route::post('/change-status', [AccessLevelsController::class, 'updateStatus']);
                         Route::get('/customize', [AccessLevelsController::class, 'customize']);
@@ -156,6 +157,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendInvitation']);
             Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateAttendeeAnswers']);
             Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadBadge']);
+            Route::post('/{attendee_id}/download-badge-increment', [AttendeesController::class, 'incrementBadgeDownload']);
         });
     });
 

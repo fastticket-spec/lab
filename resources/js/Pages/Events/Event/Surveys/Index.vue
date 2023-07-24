@@ -317,6 +317,7 @@ const onSubmit = handleSubmit((values) => {
                                             </b-btn>
                                             <b-btn variant="secondary" class="mr-2"
                                                    @click="surveys[idx].open = 1"
+                                                   :disabled="field?.value?.type === emailField"
                                             >
                                                 <i class="ri-edit-2-line p-0"/>
                                             </b-btn>
