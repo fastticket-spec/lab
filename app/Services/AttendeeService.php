@@ -98,7 +98,8 @@ class AttendeeService extends BaseRepository
                     'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id),
                     'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge,
                     'printed' => !!$attendee->printed,
-                    'collected' => !!$attendee->collected
+                    'collected' => !!$attendee->collected,
+                    'downloads' => $attendee->downloads
                 ];
             });
     }
@@ -451,8 +452,6 @@ class AttendeeService extends BaseRepository
 //            abort(404);
 //        }
 
-        $attendee->downloads = $attendee->downloads + 1;
-        $attendee->save();
         $badge_html = $getBadge->html;
 
 //        $path = config('attendize.event_images_path');
@@ -538,7 +537,9 @@ class AttendeeService extends BaseRepository
 
         $html_data = $doc->saveHTML();
 
-        $data = ['html_data' => $html_data, 'badge' => $badge, 'type' => $request->type];
+        $data = ['html_data' => $html_data, 'badge' => $badge, 'type' => $request->type, 'downloads' => $attendee->downloads, 'downloaded' => $attendee->printed, 'collected' => $attendee->collected];
+
+        return response()->json($data);
 
         return view('badge_display', $data);
     }
@@ -700,6 +701,19 @@ class AttendeeService extends BaseRepository
             flashMessage: $message,
             component: $route,
             returnType: 'redirect'
+        );
+    }
+
+    public function incrementDownloads(string $attendeeId)
+    {
+        $attendee = $this->find($attendeeId);
+
+        $attendee->update([
+            'downloads' => $attendee->downloads + 1
+        ]);
+
+        return $this->view(
+            data: ['message' => 'Updated downloads'],
         );
     }
 }

@@ -156,6 +156,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendInvitation']);
             Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateAttendeeAnswers']);
             Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadBadge']);
+            Route::post('/{attendee_id}/download-badge-increment', [AttendeesController::class, 'incrementBadgeDownload']);
         });
     });
 
