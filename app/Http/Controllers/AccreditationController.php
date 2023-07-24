@@ -19,12 +19,20 @@ class AccreditationController extends Controller
     public function index(string $eventId, string $accessLevelId): \Inertia\Response
     {
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
-        $status = $accessLevel->status;
-        $accessLevel->load(['event', 'pageDesign', 'generalSettings']);
+
+        $status = !!$accessLevel->status;
+        $accessLevel->load(['event', 'pageDesign', 'generalSettings', 'attendees']);
+
+        if ($quantityAvailable = $accessLevel->quantity_available) {
+            $quantityFilled = $accessLevel->attendees->count();
+            if ($quantityFilled >= $quantityAvailable) {
+                $status = false;
+            }
+        }
 
         return Inertia::render('Accreditation/Index', [
             'accessLevel' => $accessLevel,
-            'status' => !!$status,
+            'status' => $status,
             'reference' => request()->ref
         ]);
     }
@@ -32,10 +40,17 @@ class AccreditationController extends Controller
     public function form(Request $request, string $accessLevelId): \Inertia\Response
     {
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
-        $status = $accessLevel->status;
+        $status = !!$accessLevel->status;
         $surveys = $accessLevel->surveyAccessLevels->eventSurvey->surveys;
 
-        $accessLevel->load(['pageDesign', 'event', 'generalSettings']);
+        $accessLevel->load(['pageDesign', 'event', 'generalSettings', 'attendees']);
+
+        if ($quantityAvailable = $accessLevel->quantity_available) {
+            $quantityFilled = $accessLevel->attendees->count();
+            if ($quantityFilled >= $quantityAvailable) {
+                $status = false;
+            }
+        }
 
         $reference = $request->ref;
         $answers = null;
