@@ -38,15 +38,6 @@ const selectedImageType = reactive({
 
 const showCropperModal = ref(false);
 
-watch(eventImageUpload, (newVal) => {
-    if (newVal instanceof File) {
-        selectedImageType.type = 'event_image_upload'
-        selectedImageType.image = newVal;
-        selectedImageType.aspectRatio = 7 / 5;
-        showCropperModal.value = true;
-    }
-})
-
 watch(eventBannerUpload, (newVal) => {
     if (newVal instanceof File) {
         selectedImageType.type = 'event_banner_upload'
