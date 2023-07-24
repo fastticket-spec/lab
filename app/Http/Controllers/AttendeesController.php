@@ -202,4 +202,9 @@ class AttendeesController extends Controller
             eventId: $eventId
         );
     }
+
+    public function incrementBadgeDownload(string $attendeeId)
+    {
+        return $this->attendeeService->incrementDownloads($attendeeId);
+    }
 }
