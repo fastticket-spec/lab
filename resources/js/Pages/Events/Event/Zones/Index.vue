@@ -7,7 +7,7 @@ const props = defineProps({
     zones: Object
 })
 
-const fields = ['zone', 'event', 'status', 'date_created'];
+const fields = ['zone', 'zone_id','event', 'status', 'date_created'];
 
 const userRole = computed(() => usePage().props.user_role);
 

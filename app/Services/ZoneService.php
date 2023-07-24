@@ -26,6 +26,7 @@ class ZoneService extends BaseRepository
             ->through(function ($zone) {
                 return [
                     'id' => $zone->id,
+                    'zone_id' => $zone->id,
                     'zone' => $zone->zone,
                     'event' => $zone->event,
                     'status' => Zone::STATUS_READABLE[$zone->status],
