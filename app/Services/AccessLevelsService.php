@@ -305,4 +305,13 @@ class AccessLevelsService extends BaseRepository
 
         return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
     }
+
+    public function getSurveys(string $accessLevelId)
+    {
+        $accessLevel = $this->find($accessLevelId);
+
+        $surveys = optional(optional($accessLevel->surveyAccessLevels)->eventSurvey)->surveys;
+
+        return $this->view(['surveys' => $surveys]);
+    }
 }
