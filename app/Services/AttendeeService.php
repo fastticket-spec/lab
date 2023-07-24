@@ -609,17 +609,23 @@ class AttendeeService extends BaseRepository
             $email = $attendee['email'];
             $ref = Str::random('8');
 
+            $answers = [];
+
+            foreach ($attendee as $key => $value) {
+                if ($key == 'email') {
+                    $answers[] = ['type' => '5', 'answer' => $value, 'question' => $key];
+                } else {
+                    $answers[] = ['type' => '1', 'answer' => $value, 'question' => $key];
+                }
+            }
+
             $this->create([
                 'access_level_id' => $accessLevelId,
                 'organiser_id' => $organiserId,
                 'event_id' => $eventId,
                 'ref' => $ref,
                 'email' => $email,
-                'answers' => [
-                    ['type' => '5', 'answer' => $email, 'question' => 'Email Address'],
-                    ['type' => '1', 'answer' => $attendee['first_name'], 'question' => 'First Name'],
-                    ['type' => '1', 'answer' => $attendee['last_name'], 'question' => 'Last Name'],
-                ],
+                'answers' => $answers,
                 'status' => $approve,
                 'accept_status' => $approve
             ]);

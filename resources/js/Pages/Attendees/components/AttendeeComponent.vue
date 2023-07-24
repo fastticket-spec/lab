@@ -17,6 +17,7 @@ const props = defineProps({
 
 const selectedAttendee = ref({})
 const uploadModalShow = ref(false)
+const exportModalShow = ref(false)
 const answerModalShow = ref(false)
 const messageModalShow = ref(false)
 const badgeModalShow = ref(false)
@@ -56,6 +57,11 @@ const checkedRows = ref([]);
 const upload = reactive({
     access_level_id: '',
     approve: false
+});
+
+const exportData = reactive({
+    access_level_id: '',
+    message: ''
 });
 
 const searchAttendees = searchString => {
@@ -298,10 +304,14 @@ const onUploadFile = e => {
             const wb = XLSX.read(bstr, {type: 'binary'});
             const wsName = wb.SheetNames[0];
             const ws = wb.Sheets[wsName];
-            let data = XLSX.utils.sheet_to_json(ws, {header: 1});
-            data.splice(0, 1);
-            uploadedAttendees.value = data.map(x => {
-                return {first_name: x[0], 'last_name': x[1], 'email': x[2]}
+            uploadedAttendees.value = XLSX.utils.sheet_to_json(ws).map((x) => {
+                const email = x['Email Address'];
+                delete x['Email Address'];
+
+                return {
+                    ...x,
+                    email
+                };
             })
         }
 
@@ -315,6 +325,30 @@ const onUploadAttendees = () => {
         access_level_id: upload.access_level_id,
         approve: upload.approve
     })
+}
+
+const onExportTemplate = async () => {
+    exportData.message = '';
+
+    try {
+        let {data: {surveys}} = await axios.get(`/event/${props.eventId}/access-levels/${exportData.access_level_id}/surveys`)
+        if (!surveys) {
+            exportData.message = 'There are no surveys for selected access level!';
+            setTimeout(() => {exportData.message = ''}, 3000);
+            return;
+        }
+
+        surveys = surveys.filter(x => x.type !== '10').map(x => x.title);
+        const worksheet = XLSX.utils.json_to_sheet([]);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Survey Template");
+        XLSX.utils.sheet_add_aoa(worksheet, [surveys], { origin: "A1" });
+
+        XLSX.writeFile(workbook, "template.xlsx", { compression: true });
+        exportModalShow.value = false;
+    } catch (e) {
+        console.log(e);
+    }
 }
 </script>
 
@@ -353,6 +387,8 @@ const onUploadAttendees = () => {
                             <b-col sm="12">
                                 <a href="#" @click="uploadModalShow = true" class="btn btn-outline-primary"><i
                                     class="ri-upload-2-line"></i>Upload Attendees</a>
+                                <a href="#" @click="exportModalShow = true" class="btn btn-outline-primary ml-2"><i
+                                    class="ri-upload-2-line"></i>Export Template</a>
                             </b-col>
                         </b-row>
 
@@ -632,6 +668,41 @@ const onUploadAttendees = () => {
                         variant="danger"
                         class="float-right ml-2"
                         @click="uploadModalShow = false"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="exportModalShow" id="export-modal" title="Export Survey Template">
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <div class="form-group">
+                        <label for="access-level">Access Level</label>
+                        <select class="form-control" v-model="exportData.access_level_id" id="access-level">
+                            <option value="">Select Access level</option>
+                            <option v-for="level in accessLevels" :key="level.id" :value="level.id">{{ level.title }}
+                            </option>
+                        </select>
+                        <span v-if="exportData.message" class="text-danger">{{exportData.message}}</span>
+                    </div>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        @click="onExportTemplate"
+                        :disabled="!exportData.access_level_id"
+                        class="btn btn-primary float-right ml-2">Export
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="danger"
+                        class="float-right ml-2"
+                        @click="exportModalShow = false"
                     >
                         Close
                     </b-button>
