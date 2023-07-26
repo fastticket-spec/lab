@@ -23,6 +23,7 @@ class AttendeesController extends Controller
             'attendees' => $this->attendeeService->fetchAttendees($request),
             'zones' => $this->zoneService->allZones(),
             'sort' => $request->sort,
+            'filter_by' => $request->filter,
             'q' => $request->q,
             'accessLevels' => []
         ]);
@@ -35,6 +36,7 @@ class AttendeesController extends Controller
             'zones' => $this->zoneService->allZones($eventId),
             'attendees' => $this->attendeeService->fetchAttendees($request, $eventId),
             'sort' => $request->sort,
+            'filter_by' => $request->filter,
             'q' => $request->q,
             'accessLevels' => $this->accessLevelsService->allAccessLevels($eventId)
         ]);

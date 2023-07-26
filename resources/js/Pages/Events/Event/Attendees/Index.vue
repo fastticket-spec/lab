@@ -5,6 +5,7 @@ defineProps({
     attendees: Object,
     eventId: String,
     sort: String,
+    filter_by: String,
     zones: Array,
     q: String,
     accessLevels: Array,
@@ -13,5 +14,5 @@ defineProps({
 </script>
 
 <template>
-    <attendee-component :attendees="attendees" :event-id="eventId" :access-levels="accessLevels" :zones="zones" :sort="sort" :q="q" :errors="errors" />
+    <attendee-component :attendees="attendees" :event-id="eventId" :access-levels="accessLevels" :zones="zones" :sort="sort" :filter_by="filter_by" :q="q" :errors="errors" />
 </template>
