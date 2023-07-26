@@ -1,0 +1,25 @@
+name: SPL Deploy
+
+on:
+  push:
+    branches: [ spl-prod ]
+  pull_request:
+    branches: [ spl-prod ]
+
+jobs:
+  SPL-Deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to SPL-Prod
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.SPL_HOST }}
+        username: ${{ secrets.SPL_USERNAME }}
+        key: ${{ secrets.STAGING_KEY }}
+        port: ${{ secrets.STAGING_PORT }}
+        script: |
+          cd /var/www/spl-prod && ./spl_deploy.sh
+          cd /var/www/spl-prod && npm install
+          cd /var/www/spl-prod && npm run build
