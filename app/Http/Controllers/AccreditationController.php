@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Country;
 use App\Services\AccessLevelsService;
 use App\Services\AttendeeService;
 use Illuminate\Http\Request;
@@ -42,6 +43,7 @@ class AccreditationController extends Controller
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
         $status = !!$accessLevel->status;
         $surveys = $accessLevel->surveyAccessLevels->eventSurvey->surveys;
+        $countries = Country::all();
 
         $accessLevel->load(['pageDesign', 'event.organiser', 'generalSettings', 'attendees']);
 
@@ -64,7 +66,8 @@ class AccreditationController extends Controller
             'surveys' => $surveys,
             'lang' => $request->lang,
             'reference' => $reference,
-            'answers' => $answers
+            'answers' => $answers,
+            'countries' => $countries
         ]);
     }
 
