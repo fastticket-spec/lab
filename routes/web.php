@@ -124,9 +124,11 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::prefix('/zones')->group(function () {
                 Route::get('/', [ZonesController::class, 'index']);
-                Route::get('/create', [ZonesController::class, 'create']);
-                Route::post('/', [ZonesController::class, 'store']);
-                Route::patch('/{zone_id}/update-status', [ZonesController::class, 'updateStatus']);
+                Route::middleware('can-edit')->group(function () {
+                    Route::get('/create', [ZonesController::class, 'create']);
+                    Route::post('/', [ZonesController::class, 'store']);
+                    Route::patch('/{zone_id}/update-status', [ZonesController::class, 'updateStatus']);
+                });
             });
 
             Route::prefix('/badges')->group(function () {
