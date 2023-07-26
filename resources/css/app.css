@@ -133,7 +133,7 @@ body.sidebar-main .content-page.ar, body.two-sidebar.sidebar-main .content-page,
 @media screen and (max-width: 600px) {
     .vag {
         width: 100% !important;
-        padding-right: 15px;
-    padding-left: 15px;
+        padding-right: 15px !important;
+        padding-left: 15px !important;
     }
 }
