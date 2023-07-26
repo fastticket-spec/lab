@@ -43,7 +43,7 @@ label {
 </style>
 
 <template>
-    <b-container fluid class="mx-auto vag" style="width: 80%;" :style="{
+    <b-container fluid  style="width: 80%;" :style="{
                     backgroundColor: accessLevel?.page_design?.bg_type === 'color' && accessLevel?.page_design?.bg_color,
                     backgroundImage: accessLevel?.page_design?.bg_type === 'image'? 'url(' + accessLevel?.page_design?.bg_image + ')' : '',
                     backgroundSize: 'cover',
@@ -51,10 +51,8 @@ label {
                     backgroundPositionY: '50%',
                     paddingTop: '100px',
                     paddingBottom: '100px',
-                    paddingLeft: '200px',
-                    paddingRight: '200px',
                     minHeight: '100vh'
-                }" class="d-flex align-items-center">
+                }" class="mx-auto vag d-flex align-items-center">
         <div class="row no-gutters accreditation-form w-100" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
                 <div class="bg-div bg-white">
