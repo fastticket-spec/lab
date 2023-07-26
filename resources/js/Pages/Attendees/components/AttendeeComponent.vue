@@ -78,11 +78,11 @@ const goTo = (page, perPage, q) => {
 }
 
 const sortEvents = () => {
-    visit(`/attendees?sort=${selectedSort.value}`)
+    visit(props.eventId ? `/event/${props.eventId}/attendees?sort=${selectedSort.value}` : `/attendees?sort=${selectedSort.value}`)
 }
 
 const filterEvents = () => {
-    visit(`/attendees?filter=${selectedFilter.value}`)
+    visit(props.eventId ? `/event/${props.eventId}/attendees?filter=${selectedFilter.value}` : `/attendees?filter=${selectedFilter.value}`)
 }
 
 onUpdated(() => {
@@ -360,9 +360,7 @@ const onExportTemplate = async () => {
     <b-container fluid>
         <b-row>
             <b-col sm="12">
-                <no-data v-if="!attendees.total && !q" title="Attendees" link="#" :sub-text="false"/>
-
-                <iq-card v-if="attendees.total || (!attendees.total && q)">
+                <iq-card v-if="attendees.total || (!attendees.total && q) || (!attendees.total && filter_by)">
                     <template v-slot:headerTitle>
                         <div class="d-flex justify-content-between">
                             <h4 class="card-title">{{ $t('sidebar.attendees') }}</h4>
@@ -397,7 +395,7 @@ const onExportTemplate = async () => {
                         </div>
                     </template>
 
-                    <template v-slot:body>
+                    <template v-slot:body v-if="attendees.total">
                         <b-row v-if="eventId && userRole !== 'Viewers'">
                             <b-col sm="12">
                                 <a href="#" @click="uploadModalShow = true" class="btn btn-outline-primary"><i
@@ -508,6 +506,8 @@ const onExportTemplate = async () => {
                         </b-row>
                     </template>
                 </iq-card>
+
+                <no-data v-if="!attendees.total && !q" title="Attendees" link="#" :sub-text="false"/>
             </b-col>
         </b-row>
 
