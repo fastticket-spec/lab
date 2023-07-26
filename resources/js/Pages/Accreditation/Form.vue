@@ -18,6 +18,7 @@ const props = defineProps({
 const formData = reactive({});
 
 onMounted(() => {
+    document.querySelector('title').textContent = `${props.accessLevel.title} - ${props.accessLevel?.event?.organiser?.name}`
     props.surveys.forEach(survey => {
         formData[survey.id] = {
             type: survey.type,
@@ -110,7 +111,6 @@ input.form-control, .form-control {
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
-    color: #ffffff;
     background-color: #fff0;
     background-clip: padding-box;
     border: 1px solid #ced4da;
