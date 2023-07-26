@@ -9,6 +9,7 @@ const props = defineProps({
     attendees: Object,
     eventId: String,
     sort: String,
+    filter_by: String,
     zones: Array,
     q: String,
     accessLevels: Array,
@@ -25,6 +26,7 @@ const collectedModalShow = ref(false)
 const zonesModalShow = ref(false)
 const zonesForBulk = ref(false)
 const selectedSort = ref(props.sort || '');
+const selectedFilter = ref(props.filter_by || '');
 const message = reactive({
     subject: '',
     content: ''
@@ -79,6 +81,10 @@ const sortEvents = () => {
     visit(`/attendees?sort=${selectedSort.value}`)
 }
 
+const filterEvents = () => {
+    visit(`/attendees?filter=${selectedFilter.value}`)
+}
+
 onUpdated(() => {
     answerModalShow.value = false;
     zonesModalShow.value = false;
@@ -122,12 +128,13 @@ const reinstateAttendee = (attendeeId) => {
         : router.post(`/attendees/${attendeeId}/approval/0`)
 }
 
-const viewBadge = async (attendeeId, badgeId) => {
+const viewBadge = async (attendeeId, badgeId, status) => {
     selectedAttendee.value = attendeeId
     try {
         const {data} = await axios.get(`/attendees/${attendeeId}/download-badge/${badgeId}?type=full`);
 
         badgeData.value = data;
+        badgeData.value['status'] = status;
         badgeModalShow.value = true;
     } catch (e) {
         console.log(e);
@@ -366,19 +373,30 @@ const onExportTemplate = async () => {
                     </template>
 
                     <template v-slot:headerAction>
-                        <search-box
-                            placeholder="Search by email, ref, event"
-                            :on-search="searchAttendees"
-                            :default-value="q"
-                        />
+                        <div class="d-flex justify-content-center align-items-center" style="width: 660px">
+                            <search-box
+                                placeholder="Search by email, ref, event"
+                                :on-search="searchAttendees"
+                                :default-value="q"
+                            />
 
-                        <div class="form-group ml-4 mt-2">
-                            <select class="form-control" @change="sortEvents" v-model="selectedSort">
-                                <option value="">{{ $t('sort.title') }}</option>
-                                <option value="sort_by_creation">{{ $t('sort.creation_date') }}</option>
-                                <option value="status">Status</option>
-                                <option value="sort_by_ref">Ref</option>
-                            </select>
+                            <div class="form-group ml-4 mt-2">
+                                <select class="form-control" @change="sortEvents" v-model="selectedSort">
+                                    <option value="">{{ $t('sort.title') }}</option>
+                                    <option value="sort_by_creation">{{ $t('sort.creation_date') }}</option>
+                                    <option value="status">Status</option>
+                                    <option value="sort_by_ref">Ref</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group ml-4 mt-2">
+                                <select class="form-control" @change="filterEvents" v-model="selectedFilter">
+                                    <option value="">Filter by</option>
+                                    <option value="1">Approved</option>
+                                    <option value="0">Pending</option>
+                                    <option value="2">Declined</option>
+                                </select>
+                            </div>
                         </div>
                     </template>
 
@@ -474,7 +492,7 @@ const onExportTemplate = async () => {
                                                 @click.prevent="selectedAttendee = data.item; checkedRows = []; zonesModalShow = true; zonesForBulk = false; selectedZones = (data.item.zones || [])">Assign Zones</b-dropdown-item>
                                             <b-dropdown-item
                                                 v-if="data.item.badge"
-                                                @click.prevent="viewBadge(data.item.id, data.item.badge.id)">View Badge</b-dropdown-item>
+                                                @click.prevent="viewBadge(data.item.id, data.item.badge.id, data.item.status)">View Badge</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>
@@ -573,8 +591,6 @@ const onExportTemplate = async () => {
                                   :class="`form-control mb-0`"
                                   id="content"/>
                     </div>
-
-                    <span>The attendee will be instructed to send any reply to media@thesaudicup.com.sa</span>
                 </b-col>
             </b-row>
 
@@ -716,7 +732,7 @@ const onExportTemplate = async () => {
             </b-row>
 
             <template #modal-footer>
-                <div class="w-100">
+                <div class="w-100" v-if="badgeData.status === 'approved'">
                     <b-button
                         type="button"
                         variant="primary"
