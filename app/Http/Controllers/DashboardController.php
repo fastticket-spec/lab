@@ -95,16 +95,17 @@ class DashboardController extends Controller
 
         return Inertia::render("Dashboard/Index", [
             'data' => $data,
-            'attendees' => Attendee::with('event')
-                ->latest()
-                ->when($active_organiser, function ($query) use ($active_organiser) {
-                    $query->whereOrganiserId($active_organiser);
-                })
-                ->when($eventsAccessID, function ($query) use ($eventsAccessID) {
-                    $query->whereIn('event_id', $eventsAccessID);
-                })
-                ->take(10)
-                ->get()
+            'attendees' => []
+//        'attendees' => Attendee::with('event')
+//                ->latest()
+//                ->when($active_organiser, function ($query) use ($active_organiser) {
+//                    $query->whereOrganiserId($active_organiser);
+//                })
+//                ->when($eventsAccessID, function ($query) use ($eventsAccessID) {
+//                    $query->whereIn('event_id', $eventsAccessID);
+//                })
+//                ->take(10)
+//                ->get()
         ]);
     }
 }
