@@ -50,7 +50,7 @@ watch(badgeData, (val) => {
 
 const userRole = computed(() => usePage().props.user_role);
 
-const fields = [(userRole.value !== 'Viewers' && 'check'), 'access_level', 'category', 'ref', 'email', 'downloads', 'status', 'accept_status', 'date_submitted', (userRole.value !== 'Viewers' && 'action')]
+const fields = [(userRole.value !== 'Viewers' && 'check'), 'access_level', 'category', 'ref', 'info', 'downloads', 'status', 'accept_status', 'date_submitted', (userRole.value !== 'Viewers' && 'action')]
 
 const answerFields = ['question', 'answers', '⠀'];
 
@@ -234,14 +234,11 @@ const showEdit = answer => {
 
 const saveAnswer = async answerIndex => {
     try {
-        const {data} = await axios.post(`/attendees/${selectedAttendee.value.id}/update-answers`, {
+        await axios.post(`/attendees/${selectedAttendee.value.id}/update-answers`, {
             answers: selectedAttendee.value.answers
         })
 
-        console.log(data);
-
         selectedAttendee.value.answers[answerIndex].edit = false;
-        // answerModalShow.value = false;
     } catch (e) {
         console.log(e);
     }
@@ -373,9 +370,9 @@ const onExportTemplate = async () => {
                     </template>
 
                     <template v-slot:headerAction>
-                        <div class="d-flex justify-content-center align-items-center" style="width: 660px">
+                        <div class="d-flex justify-content-center align-items-center" style="width: 670px">
                             <search-box
-                                placeholder="Search by email, ref, event"
+                                placeholder="Search by first name, last name, email, ref or event"
                                 :on-search="searchAttendees"
                                 :default-value="q"
                             />
@@ -464,8 +461,9 @@ const onExportTemplate = async () => {
                                         </Link>
                                     </template>
 
-                                    <template #cell(email)="data">
-                                        <a :href="`mailto:${data.item.email}`">{{ data.item.email }}</a>
+                                    <template #cell(info)="data">
+                                        <div v-if="data.item.first_name"><i class="ri-user-3-line"></i> {{data.item.first_name}} {{data.item.last_name}}</div>
+                                        <a :href="`mailto:${data.item.email}`"><i class="ri-mail-line"></i> {{ data.item.email }}</a>
                                     </template>
 
                                     <template #cell(status)="data">

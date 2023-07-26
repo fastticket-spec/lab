@@ -32,7 +32,7 @@ onMounted(() => {
 const {handleSubmit, isSubmitting} = useForm({
     initialValues: (props.reference && props.answers)
         ? {
-            surveys: props.surveys.map(x => {
+            surveys: props.surveys.filter(x => !x.private).map(x => {
                 const answer = props.answers.find(y => y.question === x.title)?.answer || '';
                 return {
                     type: x.type,
@@ -48,7 +48,7 @@ const {handleSubmit, isSubmitting} = useForm({
             })
         }
         : {
-        surveys: props.surveys.map(x => ({
+        surveys: props.surveys.filter(x => !x.private).map(x => ({
             type: x.type,
             answer: (x.type === '8' || x.type === '7') ? null : '',
             title: x.title,
@@ -64,7 +64,7 @@ const {handleSubmit, isSubmitting} = useForm({
 });
 
 const onSubmit = handleSubmit(values => {
-    const answers = values.surveys.map(d => {
+    let answers = values.surveys.map(d => {
         if (d.type === '7') {
             d.answer = d.answer.map(x => {
                 if (typeof x !== 'string') {
@@ -75,6 +75,20 @@ const onSubmit = handleSubmit(values => {
         }
         return d;
     });
+
+    const privateAnswers = props.surveys.filter(x => x.private).map(x => ({
+        type: x.type,
+        answer: '',
+        title: x.title,
+        title_arabic: x.title_arabic,
+        id: x.id,
+        question: x.title,
+        is_private: x.private,
+        options: [],
+        required: x.required
+    }));
+
+    answers = [...answers, ...privateAnswers];
 
     const data = {
         answers,
