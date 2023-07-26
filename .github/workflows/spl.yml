@@ -2,9 +2,9 @@ name: SPL Deploy
 
 on:
   push:
-    branches: [ spl-prod ]
+    branches: [ spl-prodold ]
   pull_request:
-    branches: [ spl-prod ]
+    branches: [ spl-prodold ]
 
 jobs:
   SPL-Deploy:
