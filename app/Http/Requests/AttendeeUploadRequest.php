@@ -16,6 +16,8 @@ class AttendeeUploadRequest extends FormRequest
         return [
             'access_level_id' => 'required',
             'attendees' => 'array|required',
+            'attendees.*.First Name' => 'required',
+            'attendees.*.Last Name' => 'required',
             'attendees.*.email' => 'required|email'
         ];
     }

@@ -18,17 +18,19 @@ class InvitationMail extends Mailable
     public string  $title;
     public ?string $organiserName;
     public ?string $organiserLogo;
+    public ?string $firstName;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($settings, $surveyLink, $organiser)
+    public function __construct($settings, $surveyLink, $organiser, $firstName = 'Applicant')
     {
         $this->organiserName = $organiser->name ?? null;
         $this->organiserLogo = $organiser->logo_url ?? null;
 
         $content = $settings->invitation_message ?? '';
         $this->title = $settings->invitation_title ?? 'Invitation Link';
+        $this->firstName = $firstName;
         if ($content) {
             $this->content = str_replace(
                 '<strong>%invitation_link%</strong>',

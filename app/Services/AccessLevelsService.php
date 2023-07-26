@@ -11,6 +11,7 @@ use App\Services\traits\HasFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AccessLevelsService extends BaseRepository
 {
@@ -291,14 +292,16 @@ class AccessLevelsService extends BaseRepository
         $route = "/event/$eventId/access-levels";
 
         $accessLevel = $this->find($accessLevelId);
+
         $surveyLink = config('app.url') . '/e/' . $eventId . '/a/' . $accessLevelId;
         $settings = $accessLevel->generalSettings;
+        $ref = Str::random('8');
 
         $organiser = $accessLevel->event->organiser;
 
         foreach ($emails as $email) {
             Mail::to($email)
-                ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink, $organiser));
+                ->later(now()->addSeconds(5), new InvitationMail($settings, "$surveyLink?ref=$ref", $organiser));
         }
 
         $message = 'Invitation has been sent to the emails supplied';
