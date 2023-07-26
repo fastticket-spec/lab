@@ -139,10 +139,17 @@ input.form-control, .form-control {
 label {
     color: #ffffff;
 }
+
+@media screen and (max-width: 600px) {
+    .vag {
+        width: 100% !important;
+    }
+}
+
 </style>
 
 <template>
-    <b-container fluid :style="{
+    <b-container fluid class="mx-auto vag" style="width: 80%;"  :style="{
                     backgroundColor: accessLevel?.page_design?.bg_type === 'color' && accessLevel?.page_design?.bg_color,
                     backgroundImage: accessLevel?.page_design?.bg_type === 'image'? 'url(' + accessLevel?.page_design?.bg_image + ')' : '',
                     backgroundSize: 'cover',
@@ -150,8 +157,6 @@ label {
                     backgroundPositionY: '50%',
                     paddingTop: '100px',
                     paddingBottom: '100px',
-                    paddingLeft: '200px',
-                    paddingRight: '200px',
                     minHeight: '100vh'
                 }">
         <div class="row no-gutters accreditation-form" :class="{'rtl text-right': lang === 'arabic'}">
@@ -285,7 +290,7 @@ label {
                                    :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
                                 {{ accessLevel?.page_design?.form_btn_value || 'Submit' }}
                             </b-btn>
-º                        </div>
+                        </div>
                     </form>
                     </template>
                 </div>
