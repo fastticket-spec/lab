@@ -95,7 +95,7 @@ class EventSurveyService extends BaseRepository
                 'type' => $survey['type'],
                 'options' => $survey['options'],
                 'required' => $survey['required'] ?? false,
-                'private' => $survey['private']
+                'private' => $survey['private'] ?? false
             ]);
         }
         DB::commit();
