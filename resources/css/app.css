@@ -124,3 +124,9 @@ body.sidebar-main .content-page.ar, body.two-sidebar.sidebar-main .content-page,
     width: 100%!important;
     border: 1px solid;
 }
+
+@media screen and (max-width: 600px) {
+    .vag {
+        width: 100% !important;
+    }
+}
