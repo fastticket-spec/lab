@@ -36,7 +36,7 @@ const {handleSubmit, isSubmitting} = useForm({
                 const answer = props.answers.find(y => y.question === x.title)?.answer || '';
                 return {
                     type: x.type,
-                    answer: answer || ((x.type === '8' || x.type === '7') ? null : ''),
+                    answer: answer || (x.type === '8' ? [] : ((x.type === '7') ? null : '')),
                     title: x.title,
                     title_arabic: x.title_arabic,
                     id: x.id,
@@ -50,7 +50,7 @@ const {handleSubmit, isSubmitting} = useForm({
         : {
         surveys: props.surveys.filter(x => !x.private).map(x => ({
             type: x.type,
-            answer: (x.type === '8' || x.type === '7') ? null : '',
+            answer: x.type === '8' ? [] : ((x.type === '7') ? null : ''),
             title: x.title,
             title_arabic: x.title_arabic,
             id: x.id,
@@ -75,6 +75,7 @@ const onSubmit = handleSubmit(values => {
         }
         return d;
     });
+
 
     const privateAnswers = props.surveys.filter(x => x.private).map(x => ({
         type: x.type,
