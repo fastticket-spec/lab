@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -9,6 +9,10 @@ const props = defineProps({
 })
 
 const lang = ref('english');
+
+onMounted(() => {
+    document.querySelector('title').textContent = `${props.accessLevel.title} - ${props.accessLevel?.event?.organiser?.name}`
+})
 
 const goToForm = () => {
     router.get(`/form/${props.accessLevel.id}?ref=${props.reference || ''}&lang=${lang.value}`)
@@ -32,7 +36,6 @@ export default {
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
-    color: #ffffff;
     background-color: #fff0;
     background-clip: padding-box;
     border: 1px solid #ced4da;

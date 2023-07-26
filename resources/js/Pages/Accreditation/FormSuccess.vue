@@ -1,7 +1,13 @@
 <script setup>
+import {onMounted} from "vue";
+
 const props = defineProps({
     accessLevel: Object,
     lang: String
+})
+
+onMounted(() => {
+    document.querySelector('title').textContent = `${props.accessLevel.title} - ${props.accessLevel?.event?.organiser?.name}`
 })
 </script>
 

@@ -21,7 +21,7 @@ class AccreditationController extends Controller
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
 
         $status = !!$accessLevel->status;
-        $accessLevel->load(['event', 'pageDesign', 'generalSettings', 'attendees']);
+        $accessLevel->load(['event.organiser', 'pageDesign', 'generalSettings', 'attendees']);
 
         if ($quantityAvailable = $accessLevel->quantity_available) {
             $quantityFilled = $accessLevel->attendees->count();
@@ -43,7 +43,7 @@ class AccreditationController extends Controller
         $status = !!$accessLevel->status;
         $surveys = $accessLevel->surveyAccessLevels->eventSurvey->surveys;
 
-        $accessLevel->load(['pageDesign', 'event', 'generalSettings', 'attendees']);
+        $accessLevel->load(['pageDesign', 'event.organiser', 'generalSettings', 'attendees']);
 
         if ($quantityAvailable = $accessLevel->quantity_available) {
             $quantityFilled = $accessLevel->attendees->count();
@@ -76,7 +76,7 @@ class AccreditationController extends Controller
     public function formSuccess(Request $request, string $accessLevelId): \Inertia\Response
     {
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
-        $accessLevel->load(['pageDesign', 'event', 'generalSettings']);
+        $accessLevel->load(['pageDesign', 'event.organiser', 'generalSettings']);
 
         return Inertia::render('Accreditation/FormSuccess', [
             'accessLevel' => $accessLevel,
