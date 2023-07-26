@@ -58,6 +58,8 @@ class AttendeeService extends BaseRepository
                 $searchTerm = $request->q;
                 $query->where('email', 'like', "%{$searchTerm}%")
                     ->orWhere('ref', 'like', "%{$searchTerm}%")
+                    ->orWhere('first_name', 'like', "%{$searchTerm}%")
+                    ->orWhere('last_name', 'like', "%{$searchTerm}%")
                     ->orWhereHas('event', function ($q) use ($searchTerm) {
                         $q->where('title', 'like', "%{$searchTerm}%")
                             ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
@@ -95,6 +97,8 @@ class AttendeeService extends BaseRepository
                     'category' => $attendee->event,
                     'ref' => $attendee->ref,
                     'answers' => $attendee->answers,
+                    'first_name' => $attendee->first_name,
+                    'last_name' => $attendee->last_name,
                     'email' => $attendee->email,
                     'status' => Attendee::STATUS_READABLE[$attendee->status],
                     'accept_status' => Attendee::ACCEPT_STATUS_READABLE[$attendee->accept_status],
@@ -119,10 +123,19 @@ class AttendeeService extends BaseRepository
             DB::beginTransaction();
 
             $email = '';
+            $first_name = '';
+            $last_name = '';
+
             $answers = [];
             foreach ($request->answers as $answer) {
-                if ($answer['type'] == '5') {
+                if ($answer['title'] == 'Email Address') {
                     $email = $answer['answer'];
+                }
+                if ($answer['title'] == 'First Name') {
+                    $first_name = $answer['answer'];
+                }
+                if ($answer['title'] == 'Last Name') {
+                    $last_name = $answer['answer'];
                 }
                 if ($answer['type'] == '4' && ($file = $answer['answer'])) {
                     $fileUrl = $this->uploadFile($file, $answer['question'], '-accreditation-file-');
@@ -132,8 +145,7 @@ class AttendeeService extends BaseRepository
                 }
             }
 
-            if ($ref) {
-                $attendee = $this->findOneBy(['ref' => $ref]);
+            if ($ref && ($attendee = $this->findOneBy(['ref' => $ref]))) {
                 $answersCollection = collect($answers);
                 foreach ($attendee->answers as $answer) {
                     if (!($answersCollection->search(function ($a) use ($answer) {
@@ -143,14 +155,16 @@ class AttendeeService extends BaseRepository
                     }
                 }
 
-                $attendee->update(['email' => $email, 'answers' => $answersCollection->toArray()]);
+                $attendee->update(['email' => $email, 'first_name' => $first_name, 'last_name' => $last_name, 'answers' => $answersCollection->toArray()]);
             } else {
                 $attendee = $this->create([
                     'access_level_id' => $accessLevelId,
                     'event_id' => $eventId,
                     'organiser_id' => $event->organiser_id,
-                    'ref' => Str::random('8'),
+                    'ref' => $ref ?: Str::random('8'),
                     'email' => $email,
+                    'first_name' => $first_name,
+                    'last_name' => $last_name,
                     'answers' => $answers
                 ]);
             }
@@ -159,7 +173,7 @@ class AttendeeService extends BaseRepository
 
             $settings = optional($attendee->accessLevel)->generalSettings;
 
-            Mail::to($email)->later(now()->addSeconds(5), new AttendeeMail($settings, $lang, $attendee->event->organiser));
+            Mail::to($email)->later(now()->addSeconds(5), new AttendeeMail($settings, $lang, $attendee->event->organiser, $first_name));
 
             $message = $lang === 'arabic' ? optional($settings)->success_message_arabic ?: 'Saved successfully' : (optional($settings)->success_message ?: 'Saved successfully');
 
@@ -362,17 +376,26 @@ class AttendeeService extends BaseRepository
 
             $attendee = $this->find($attendeeId);
             $email = '';
+            $first_name = '';
+            $last_name = '';
+
             $answers = [];
             foreach ($request->answers as $answer) {
-                if ($answer['type'] == '5') {
+                if ($answer['question'] == 'Email Address') {
                     $email = $answer['answer'];
+                }
+                if ($answer['question'] == 'First Name') {
+                    $first_name = $answer['answer'];
+                }
+                if ($answer['question'] == 'Last Name') {
+                    $last_name = $answer['answer'];
                 }
                 $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => $answer['answer'] ?? ''];
             }
 
-//            dd($answers);
-
             $attendee->update([
+                'first_name' => $first_name,
+                'last_name' => $last_name,
                 'email' => $email,
                 'answers' => $answers
             ]);
@@ -448,9 +471,9 @@ class AttendeeService extends BaseRepository
 
         $badgeDatas[] = (object)['column_title' => 'function', 'column_value' => $event->title];
 //        $badgeDatas[] = (object)['column_title' => 'registration_reference', 'column_value' => $attendee->order->order_reference];
-        $badgeDatas[] = (object)['column_title' => 'first_name', 'column_value' => $attendee->email];
-//        $badgeDatas[] = (object)['column_title' => 'last_name', 'column_value' => $attendee->last_name];
-        $badgeDatas[] = (object)['column_title' => 'full_name', 'column_value' => $attendee->email];
+        $badgeDatas[] = (object)['column_title' => 'first_name', 'column_value' => $attendee->first_name];
+        $badgeDatas[] = (object)['column_title' => 'last_name', 'column_value' => $attendee->last_name];
+        $badgeDatas[] = (object)['column_title' => 'email', 'column_value' => $attendee->email];
 
 //        if (!$attendee) {
 //            abort(404);
@@ -611,6 +634,8 @@ class AttendeeService extends BaseRepository
 
         foreach ($attendees as $attendee) {
             $email = $attendee['email'];
+            $first_name = $attendee['First Name'];
+            $last_name = $attendee['Last Name'];
             $ref = Str::random('8');
 
             $answers = [];
@@ -628,13 +653,15 @@ class AttendeeService extends BaseRepository
                 'organiser_id' => $organiserId,
                 'event_id' => $eventId,
                 'ref' => $ref,
+                'first_name' => $first_name,
+                'last_name' => $last_name,
                 'email' => $email,
                 'answers' => $answers,
                 'status' => $approve,
                 'accept_status' => $approve
             ]);
 
-            Mail::to($email)->later(now()->addSeconds(3), new InvitationMail($settings, "$surveyLink?ref=$ref", $organiser));
+            Mail::to($email)->later(now()->addSeconds(3), new InvitationMail($settings, "$surveyLink?ref=$ref", $organiser, $first_name));
         }
 
         $message = 'Attendees uploaded successfully!';
