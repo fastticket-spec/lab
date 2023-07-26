@@ -12,7 +12,8 @@ const props = defineProps({
     lang: String,
     surveys: Array,
     reference: String,
-    answers: Array
+    answers: Array,
+    countries: Array
 })
 
 const formData = reactive({});
@@ -277,6 +278,18 @@ label {
                                                 <h5 v-if="field.value.type === '10'" class="mt-5 mb-2">{{
                                                         lang === 'arabic' ? field.value.title_arabic : field.value.title
                                                     }}</h5>
+
+                                                <Field as="select"
+                                                       v-else-if="field.value.type === '11'"
+                                                       :name="`surveys[${idx}].answer`"
+                                                       :id="`surveys-${idx}`"
+                                                       :class="`form-control mb-0`" :validateOnInput="true">
+                                                    <option v-for="country in countries"
+                                                            :key="`${field.value.id}-${country.country}`"
+                                                            :value="country.country">
+                                                        {{ country.country }}
+                                                    </option>
+                                                </Field>
 
 
                                                 <ErrorMessage :name="`surveys[${idx}].answer`" class="text-danger"/>
