@@ -55,7 +55,7 @@ class EventSurveyService extends BaseRepository
                 'event_id' => $eventId,
                 'event_survey_id' => $eventSurvey->id,
                 'title' => $survey['title'],
-                'title_arabic' => $survey['title_arabic'],
+                'title_arabic' => $survey['title_arabic'] ?? '',
                 'type' => $survey['type'],
                 'options' => $survey['options'],
                 'required' => $survey['required'],
