@@ -82,7 +82,7 @@ class AttendeeService extends BaseRepository
                         $query->orderByDesc('created_at');
                 }
             })
-            ->when(($request->input('filter') || $request->filter == 0), function ($query) use ($request) {
+            ->when(($request->input('filter') || $request->filter == '0'), function ($query) use ($request) {
                 $query->whereStatus($request->filter);
             })
             ->latest()
