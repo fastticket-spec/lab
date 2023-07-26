@@ -18,17 +18,19 @@ class AttendeeMail extends Mailable
     public string $title;
     public ?string $organiserName;
     public ?string $organiserLogo;
+    public ?string $firstName;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($settings, $lang, $organiser)
+    public function __construct($settings, $lang, $organiser, $firstName)
     {
         $this->organiserName = $organiser->name ?? null;
         $this->organiserLogo = $organiser->logo_url ?? null;
 
         $this->content = $lang == 'arabic' ? ($settings->email_message_arabic ?? '<p></p>') : ($settings->email_message ?? '<p></p>');
         $this->title = $settings->email_message_title ?? 'Attendee Mail';
+        $this->firstName = $firstName;
     }
 
     /**

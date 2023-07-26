@@ -27,6 +27,14 @@ const emailField = computed(() => {
     return emailField.toString();
 })
 
+const textField = computed(() => {
+    const textField = Object.keys(props.field_types).find(x => {
+        return props.field_types[x].key === 'textbox';
+    })
+
+    return textField.toString();
+})
+
 const initialValues = props.event_survey ? {
     surveys: props.event_survey.surveys.length > 0
         ? props.event_survey.surveys.map(x => ({
@@ -38,19 +46,65 @@ const initialValues = props.event_survey ? {
                 : [{name: '', name_arabic: ''}],
             open: false
         }))
-        : [{
-            title: 'Email Address',
-            title_arabic: 'Email Address',
-            type: emailField.value,
+        : [
+            {
+                title: 'First Name',
+                title_arabic: 'First Name',
+                type: textField.value,
+                required: true,
+                private: false,
+                options: [
+                    {name: '', name_arabic: ''}
+                ],
+                open: false
+            },
+            {
+                title: 'Last Name',
+                title_arabic: 'Last Name',
+                type: textField.value,
+                required: true,
+                private: false,
+                options: [
+                    {name: '', name_arabic: ''}
+                ],
+                open: false
+            },
+            {
+                title: 'Email Address',
+                title_arabic: 'Email Address',
+                type: emailField.value,
+                required: true,
+                private: false,
+                options: [
+                    {name: '', name_arabic: ''}
+                ],
+                open: false
+            }
+        ]
+} : {
+    surveys: [
+        {
+            title: 'First Name',
+            title_arabic: 'First Name',
+            type: textField.value,
             required: true,
             private: false,
             options: [
                 {name: '', name_arabic: ''}
             ],
-            open: true
-        }]
-} : {
-    surveys: [
+            open: false
+        },
+        {
+            title: 'Last Name',
+            title_arabic: 'Last Name',
+            type: textField.value,
+            required: true,
+            private: false,
+            options: [
+                {name: '', name_arabic: ''}
+            ],
+            open: false
+        },
         {
             title: 'Email Address',
             title_arabic: 'Email Address',
@@ -60,7 +114,7 @@ const initialValues = props.event_survey ? {
             options: [
                 {name: '', name_arabic: ''}
             ],
-            open: true
+            open: false
         }
     ]
 }
@@ -93,7 +147,7 @@ const onSubmit = handleSubmit((values) => {
         return accessLevelError.value = 'Please choose an access level';
     }
 
-    values.access_levels = [... new Set(selectedAccessLevels.value.filter(x => !!x))];
+    values.access_levels = [...new Set(selectedAccessLevels.value.filter(x => !!x))];
     values.event_id = props.event_id;
 
     values.surveys = values.surveys.map(survey => {
@@ -281,7 +335,7 @@ const onSubmit = handleSubmit((values) => {
                                                    @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, private: false, options: [{name: '', name_arabic: ''}], open: true})">
                                                 <i class="ri-add-line"/> Add Field
                                             </b-btn>
-                                            <b-btn variant="danger" :disabled="field?.value?.type === emailField"
+                                            <b-btn variant="danger" :disabled="['Email Address', 'First Name', 'Last Name'].includes(field?.value?.title)"
                                                    class="mr-2" v-show="surveys.length > 1"
                                                    @click="remove(idx)"><i class="ri-subtract-line"></i> Remove
                                                 Field
@@ -311,13 +365,13 @@ const onSubmit = handleSubmit((values) => {
                                                    @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, private: false, options: [{name: '', name_arabic: ''}], open: true})">
                                                 <i class="ri-add-line p-0"/>
                                             </b-btn>
-                                            <b-btn :disabled="field?.value?.type === emailField" variant="danger"
+                                            <b-btn :disabled="['Email Address', 'First Name', 'Last Name'].includes(field?.value?.title)" variant="danger"
                                                    class="mr-2" v-show="surveys.length > 1"
                                                    @click="remove(idx)"><i class="ri-subtract-line p-0"></i>
                                             </b-btn>
                                             <b-btn variant="secondary" class="mr-2"
                                                    @click="surveys[idx].open = 1"
-                                                   :disabled="field?.value?.type === emailField"
+                                                   :disabled="['Email Address', 'First Name', 'Last Name'].includes(field?.value?.title)"
                                             >
                                                 <i class="ri-edit-2-line p-0"/>
                                             </b-btn>
