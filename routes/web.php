@@ -82,6 +82,7 @@ Route::group(['middleware' => 'auth'], function () {
                     Route::group(['prefix' => '{access_level_id}'], function () {
                         Route::get('/edit', [AccessLevelsController::class, 'edit']);
                         Route::get('/surveys', [AccessLevelsController::class, 'getSurveys']);
+                        Route::get('/invites', [AccessLevelsController::class, 'getInvites']);
                         Route::patch('/update', [AccessLevelsController::class, 'update']);
                         Route::post('/change-status', [AccessLevelsController::class, 'updateStatus']);
                         Route::get('/customize', [AccessLevelsController::class, 'customize']);
