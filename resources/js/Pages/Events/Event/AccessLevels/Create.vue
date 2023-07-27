@@ -2,6 +2,7 @@
 import {ErrorMessage, Field, Form, useForm} from "vee-validate";
 import {router} from "@inertiajs/vue3";
 import {createAccessLevelSchema} from "../../../../Shared/components/helpers/Validators.js";
+import {onMounted, ref} from "vue";
 
 const props = defineProps({
     code: Number,
@@ -13,6 +14,14 @@ const props = defineProps({
 
 const initialValues = props.editMode ? props.access_level : {}
 
+const requireRegistration = ref(false);
+
+onMounted(() => {
+    if (props.editMode) {
+        requireRegistration.value = !!props.access_level.registration;
+    }
+})
+
 const {handleSubmit, isSubmitting} = useForm({
     initialValues,
     validationSchema: createAccessLevelSchema,
@@ -20,8 +29,8 @@ const {handleSubmit, isSubmitting} = useForm({
 
 const onSubmit = handleSubmit(async (values) => {
     props.editMode
-        ? router.patch(`/event/${props.event_id}/access-levels/${props.access_level.id}/update`, values)
-        : router.post(`/event/${props.event_id}/access-levels`, values)
+        ? router.patch(`/event/${props.event_id}/access-levels/${props.access_level.id}/update`, {...values, registration: requireRegistration.value})
+        : router.post(`/event/${props.event_id}/access-levels`, {...values, registration: requireRegistration.value})
 });
 </script>
 
@@ -63,6 +72,16 @@ const onSubmit = handleSubmit(async (values) => {
                                                :class="`form-control mb-0`"
                                                :placeholder="$t('input.quantity')" :validateOnInput="true"/>
                                         <ErrorMessage name="quantity_available" class="text-danger"/>
+                                    </div>
+                                </b-col>
+
+                                <b-col sm="12">
+                                    <div class="form-group">
+                                        <b-checkbox v-model="requireRegistration"
+                                                    class="form-control custom-checkbox-color no-border"
+                                                    name="check-button" inline>
+                                            Requires Registration?
+                                        </b-checkbox>
                                     </div>
                                 </b-col>
                             </b-row>
