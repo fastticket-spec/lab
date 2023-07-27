@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Events;
 
 use App\Http\Controllers\Controller;
+use App\Models\AccessLevel;
 use App\Models\Attendee;
+use App\Services\AccessLevelsService;
 use App\Services\AccountEventAccessService;
 use App\Services\AttendeeService;
 use App\Services\BadgeService;
@@ -19,9 +21,10 @@ class DashboardController extends Controller
         private AttendeeService $attendeeService,
         private BadgeService    $badgeService,
         private ZoneService     $zoneService,
-        private AccountEventAccessService $accountEventAccessService
-    )
-    {
+        private EventService     $eventService,
+        private AccountEventAccessService $accountEventAccessService,
+        private AccessLevelsService $accessLevelsService
+    ) {
     }
 
     public function index(string $eventId): \Inertia\Response
@@ -68,6 +71,16 @@ class DashboardController extends Controller
         return Inertia::render('Events/Event/Dashboard', [
             'data' => $data,
             'attendees' => Attendee::with('event')->whereEventId($eventId)->latest()->take(10)->get()
+        ]);
+    }
+
+
+    public function public(Request $request, string $categryId): \Inertia\Response
+    {
+        $data = $this->accessLevelsService->fetchCategoryAccessLevels($request, $categryId);
+
+        return Inertia::render('Events/Event/Public', [
+            'data' => $data,
         ]);
     }
 }
