@@ -3,6 +3,7 @@ import {computed, onUpdated, reactive, ref} from "vue";
 import {router, usePage} from "@inertiajs/vue3";
 import VueSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
+import axios from "axios";
 
 const props = defineProps({
     access_levels: {},
@@ -28,6 +29,7 @@ const visit = (link, method = 'get') => {
 }
 
 const invitationModal = ref(false);
+const invitesModal = ref(false);
 
 const invitation = reactive({
     emails: []
@@ -53,13 +55,29 @@ const quantityAvailable = computed(() => (quantityAvailable, quantityFilled) => 
     return available >= 0 ? available : 0
 })
 
+const inviteFields = ['email', 'date_sent'];
+const accessLevelInvites = ref([]);
+
+const viewInvitations = async (accessLevelId) => {
+    try {
+        const {data} = await axios.get(`/event/${props.event_id}/access-levels/${accessLevelId}/invites`);
+        accessLevelInvites.value = data.invites;
+
+        invitesModal.value = true;
+        selectedAccessLevel.value = accessLevelId;
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 </script>
 
 <template>
     <b-container fluid>
         <b-row>
             <b-col sm="12">
-                <Link v-if="(userRole !== 'Operations' && userRole !== 'Viewers')" :href="`/event/${event_id}/access-levels/create`" class="btn btn-primary mb-3">Add Access Level
+                <Link v-if="(userRole !== 'Operations' && userRole !== 'Viewers')"
+                      :href="`/event/${event_id}/access-levels/create`" class="btn btn-primary mb-3">Add Access Level
                 </Link>
 
                 <no-data v-if="!access_levels.total" title="Access Levels"
@@ -129,6 +147,12 @@ const quantityAvailable = computed(() => (quantityAvailable, quantityFilled) => 
                             class="ri-settings-2-line"></i>
                             Send Invitation</a>
 
+                        <a href="#"
+                           v-if="access_level.has_surveys && userRole !== 'Viewers'"
+                           @click.prevent.stop="viewInvitations(access_level.id)"><i
+                            class="ri-eye-line"></i>
+                            View Invites</a>
+
                     </div>
                 </b-card>
             </b-col>
@@ -144,7 +168,7 @@ const quantityAvailable = computed(() => (quantityAvailable, quantityFilled) => 
                     <span>Supply the emails you want to send invite to.</span>
                     <div class="form-group">
                         <label for="subject">Emails</label>
-                        <vue-select v-model="invitation.emails"  class="form-control mb-0"
+                        <vue-select v-model="invitation.emails" class="form-control mb-0"
                                     :options="[]"
                                     multiple taggable>
                             <template v-slot:no-options>Type emails and press enter.</template>
@@ -171,6 +195,19 @@ const quantityAvailable = computed(() => (quantityAvailable, quantityFilled) => 
                         Close
                     </b-button>
                 </div>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="invitesModal" id="message-modal" title="View Invites" scrollable>
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <b-table v-if="accessLevelInvites.length > 0" :items="accessLevelInvites" :fields="inviteFields"
+                             class="table-responsive-sm table-borderless" />
+                    <h5 v-else class="text-center mb-3">Invites will appear here</h5>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
             </template>
         </b-modal>
     </b-container>

@@ -217,7 +217,9 @@
         "role": "Role",
         "select_role": "Select Role",
         "all_events": "Access to All Categories",
-        "attend_date": "Attend Date"
+        "attend_date": "Attend Date",
+        "enter_email": "Enter your email address",
+        "enter_reg_no": "Enter your registration number"
     },
     "button": {
         "create": "Create",

@@ -148,4 +148,9 @@ class AccessLevelsController extends Controller
     {
         return $this->accessLevelsService->getSurveys($accessLevelId);
     }
+
+    public function getInvites(string $eventId, string $accessLevelId)
+    {
+        return $this->accessLevelsService->getInvites($accessLevelId);
+    }
 }

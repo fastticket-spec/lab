@@ -217,7 +217,9 @@
         "role": "الوظيفة",
         "select_role": "اختيار الوظيفة",
         "all_events": "الدخول لجميع الأحداث",
-        "attend_date": "تاريخ الحضور"
+        "attend_date": "تاريخ الحضور",
+        "enter_email": "Enter your email address",
+        "enter_reg_no": "Enter your registration number"
     },
     "button": {
         "create": "إنشاء",

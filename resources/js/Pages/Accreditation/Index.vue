@@ -109,7 +109,7 @@ label {
                         <p class="pt-3 px-4" :class="{rtl: lang === 'arabic'}"
                            v-html="lang === 'english' ? accessLevel?.general_settings?.description : accessLevel?.general_settings?.description_arabic"/>
 
-                        <div v-if="accessLevel.registration && reference">
+                        <div v-if="accessLevel.registration">
                             <h5 class="text-center" v-if="lang === 'english'">Your registration number will be found in
                                 your invitation email.</h5>
                             <h5 class="text-center" v-else>سيتم العثور على رقم التسجيل الخاص بك في رسالة الدعوة الخاصة بك.</h5>
@@ -121,7 +121,7 @@ label {
                                             <Field type="text"
                                                    name="registration_number"
                                                    id="reg_no"
-                                                   placeholder="Enter your registration number"
+                                                   :placeholder="$t('input.enter_reg_no')"
                                                    class="form-control mb-0" :validateOnInput="true"/>
                                             <ErrorMessage name="registration_number" class="text-danger"/>
                                         </div>
@@ -133,7 +133,7 @@ label {
                                             <Field type="email"
                                                    name="email"
                                                    id="email"
-                                                   placeholder="Enter your email adderss"
+                                                   :placeholder="$t('input.enter_email')"
                                                    class="form-control mb-0" :validateOnInput="true"/>
                                             <ErrorMessage name="email" class="text-danger"/>
                                         </div>
