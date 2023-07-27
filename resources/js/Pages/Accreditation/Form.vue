@@ -112,9 +112,11 @@ export default {
 </script>
 
 <style>
+
 input.form-control, .form-control {
     background: #f2f2f2;
     background-color: #f2f2f2;
+    line-height: 27px !important;
 }
 
 .form-control {
