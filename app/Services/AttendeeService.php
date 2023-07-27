@@ -9,6 +9,7 @@ use App\Mail\InvitationMail;
 use App\Models\Area;
 use App\Models\Attendee;
 use App\Models\AttendeeZone;
+use App\Models\Invite;
 use App\Models\Zone;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
@@ -640,13 +641,13 @@ class AttendeeService extends BaseRepository
     {
         $organiserId = auth()->user()->account->active_organiser;
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
-        $surveyLink = config('app.url') . '/e/' . $eventId . '/a/' . $accessLevelId;
+        $surveyLink = config('app.url') . '/a/' . $accessLevelId;
         $settings = $accessLevel->generalSettings;
 
         $organiser = $accessLevel->event->organiser;
 
         foreach ($attendees as $attendee) {
-            $email = $attendee['email'];
+            $email = $attendee['Email Address'];
             $first_name = $attendee['First Name'];
             $last_name = $attendee['Last Name'];
             $ref = Str::random('8');
@@ -674,7 +675,16 @@ class AttendeeService extends BaseRepository
                 'accept_status' => $approve
             ]);
 
-            Mail::to($email)->later(now()->addSeconds(3), new InvitationMail($settings, "$surveyLink?ref=$ref", $organiser, $first_name));
+            $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
+
+            Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
+                settings: $settings,
+                surveyLink: "$surveyLink?ref=$inviteId",
+                organiser: $organiser,
+                firstName: $first_name,
+                registration: $accessLevel->registration,
+                ref: $ref
+            ));
         }
 
         $message = 'Attendees uploaded successfully!';

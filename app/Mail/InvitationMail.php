@@ -19,11 +19,12 @@ class InvitationMail extends Mailable
     public ?string $organiserName;
     public ?string $organiserLogo;
     public ?string $firstName;
+    private bool $registration;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($settings, $surveyLink, $organiser, $firstName = 'Applicant')
+    public function __construct($settings, $surveyLink, $organiser, $firstName = 'Applicant', $registration = false, $ref = null)
     {
         $this->organiserName = $organiser->name ?? null;
         $this->organiserLogo = $organiser->logo_url ?? null;
@@ -33,13 +34,27 @@ class InvitationMail extends Mailable
         $this->firstName = $firstName;
         if ($content) {
             $this->content = str_replace(
-                '<strong>%invitation_link%</strong>',
-                "<strong><a href='$surveyLink'>$surveyLink</a></strong>",
+                '%invitation_link%',
+                "<a href='$surveyLink'>$surveyLink</a>",
                 $content
             );
+
+            if ($registration) {
+                $this->content = str_replace(
+                    '%registration_number%',
+                    $ref,
+                    $this->content
+                );
+            }
+
         } else {
             $this->content = "<span>Your survey link is <strong><a href='$surveyLink'>$surveyLink</a></strong></span>";
+
+            if ($registration) {
+                $this->content = "$this->content <br> <span>Your registration number is: $ref</span>";
+            }
         }
+        $this->registration = $registration;
     }
 
     /**
