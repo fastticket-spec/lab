@@ -13,7 +13,8 @@ const props = defineProps({
     surveys: Array,
     reference: String,
     answers: Array,
-    countries: Array
+    countries: Array,
+    email: String
 })
 
 const formData = reactive({});
@@ -35,6 +36,7 @@ const {handleSubmit, isSubmitting} = useForm({
         ? {
             surveys: props.surveys.filter(x => !x.private).map(x => {
                 const answer = props.answers.find(y => y.question === x.title)?.answer || '';
+
                 return {
                     type: x.type,
                     answer: answer || (x.type === '8' ? [] : ((x.type === '7') ? null : '')),
@@ -51,14 +53,15 @@ const {handleSubmit, isSubmitting} = useForm({
         : {
         surveys: props.surveys.filter(x => !x.private).map(x => ({
             type: x.type,
-            answer: x.type === '8' ? [] : ((x.type === '7') ? null : ''),
+            answer: x.title === 'Email Address' ? props.email : (x.type === '8' ? [] : ((x.type === '7') ? null : '')),
             title: x.title,
             title_arabic: x.title_arabic,
             id: x.id,
             question: x.title,
             is_private: x.private,
             options: x.options,
-            required: x.required
+            required: x.required,
+            disabled: x.title === 'Email Address' && props.email
         }))
     },
     validationSchema: accreditationFormSchema,
@@ -214,6 +217,7 @@ label {
                                                        v-else-if="field.value.type === '5'"
                                                        :name="`surveys[${idx}].answer`"
                                                        :id="`surveys-${idx}`"
+                                                       :disabled="field.value.disabled"
                                                        :class="`form-control mb-0`" :validateOnInput="true"/>
 
                                                 <Field as="select"
