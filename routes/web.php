@@ -34,6 +34,8 @@ Route::get('/form/{access_level_id}', [AccreditationController::class, 'form']);
 Route::post('/form/{event_id}/{access_level_id}/submit', [AccreditationController::class, 'formSubmit']);
 Route::get('/form/{access_level_id}/success', [AccreditationController::class, 'formSuccess']);
 
+Route::get('/home/{id}', [EventDashboardController::class, 'public']);
+
 Route::post('/event_badge_image_upload', [BadgeController::class, 'imageUpload']);
 
 Route::group(['middleware' => 'auth'], function () {

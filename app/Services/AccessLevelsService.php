@@ -23,8 +23,7 @@ class AccessLevelsService extends BaseRepository
         AccessLevel          $model,
         private FileService  $file,
         private EventService $eventService
-    )
-    {
+    ) {
         parent::__construct($model);
 
         $this->images_path = config('filesystems.directory') . "access_level_images/";
@@ -55,6 +54,33 @@ class AccessLevelsService extends BaseRepository
             });
     }
 
+    // fetch all categories access leve
+    public function fetchCategoryAccessLevels(Request $request, string $categoryID)
+    {
+        $getEvents = $this->eventService->fetchEventsId($categoryID);
+        return $this->model->query()
+            ->with(['event', 'surveyAccessLevels.surveys', 'attendees'])
+            ->whereEventId($getEvents)
+            ->latest()
+            ->paginate($request->per_page ?: 10)
+            ->withQueryString()
+            ->through(function ($accessLevel) {
+                $quantity = $accessLevel->quantity_available;
+
+                return [
+                    'id' => $accessLevel->id,
+                    'title' => $accessLevel->title,
+                    'title_arabic' => $accessLevel->title_arabic,
+                    'quantity_available' => $quantity,
+                    'quantity_filled' => $accessLevel->attendees->count(),
+                    'event' => $accessLevel->event,
+                    'status' => $accessLevel->status,
+                    'attendees' => $accessLevel->attendees,
+                    'has_surveys' => !!optional($accessLevel->surveyAccessLevels)->surveys
+                ];
+            });
+    }
+
     public function allAccessLevels(string $eventId, ?bool $excludeExisting = false, ?array $showIds = null): \Illuminate\Database\Eloquent\Collection|array
     {
         $excludeIds = [];
@@ -63,7 +89,7 @@ class AccessLevelsService extends BaseRepository
             $badges = array_merge(...$event->badges()
                 ->with('badgeAccessLevels')
                 ->get()
-                ->map(fn($badge) => $badge->badgeAccessLevels)->toArray());
+                ->map(fn ($badge) => $badge->badgeAccessLevels)->toArray());
 
             $excludeIds = collect($badges)->pluck('access_level_id')->toArray();
 
@@ -197,7 +223,10 @@ class AccessLevelsService extends BaseRepository
                 data: [
                     'message' => $message,
                     'data' => $event
-                ], flashMessage: $message, component: $route, returnType: 'redirect'
+                ],
+                flashMessage: $message,
+                component: $route,
+                returnType: 'redirect'
             );
         } catch (\Throwable $th) {
             $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
@@ -233,7 +262,10 @@ class AccessLevelsService extends BaseRepository
                 data: [
                     'message' => $message,
                     'data' => $event
-                ], flashMessage: $message, component: $route, returnType: 'redirect'
+                ],
+                flashMessage: $message,
+                component: $route,
+                returnType: 'redirect'
             );
         } catch (\Throwable $th) {
             $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
@@ -244,7 +276,6 @@ class AccessLevelsService extends BaseRepository
 
             return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
         }
-
     }
 
     public function updateRequestForm(Request $request, string $eventId, string $accessLevelId)
