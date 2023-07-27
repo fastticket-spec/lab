@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccreditationController;
+use App\Http\Controllers\AreasController;
 use App\Http\Controllers\AttendeesController;
 use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\DashboardController;
@@ -30,9 +31,11 @@ Route::get('/change-password', [LoginController::class, 'changePassword']);
 Route::post('/change-password', [LoginController::class, 'updatePassword']);
 
 Route::get('/e/{event_id}/a/{access_level_id}', [AccreditationController::class, 'index']);
+Route::get('/a/{access_level_id}', [AccreditationController::class, 'indexNew']);
 Route::get('/form/{access_level_id}', [AccreditationController::class, 'form']);
 Route::post('/form/{event_id}/{access_level_id}/submit', [AccreditationController::class, 'formSubmit']);
 Route::get('/form/{access_level_id}/success', [AccreditationController::class, 'formSuccess']);
+Route::post('/form/{access_level_id}/accreditation-login', [AccreditationController::class, 'login']);
 
 Route::get('/home/{id}', [EventDashboardController::class, 'public']);
 
@@ -130,6 +133,15 @@ Route::group(['middleware' => 'auth'], function () {
                     Route::get('/create', [ZonesController::class, 'create']);
                     Route::post('/', [ZonesController::class, 'store']);
                     Route::patch('/{zone_id}/update-status', [ZonesController::class, 'updateStatus']);
+                });
+            });
+
+            Route::prefix('/areas')->group(function () {
+                Route::get('/', [AreasController::class, 'index']);
+                Route::middleware('can-edit')->group(function () {
+                    Route::get('/create', [AreasController::class, 'create']);
+                    Route::post('/', [AreasController::class, 'store']);
+                    Route::patch('/{area_id}/update-status', [AreasController::class, 'updateStatus']);
                 });
             });
 

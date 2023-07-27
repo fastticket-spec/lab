@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Country;
+use App\Models\Invite;
 use App\Services\AccessLevelsService;
 use App\Services\AttendeeService;
 use Illuminate\Http\Request;
@@ -17,6 +19,11 @@ class AccreditationController extends Controller
     }
 
     public function index(string $eventId, string $accessLevelId): \Inertia\Response
+    {
+        return $this->indexNew($accessLevelId);
+    }
+
+    public function indexNew(string $accessLevelId): \Inertia\Response
     {
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
 
@@ -42,6 +49,7 @@ class AccreditationController extends Controller
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
         $status = !!$accessLevel->status;
         $surveys = $accessLevel->surveyAccessLevels->eventSurvey->surveys;
+        $countries = Country::all();
 
         $accessLevel->load(['pageDesign', 'event.organiser', 'generalSettings', 'attendees']);
 
@@ -52,7 +60,7 @@ class AccreditationController extends Controller
             }
         }
 
-        $reference = $request->ref;
+        $reference = strlen($request->ref) == 36 ? optional(Invite::find($request->ref))->ref : $request->ref ;
         $answers = null;
         if ($reference) {
             $answers = optional($this->attendeeService->findOneBy(['ref' => $reference]))->answers;
@@ -64,7 +72,8 @@ class AccreditationController extends Controller
             'surveys' => $surveys,
             'lang' => $request->lang,
             'reference' => $reference,
-            'answers' => $answers
+            'answers' => $answers,
+            'countries' => $countries
         ]);
     }
 
@@ -82,5 +91,12 @@ class AccreditationController extends Controller
             'accessLevel' => $accessLevel,
             'lang' => $request->lang
         ]);
+    }
+
+    public function login(Request $request, string $accessLevelId): \Illuminate\Http\JsonResponse
+    {
+        $inviteQuery = Invite::whereAccessLevelId($accessLevelId)->whereEmail($request->email)->whereRef($request->registration_number);
+
+        return response()->json(['status' => $inviteQuery->exists()]);
     }
 }

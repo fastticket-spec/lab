@@ -12,7 +12,8 @@ const props = defineProps({
     lang: String,
     surveys: Array,
     reference: String,
-    answers: Array
+    answers: Array,
+    countries: Array
 })
 
 const formData = reactive({});
@@ -36,7 +37,7 @@ const {handleSubmit, isSubmitting} = useForm({
                 const answer = props.answers.find(y => y.question === x.title)?.answer || '';
                 return {
                     type: x.type,
-                    answer: answer || ((x.type === '8' || x.type === '7') ? null : ''),
+                    answer: answer || (x.type === '8' ? [] : ((x.type === '7') ? null : '')),
                     title: x.title,
                     title_arabic: x.title_arabic,
                     id: x.id,
@@ -50,7 +51,7 @@ const {handleSubmit, isSubmitting} = useForm({
         : {
         surveys: props.surveys.filter(x => !x.private).map(x => ({
             type: x.type,
-            answer: (x.type === '8' || x.type === '7') ? null : '',
+            answer: x.type === '8' ? [] : ((x.type === '7') ? null : ''),
             title: x.title,
             title_arabic: x.title_arabic,
             id: x.id,
@@ -75,6 +76,7 @@ const onSubmit = handleSubmit(values => {
         }
         return d;
     });
+
 
     const privateAnswers = props.surveys.filter(x => x.private).map(x => ({
         type: x.type,
@@ -276,6 +278,18 @@ label {
                                                 <h5 v-if="field.value.type === '10'" class="mt-5 mb-2">{{
                                                         lang === 'arabic' ? field.value.title_arabic : field.value.title
                                                     }}</h5>
+
+                                                <Field as="select"
+                                                       v-else-if="field.value.type === '11'"
+                                                       :name="`surveys[${idx}].answer`"
+                                                       :id="`surveys-${idx}`"
+                                                       :class="`form-control mb-0`" :validateOnInput="true">
+                                                    <option v-for="country in countries"
+                                                            :key="`${field.value.id}-${country.country}`"
+                                                            :value="country.country">
+                                                        {{ country.country }}
+                                                    </option>
+                                                </Field>
 
 
                                                 <ErrorMessage :name="`surveys[${idx}].answer`" class="text-danger"/>
