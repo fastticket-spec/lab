@@ -106,7 +106,7 @@ label {
                                  :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                         </div>
 
-                        <p class="pt-3 px-4" :class="{rtl: lang === 'arabic'}"
+                        <p class="pt-3 px-4" :style="{textAlign: lang != 'english' ? 'right' : '', direction:  lang != 'english' ? 'rtl' : ''}"  :class="{rtl: lang === 'arabic'}"
                            v-html="lang === 'english' ? accessLevel?.general_settings?.description : accessLevel?.general_settings?.description_arabic"/>
 
                         <div v-if="accessLevel.registration">
