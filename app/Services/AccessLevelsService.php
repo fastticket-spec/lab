@@ -363,7 +363,7 @@ class AccessLevelsService extends BaseRepository
     {
         $accessLevel = $this->find($accessLevelId);
 
-        $invites = $accessLevel->invites->map(function ($invite) {
+        $invites = $accessLevel->invites()->latest()->get()->map(function ($invite) {
             return [
                 'email' => $invite->email,
                 'date_sent' => $invite->created_at->format('jS M, Y h:i a')
