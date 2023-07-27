@@ -49,7 +49,7 @@ const initialValues = props.event_survey ? {
         : [
             {
                 title: 'First Name',
-                title_arabic: 'First Name',
+                title_arabic: 'الاسم الأول',
                 type: textField.value,
                 required: true,
                 private: false,
@@ -60,7 +60,7 @@ const initialValues = props.event_survey ? {
             },
             {
                 title: 'Last Name',
-                title_arabic: 'Last Name',
+                title_arabic: 'الاسم الأخير',
                 type: textField.value,
                 required: true,
                 private: false,
@@ -71,7 +71,7 @@ const initialValues = props.event_survey ? {
             },
             {
                 title: 'Email Address',
-                title_arabic: 'Email Address',
+                title_arabic: 'البريد الإلكتروني',
                 type: emailField.value,
                 required: true,
                 private: false,
@@ -85,7 +85,7 @@ const initialValues = props.event_survey ? {
     surveys: [
         {
             title: 'First Name',
-            title_arabic: 'First Name',
+            title_arabic: 'الاسم الأول',
             type: textField.value,
             required: true,
             private: false,
@@ -96,7 +96,7 @@ const initialValues = props.event_survey ? {
         },
         {
             title: 'Last Name',
-            title_arabic: 'Last Name',
+            title_arabic: 'الاسم الأخير',
             type: textField.value,
             required: true,
             private: false,
@@ -107,7 +107,7 @@ const initialValues = props.event_survey ? {
         },
         {
             title: 'Email Address',
-            title_arabic: 'Email Address',
+            title_arabic: 'البريد الإلكتروني',
             type: emailField.value,
             required: true,
             private: false,
@@ -195,6 +195,7 @@ const onSubmit = handleSubmit((values) => {
                                             <Field type="text"
                                                    :name="`surveys[${idx}].title`"
                                                    :id="`question-${idx}`"
+                                                   :disabled="['Email Address', 'First Name', 'Last Name'].includes(field?.value?.title)"
                                                    :class="`form-control mb-0`" :validateOnInput="true"/>
                                             <ErrorMessage :name="`surveys[${idx}].title`" class="text-danger"/>
                                         </div>
@@ -370,9 +371,7 @@ const onSubmit = handleSubmit((values) => {
                                                    @click="remove(idx)"><i class="ri-subtract-line p-0"></i>
                                             </b-btn>
                                             <b-btn variant="secondary" class="mr-2"
-                                                   @click="surveys[idx].open = 1"
-                                                   :disabled="['Email Address', 'First Name', 'Last Name'].includes(field?.value?.title)"
-                                            >
+                                                   @click="surveys[idx].open = 1">
                                                 <i class="ri-edit-2-line p-0"/>
                                             </b-btn>
                                             <b-btn variant="primary" class="mr-2"
