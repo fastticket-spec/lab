@@ -60,9 +60,10 @@ class AccessLevelsService extends BaseRepository
     public function fetchCategoryAccessLevels(Request $request, string $categoryID)
     {
         $getEvents = $this->eventService->fetchEventsId($categoryID);
+
         return $this->model->query()
             ->with(['event', 'surveyAccessLevels.surveys', 'attendees'])
-            ->whereEventId($getEvents)
+            ->whereIn('event_id', $getEvents)
             ->latest()
             ->paginate($request->per_page ?: 10)
             ->withQueryString()
