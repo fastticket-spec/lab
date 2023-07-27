@@ -109,7 +109,7 @@ label {
                         <p class="pt-3 px-4" :class="{rtl: lang === 'arabic'}"
                            v-html="lang === 'english' ? accessLevel?.general_settings?.description : accessLevel?.general_settings?.description_arabic"/>
 
-                        <div v-if="accessLevel.registration && reference">
+                        <div v-if="accessLevel.registration">
                             <h5 class="text-center" v-if="lang === 'english'">Your registration number will be found in
                                 your invitation email.</h5>
                             <h5 class="text-center" v-else>سيتم العثور على رقم التسجيل الخاص بك في رسالة الدعوة الخاصة بك.</h5>
