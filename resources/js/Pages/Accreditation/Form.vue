@@ -46,7 +46,8 @@ const {handleSubmit, isSubmitting} = useForm({
                     question: x.title,
                     is_private: x.private,
                     options: x.options,
-                    required: x.required
+                    required: x.required,
+                    disabled: x.title === 'Email Address' && props.email
                 }
             })
         }
