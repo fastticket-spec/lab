@@ -308,15 +308,7 @@ const onUploadFile = e => {
             const wb = XLSX.read(bstr, {type: 'binary'});
             const wsName = wb.SheetNames[0];
             const ws = wb.Sheets[wsName];
-            uploadedAttendees.value = XLSX.utils.sheet_to_json(ws).map((x) => {
-                const email = x['Email Address'];
-                delete x['Email Address'];
-
-                return {
-                    ...x,
-                    email
-                };
-            })
+            uploadedAttendees.value = XLSX.utils.sheet_to_json(ws);
         }
 
         reader.readAsBinaryString(file);

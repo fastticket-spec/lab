@@ -31,9 +31,11 @@ Route::get('/change-password', [LoginController::class, 'changePassword']);
 Route::post('/change-password', [LoginController::class, 'updatePassword']);
 
 Route::get('/e/{event_id}/a/{access_level_id}', [AccreditationController::class, 'index']);
+Route::get('/a/{access_level_id}', [AccreditationController::class, 'indexNew']);
 Route::get('/form/{access_level_id}', [AccreditationController::class, 'form']);
 Route::post('/form/{event_id}/{access_level_id}/submit', [AccreditationController::class, 'formSubmit']);
 Route::get('/form/{access_level_id}/success', [AccreditationController::class, 'formSuccess']);
+Route::post('/form/{access_level_id}/accreditation-login', [AccreditationController::class, 'login']);
 
 Route::post('/event_badge_image_upload', [BadgeController::class, 'imageUpload']);
 

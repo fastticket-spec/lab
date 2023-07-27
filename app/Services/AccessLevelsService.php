@@ -6,6 +6,7 @@ use App\Http\Requests\AccessLevelGeneralRequest;
 use App\Mail\InvitationMail;
 use App\Models\AccessLevel;
 use App\Models\EventSurvey;
+use App\Models\Invite;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
 use Illuminate\Http\Request;
@@ -49,6 +50,7 @@ class AccessLevelsService extends BaseRepository
                     'quantity_filled' => $accessLevel->attendees->count(),
                     'event' => $accessLevel->event,
                     'status' => $accessLevel->status,
+                    'registration' => $accessLevel->registration,
                     'attendees' => $accessLevel->attendees,
                     'has_surveys' => !!optional($accessLevel->surveyAccessLevels)->surveys
                 ];
@@ -293,15 +295,22 @@ class AccessLevelsService extends BaseRepository
 
         $accessLevel = $this->find($accessLevelId);
 
-        $surveyLink = config('app.url') . '/e/' . $eventId . '/a/' . $accessLevelId;
+        $surveyLink = config('app.url') . '/a/' . $accessLevelId;
         $settings = $accessLevel->generalSettings;
         $ref = Str::random('8');
 
         $organiser = $accessLevel->event->organiser;
 
         foreach ($emails as $email) {
+            $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
             Mail::to($email)
-                ->later(now()->addSeconds(5), new InvitationMail($settings, "$surveyLink?ref=$ref", $organiser));
+                ->later(now()->addSeconds(5), new InvitationMail(
+                    settings: $settings,
+                    surveyLink: "$surveyLink?ref=$inviteId",
+                    organiser: $organiser,
+                    registration: $accessLevel->registration,
+                    ref: $ref
+                ));
         }
 
         $message = 'Invitation has been sent to the emails supplied';
