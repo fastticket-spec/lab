@@ -24,6 +24,16 @@ class EventService extends BaseRepository
         $this->images_path = config('filesystems.directory') . "event_images/";
     }
 
+    public function fetchEventsId(string $organiserId): array
+    {
+        return $this->model->query()
+            ->when($organiserId, function (Builder $query) use ($organiserId) {
+                $query->where('organiser_id', $organiserId);
+            })
+            ->pluck('id')
+            ->toArray();
+    }
+
     public function fetchEvents(Request $request): LengthAwarePaginator
     {
         $account = auth()->user()->account;
@@ -31,7 +41,7 @@ class EventService extends BaseRepository
 
         $eventsAccessID = null;
         if ($roleId) {
-            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn($access) => $access->event_id);
+            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn ($access) => $access->event_id);
         }
 
         return $this->model->query()
@@ -138,9 +148,9 @@ class EventService extends BaseRepository
         }
 
         $updatedEvent = $this->update($data + [
-                'logo' => $eventImage ?: $event->logo,
-                'banner' => $eventBanner ?: $event->banner,
-            ], $event->id);
+            'logo' => $eventImage ?: $event->logo,
+            'banner' => $eventBanner ?: $event->banner,
+        ], $event->id);
 
         if (!$updatedEvent) {
             $this->removeUploadedFile($eventImage);
