@@ -118,9 +118,18 @@ export default {
 </script>
 
 <style>
+
 input.form-control, .form-control {
-    background: #f2f2f2;
-    background-color: #f2f2f2;
+    background: #324067;
+    background-color: #303d63;
+    line-height: 27px !important;
+    color: #eaecef;
+}
+form-control:disabled, .form-control[readonly] {
+    background-color: #324067;
+    opacity: 1;
+    color: #eaecef;
+
 }
 
 .form-control {
@@ -143,7 +152,7 @@ input.form-control, .form-control {
 }
 
 label {
-    color: #ffffff;
+    color: #000;
 }
 
 @media screen and (max-width: 600px) {
