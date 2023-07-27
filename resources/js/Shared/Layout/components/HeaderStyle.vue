@@ -27,7 +27,7 @@
                 <b-collapse id="nav-collapse" is-nav>
                     <ul class="navbar-nav ml-auto navbar-list">
                         <li class="nav-item" v-nav-toggle v-if="$page.props.active_organiser">
-                            <a class="iq-waves-effect language-title"
+                            <a class="iq-waves-effect language-title" v-if="!$page.component.includes('Events/Event')"
                                :href="$page.component.includes('Events/Event')
                                ? eventUrl($page.url)
                                : organiserUrl()"
@@ -128,14 +128,14 @@ const taifOrgId = page.props.taif_organiser_id;
 const eventUrl = (url) => {
     const eventID = url.split('/')[2];
     if (taifOrgId !== isOrganiser.value) {
-        return `${page.props.front_url}/events/${eventID}`;
+        return `/home/${eventID}`;
     }
     return `https://tickets.jcsa.sa/events/${eventID}`;
 }
 
 const organiserUrl = () => {
     if (taifOrgId !== isOrganiser.value) {
-        return `${page.props.front_url}/o/${isOrganiser.value}`;
+        return `/home/${isOrganiser.value}`;
     }
     return `https://tickets.jcsa.sa/o/${isOrganiser.value}`;
 }

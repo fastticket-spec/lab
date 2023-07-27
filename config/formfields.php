@@ -11,6 +11,7 @@ return [
         7 => ['name' => 'Dropdown (multiple selection)', 'key' => 'multi_select', 'has_options' => true],
         8 => ['name' => 'Checkbox', 'key' => 'checkbox', 'has_options' => true],
         9 => ['name' => 'Radio input', 'key' => 'radio', 'has_options' => true],
-        10 => ['name' => 'Header', 'key' => 'header', 'has_options' => false]
+        10 => ['name' => 'Header', 'key' => 'header', 'has_options' => false],
+        11 => ['name' => 'Country', 'key' => 'country', 'has_options' => false]
     ]
 ];

@@ -6,6 +6,7 @@ use App\Http\Requests\AccessLevelGeneralRequest;
 use App\Mail\InvitationMail;
 use App\Models\AccessLevel;
 use App\Models\EventSurvey;
+use App\Models\Invite;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
 use Illuminate\Http\Request;
@@ -23,8 +24,7 @@ class AccessLevelsService extends BaseRepository
         AccessLevel          $model,
         private FileService  $file,
         private EventService $eventService
-    )
-    {
+    ) {
         parent::__construct($model);
 
         $this->images_path = config('filesystems.directory') . "access_level_images/";
@@ -35,6 +35,35 @@ class AccessLevelsService extends BaseRepository
         return $this->model->query()
             ->with(['event', 'surveyAccessLevels.surveys', 'attendees'])
             ->whereEventId($eventId)
+            ->latest()
+            ->paginate($request->per_page ?: 10)
+            ->withQueryString()
+            ->through(function ($accessLevel) {
+                $quantity = $accessLevel->quantity_available;
+
+                return [
+                    'id' => $accessLevel->id,
+                    'title' => $accessLevel->title,
+                    'title_arabic' => $accessLevel->title_arabic,
+                    'quantity_available' => $quantity,
+                    'quantity_filled' => $accessLevel->attendees->count(),
+                    'event' => $accessLevel->event,
+                    'status' => $accessLevel->status,
+                    'registration' => $accessLevel->registration,
+                    'attendees' => $accessLevel->attendees,
+                    'has_surveys' => !!optional($accessLevel->surveyAccessLevels)->surveys
+                ];
+            });
+    }
+
+    // fetch all categories access leve
+    public function fetchCategoryAccessLevels(Request $request, string $categoryID)
+    {
+        $getEvents = $this->eventService->fetchEventsId($categoryID);
+
+        return $this->model->query()
+            ->with(['event', 'surveyAccessLevels.surveys', 'attendees'])
+            ->whereIn('event_id', $getEvents)
             ->latest()
             ->paginate($request->per_page ?: 10)
             ->withQueryString()
@@ -63,7 +92,7 @@ class AccessLevelsService extends BaseRepository
             $badges = array_merge(...$event->badges()
                 ->with('badgeAccessLevels')
                 ->get()
-                ->map(fn($badge) => $badge->badgeAccessLevels)->toArray());
+                ->map(fn ($badge) => $badge->badgeAccessLevels)->toArray());
 
             $excludeIds = collect($badges)->pluck('access_level_id')->toArray();
 
@@ -197,7 +226,10 @@ class AccessLevelsService extends BaseRepository
                 data: [
                     'message' => $message,
                     'data' => $event
-                ], flashMessage: $message, component: $route, returnType: 'redirect'
+                ],
+                flashMessage: $message,
+                component: $route,
+                returnType: 'redirect'
             );
         } catch (\Throwable $th) {
             $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
@@ -233,7 +265,10 @@ class AccessLevelsService extends BaseRepository
                 data: [
                     'message' => $message,
                     'data' => $event
-                ], flashMessage: $message, component: $route, returnType: 'redirect'
+                ],
+                flashMessage: $message,
+                component: $route,
+                returnType: 'redirect'
             );
         } catch (\Throwable $th) {
             $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
@@ -244,7 +279,6 @@ class AccessLevelsService extends BaseRepository
 
             return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
         }
-
     }
 
     public function updateRequestForm(Request $request, string $eventId, string $accessLevelId)
@@ -293,15 +327,22 @@ class AccessLevelsService extends BaseRepository
 
         $accessLevel = $this->find($accessLevelId);
 
-        $surveyLink = config('app.url') . '/e/' . $eventId . '/a/' . $accessLevelId;
+        $surveyLink = config('app.url') . '/a/' . $accessLevelId;
         $settings = $accessLevel->generalSettings;
         $ref = Str::random('8');
 
         $organiser = $accessLevel->event->organiser;
 
         foreach ($emails as $email) {
+            $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
             Mail::to($email)
-                ->later(now()->addSeconds(5), new InvitationMail($settings, "$surveyLink?ref=$ref", $organiser));
+                ->later(now()->addSeconds(5), new InvitationMail(
+                    settings: $settings,
+                    surveyLink: "$surveyLink?ref=$inviteId",
+                    organiser: $organiser,
+                    registration: $accessLevel->registration,
+                    ref: $ref
+                ));
         }
 
         $message = 'Invitation has been sent to the emails supplied';
@@ -316,5 +357,19 @@ class AccessLevelsService extends BaseRepository
         $surveys = optional(optional($accessLevel->surveyAccessLevels)->eventSurvey)->surveys;
 
         return $this->view(['surveys' => $surveys]);
+    }
+
+    public function getInvites(string $accessLevelId)
+    {
+        $accessLevel = $this->find($accessLevelId);
+
+        $invites = $accessLevel->invites()->latest()->get()->map(function ($invite) {
+            return [
+                'email' => $invite->email,
+                'date_sent' => $invite->created_at->format('jS M, Y h:i a')
+            ];
+        });
+
+        return $this->view(['invites' => $invites]);
     }
 }

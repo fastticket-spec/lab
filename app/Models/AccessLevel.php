@@ -14,7 +14,7 @@ class AccessLevel extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'event_id', 'title', 'title_arabic', 'quantity_available', 'quantity_filled', 'status'
+        'event_id', 'title', 'title_arabic', 'quantity_available', 'quantity_filled', 'status', 'registration'
     ];
 
     public function event(): BelongsTo
@@ -55,5 +55,10 @@ class AccessLevel extends Model
     public function accessLevelBadge(): HasOne
     {
         return $this->hasOne(BadgeAccessLevel::class);
+    }
+
+    public function invites(): HasMany
+    {
+        return $this->hasMany(Invite::class);
     }
 }

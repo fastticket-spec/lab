@@ -110,6 +110,15 @@ export const zoneSchema = yup.object({
         )
 })
 
+export const areaSchema = yup.object({
+    areas: array()
+        .of(
+            yup.object().shape({
+                area: yup.string().required('This field is required'),
+            })
+        )
+})
+
 export const createBadgeSchema = yup.object({
     title: yup.string().required(),
     description: yup.string().required(),
