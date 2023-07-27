@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccreditationController;
+use App\Http\Controllers\AreasController;
 use App\Http\Controllers\AttendeesController;
 use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\DashboardController;
@@ -128,6 +129,15 @@ Route::group(['middleware' => 'auth'], function () {
                     Route::get('/create', [ZonesController::class, 'create']);
                     Route::post('/', [ZonesController::class, 'store']);
                     Route::patch('/{zone_id}/update-status', [ZonesController::class, 'updateStatus']);
+                });
+            });
+
+            Route::prefix('/areas')->group(function () {
+                Route::get('/', [AreasController::class, 'index']);
+                Route::middleware('can-edit')->group(function () {
+                    Route::get('/create', [AreasController::class, 'create']);
+                    Route::post('/', [AreasController::class, 'store']);
+                    Route::patch('/{area_id}/update-status', [AreasController::class, 'updateStatus']);
                 });
             });
 
