@@ -60,7 +60,7 @@ class AccreditationController extends Controller
             }
         }
 
-        $email = '';
+        $email = null;
         $reference = '';
 
         if (strlen($request->ref) == 36) {
@@ -73,7 +73,6 @@ class AccreditationController extends Controller
             }
         }
 
-        $reference = strlen($request->ref) == 36 ? optional(Invite::find($request->ref))->ref : $request->ref ;
         $answers = null;
         if ($reference) {
             $answers = optional($this->attendeeService->findOneBy(['ref' => $reference]))->answers;
