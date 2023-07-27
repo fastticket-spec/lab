@@ -268,7 +268,7 @@ const onSubmit = handleSubmit(values => {
                                 <b-col sm="12">
                                     <div class="form-group">
                                         <label for="invitation_message">Invitation Link Message</label>
-                                        <span><small>&nbsp; Copy this placeholder to denote the link - <strong>%invitation_link%</strong> and <strong>%registration_number%</strong> denotes the registration number.</small></span>
+                                        <span><small>&nbsp; Copy this placeholder to denote the link - <strong>%invitation_link%</strong><template v-if="accessLevel.registration"> and <strong>%registration_number%</strong> denotes the registration number.</template></small></span>
                                         <quill-editor toolbar="full" theme="snow" v-model:content="invitation_message"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="invitation_message" class="text-danger"/>
