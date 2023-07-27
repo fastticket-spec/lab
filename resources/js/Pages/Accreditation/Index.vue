@@ -112,8 +112,7 @@ label {
                         <div v-if="accessLevel.registration && reference">
                             <h5 class="text-center" v-if="lang === 'english'">Your registration number will be found in
                                 your invitation email.</h5>
-                            <h5 class="text-center" v-else>Your registration number will be found in your invitation
-                                email......</h5>
+                            <h5 class="text-center" v-else>سيتم العثور على رقم التسجيل الخاص بك في رسالة الدعوة الخاصة بك.</h5>
                             <form @submit.prevent="onSubmit" v-if="loginStatus" class="mx-5">
                                 <div class="row reg-form">
                                     <div class="col-md-6">
@@ -152,8 +151,7 @@ label {
                             <div class="d-flex flex-column align-items-center" v-else>
                                 <h4 class="mt-4 text-center" v-if="lang === 'english'">Invalid Confirmation Code or
                                     Email, Please try again</h4>
-                                <h4 class="mt-4 text-center" v-else>Invalid Confirmation Code or Email, Please try
-                                    again</h4>
+                                <h4 class="mt-4 text-center" v-else>رمز التأكيد أو البريد الإلكتروني غير صالح، يرجى المحاولة مرة أخرى.</h4>
 
                                 <div>
                                     <b-btn @click="loginStatus = true" size="lg" class="mt-4 px-5 py-2 text-center"
