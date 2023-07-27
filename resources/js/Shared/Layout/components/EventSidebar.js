@@ -71,5 +71,16 @@ export const eventSideBar = eventId => ([
         "is_icon_class": true,
         "component": ["Events/Event/Zones/Index", "Events/Event/Zones/Create"],
         "icon": "ri-command-line"
+    },
+    {
+        "title": "Areas",
+        "name": "sidebar.areas",
+        "is_heading": false,
+        "is_active": false,
+        "link": `/event/${eventId}/areas`,
+        "class_name": "",
+        "is_icon_class": true,
+        "component": ["Events/Event/Areas/Index", "Events/Event/Areas/Create"],
+        "icon": "ri-command-line"
     }
 ])

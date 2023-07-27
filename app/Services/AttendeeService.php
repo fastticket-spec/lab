@@ -6,6 +6,7 @@ use App\Mail\ApprovalMail;
 use App\Mail\AttendeeMail;
 use App\Mail\CustomAttendeeMail;
 use App\Mail\InvitationMail;
+use App\Models\Area;
 use App\Models\Attendee;
 use App\Models\AttendeeZone;
 use App\Models\Zone;
@@ -552,6 +553,18 @@ class AttendeeService extends BaseRepository
                     $attXone = [];
                     foreach ($attendee->zones as $att_zone) {
                         $attXone[] = optional(Zone::where('id', $att_zone->zone_id)->first())->id;
+                    }
+
+
+                    if (!in_array($element->getAttribute('id'), $attXone)) {
+                        $element->setAttribute('style', 'display: none;');
+                    }
+                }
+
+                if (!empty($element->getAttribute('key')) && $element->getAttribute('key') == 'area') {
+                    $attXone = [];
+                    foreach ($attendee->areas as $att_area) {
+                        $attXone[] = optional(Area::where('id', $att_area->area_id)->first())->id;
                     }
 
 
