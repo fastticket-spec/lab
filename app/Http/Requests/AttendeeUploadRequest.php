@@ -18,7 +18,7 @@ class AttendeeUploadRequest extends FormRequest
             'attendees' => 'array|required',
             'attendees.*.First Name' => 'required',
             'attendees.*.Last Name' => 'required',
-            'attendees.*.email' => 'required|email'
+            'attendees.*.Email Address' => 'required|email'
         ];
     }
 }
