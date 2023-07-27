@@ -358,4 +358,18 @@ class AccessLevelsService extends BaseRepository
 
         return $this->view(['surveys' => $surveys]);
     }
+
+    public function getInvites(string $accessLevelId)
+    {
+        $accessLevel = $this->find($accessLevelId);
+
+        $invites = $accessLevel->invites()->latest()->get()->map(function ($invite) {
+            return [
+                'email' => $invite->email,
+                'date_sent' => $invite->created_at->format('jS M, Y h:i a')
+            ];
+        });
+
+        return $this->view(['invites' => $invites]);
+    }
 }
