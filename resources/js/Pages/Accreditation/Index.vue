@@ -121,7 +121,7 @@ label {
                                             <Field type="text"
                                                    name="registration_number"
                                                    id="reg_no"
-                                                   placeholder="Enter your registration number"
+                                                   :placeholder="$t('input.enter_reg_no')"
                                                    class="form-control mb-0" :validateOnInput="true"/>
                                             <ErrorMessage name="registration_number" class="text-danger"/>
                                         </div>
@@ -133,7 +133,7 @@ label {
                                             <Field type="email"
                                                    name="email"
                                                    id="email"
-                                                   placeholder="Enter your email adderss"
+                                                   :placeholder="$t('input.enter_email')"
                                                    class="form-control mb-0" :validateOnInput="true"/>
                                             <ErrorMessage name="email" class="text-danger"/>
                                         </div>
