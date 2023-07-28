@@ -318,7 +318,7 @@ label {
                         <div class="col-12 pb-5 text-center">
                             <b-btn type="submit" size="lg" class="px-5 py-2"
                                    :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
-                                {{ accessLevel?.page_design?.form_btn_value || 'Submit' }}
+                                {{ lang != 'english' ? accessLevel?.page_design?.form_btn_value : accessLevel?.page_design?.form_btn_value_ar }}
                             </b-btn>
                         </div>
                     </form>
