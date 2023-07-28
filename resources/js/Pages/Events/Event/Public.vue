@@ -36,7 +36,7 @@ defineProps({
                                 <b-card :title="access_level.title" class="iq-mb-3 text-center" style=" height: 154px;">
                                     <div v-if="access_level.has_surveys && access_level.status == 1" class="card-date d-flex flex-column text-center"
                                         :class="{'card-date-ar': locale === 'ar'}">
-                                        <a :href="`/e/${access_level.event.id}/a/${access_level.id}`" class="btn btn-primary" target="_blank" style="margin-top: 45px;">Register</a>
+                                        <a :href="`/e/${access_level.event.id}/a/${access_level.id}`" class="btn btn-primary" target="_blank" >Register</a>
                                     </div>
 
                                 </b-card>
