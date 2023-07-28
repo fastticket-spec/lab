@@ -64,6 +64,7 @@ class AccessLevelsService extends BaseRepository
         return $this->model->query()
             ->with(['event', 'surveyAccessLevels.surveys', 'attendees'])
             ->whereIn('event_id', $getEvents)
+            ->whereStatus(1)
             ->latest()
             ->paginate($request->per_page ?: 10)
             ->withQueryString()

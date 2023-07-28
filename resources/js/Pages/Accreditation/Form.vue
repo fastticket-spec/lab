@@ -121,7 +121,7 @@ export default {
 
 input.form-control, .form-control {
     background: #324067;
-    background-color: #303d63;
+    background-color: #303d63 !important;
     line-height: 27px !important;
     color: #eaecef;
 }
@@ -172,7 +172,9 @@ label {
                     backgroundPositionY: '50%',
                     paddingTop: '100px',
                     paddingBottom: '100px',
-                    minHeight: '100vh'
+                    minHeight: '100vh',
+                    textAlign: lang != 'english' ? 'right' : '',
+                    direction:  lang != 'english' ? 'rtl' : ''
                 }">
         <div class="row no-gutters accreditation-form" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
