@@ -42,6 +42,7 @@ label {
 }
 </style>
 
+
 <template>
     <b-container fluid  style="width: 80%;" :style="{
                     backgroundColor: accessLevel?.page_design?.bg_type === 'color' && accessLevel?.page_design?.bg_color,
@@ -51,7 +52,9 @@ label {
                     backgroundPositionY: '50%',
                     paddingTop: '100px',
                     paddingBottom: '100px',
-                    minHeight: '100vh'
+                    minHeight: '100vh',
+                    textAlign: lang != 'english' ? 'right' : '',
+                    direction:  lang != 'english' ? 'rtl' : ''
                 }" class="mx-auto vag d-flex align-items-center">
         <div class="row no-gutters accreditation-form w-100" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
