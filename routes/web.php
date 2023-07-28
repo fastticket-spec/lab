@@ -87,6 +87,7 @@ Route::group(['middleware' => 'auth'], function () {
                         Route::get('/invites', [AccessLevelsController::class, 'getInvites']);
                         Route::patch('/update', [AccessLevelsController::class, 'update']);
                         Route::post('/change-status', [AccessLevelsController::class, 'updateStatus']);
+                        Route::post('/change-public-status', [AccessLevelsController::class, 'updatePublicStatus']);
                         Route::get('/customize', [AccessLevelsController::class, 'customize']);
                         Route::post('/customize/general', [AccessLevelsController::class, 'customizeGeneral']);
                         Route::post('/customize/page-design', [AccessLevelsController::class, 'customizePageDesign']);

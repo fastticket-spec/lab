@@ -14,7 +14,7 @@ class AccessLevel extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'event_id', 'title', 'title_arabic', 'quantity_available', 'quantity_filled', 'status', 'registration'
+        'event_id', 'title', 'title_arabic', 'quantity_available', 'quantity_filled', 'status', 'registration', 'public_status'
     ];
 
     public function event(): BelongsTo
