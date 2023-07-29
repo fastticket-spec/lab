@@ -165,7 +165,7 @@ label {
                         <div class="py-4 text-center" v-else>
                             <b-btn @click="goToForm" size="lg" class="px-5 py-2"
                                    :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
-                                {{ accessLevel?.page_design?.register_btn_value || 'Register' }}
+                                {{ lang === 'english' ? accessLevel?.page_design?.register_btn_value : accessLevel?.page_design?.register_btn_value_ar  }}
                             </b-btn>
                         </div>
                     </template>
