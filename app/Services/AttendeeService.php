@@ -179,18 +179,22 @@ class AttendeeService extends BaseRepository
 
             $message = $lang === 'arabic' ? optional($settings)->success_message_arabic ?: 'Saved successfully' : (optional($settings)->success_message ?: 'Saved successfully');
 
+            $route = $request->route ? $request->route : "/form/{$accessLevelId}/success?lang=$lang";
+
             return $this->view(
                 data: ['message' => $message],
-                component: "/form/{$accessLevelId}/success?lang=$lang", returnType: 'redirect'
+                component: $route, returnType: 'redirect'
             );
         } catch (\Throwable $th) {
             \Log::error($th);
 
             $message = 'An error occurred while submitting the form.';
+            $route = $request->route ? $request->route : "/form/{$accessLevelId}?lang=$lang";
+
             return $this->view(
                 data: ['message' => $message],
                 flashMessage: $message, messageType: 'danger',
-                component: "/form/{$accessLevelId}?lang=$lang", returnType: 'redirect'
+                component: $route, returnType: 'redirect'
             );
         }
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AttendeeMessageRequest;
 use App\Http\Requests\AttendeeUploadRequest;
+use App\Models\Country;
 use App\Services\AccessLevelsService;
 use App\Services\AttendeeService;
 use App\Services\ZoneService;
@@ -208,5 +209,24 @@ class AttendeesController extends Controller
     public function incrementBadgeDownload(string $attendeeId)
     {
         return $this->attendeeService->incrementDownloads($attendeeId);
+    }
+
+    public function registerApplicant(string $eventId): \Inertia\Response
+    {
+        $surveys = [];
+        if ($accessId = request()->accessId) {
+            $accessLevel = $this->accessLevelsService->find($accessId);
+            $surveys = $accessLevel->surveyAccessLevels->eventSurvey->surveys;
+        }
+
+        $countries = Country::all();
+
+        return Inertia::render('Attendees/RegisterApplicants', [
+            'accessLevels' => $this->accessLevelsService->allAccessLevels($eventId),
+            'eventId' => $eventId,
+            'accessId' => $accessId,
+            'countries' => $countries,
+            'surveys' => $surveys
+        ]);
     }
 }

@@ -119,6 +119,7 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('/mark-as-printed', [AttendeesController::class, 'markAsPrintedEvent']);
                 Route::post('/mark-as-collected', [AttendeesController::class, 'markAsCollectedEvent']);
                 Route::post('/upload-attendees', [AttendeesController::class, 'uploadAttendees']);
+                Route::get('/register-applicant', [AttendeesController::class, 'registerApplicant']);
                 Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveEventAttendee']);
                 Route::post('/{attendee_id}/send-message', [AttendeesController::class, 'sendEventAttendeeMessage']);
                 Route::post('/bulk-assign-zones', [AttendeesController::class, 'bulkAssignEventZones']);

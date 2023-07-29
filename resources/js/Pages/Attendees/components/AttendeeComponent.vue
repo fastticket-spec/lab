@@ -23,6 +23,7 @@ const answerModalShow = ref(false)
 const messageModalShow = ref(false)
 const badgeModalShow = ref(false)
 const collectedModalShow = ref(false)
+const registerModalShow = ref(false)
 const zonesModalShow = ref(false)
 const zonesForBulk = ref(false)
 const selectedSort = ref(props.sort || '');
@@ -394,6 +395,8 @@ const onExportTemplate = async () => {
                                     class="ri-upload-2-line"></i>Upload Attendees</a>
                                 <a href="#" @click="exportModalShow = true" class="btn btn-outline-primary ml-2"><i
                                     class="ri-upload-2-line"></i>Export Template</a>
+                                <Link :href="`/event/${eventId}/attendees/register-applicant`" class="btn btn-outline-primary ml-2"><i
+                                    class="ri-user-3-line"></i>Register Applicant</Link>
                             </b-col>
                         </b-row>
 
