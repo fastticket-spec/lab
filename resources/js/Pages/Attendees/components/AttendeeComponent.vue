@@ -11,6 +11,7 @@ const props = defineProps({
     sort: String,
     filter_by: String,
     zones: Array,
+    areas: Array,
     q: String,
     accessLevels: Array,
     errors: Object
@@ -25,6 +26,9 @@ const badgeModalShow = ref(false)
 const collectedModalShow = ref(false)
 const zonesModalShow = ref(false)
 const zonesForBulk = ref(false)
+const moveAttendeeModal = ref(false)
+const areasModalShow = ref(false)
+const areasForBulk = ref(false)
 const selectedSort = ref(props.sort || '');
 const selectedFilter = ref(props.filter_by || '');
 const message = reactive({
@@ -32,6 +36,7 @@ const message = reactive({
     content: ''
 })
 const selectedZones = ref([]);
+const selectedAreas = ref([]);
 const badgeData = ref(null)
 
 watch(badgeData, (val) => {
@@ -88,7 +93,9 @@ const filterEvents = () => {
 onUpdated(() => {
     answerModalShow.value = false;
     zonesModalShow.value = false;
+    areasModalShow.value = false;
     messageModalShow.value = false;
+    moveAttendeeModal.value = false;
     if (Object.keys(props.errors).length === 0) {
         uploadModalShow.value = false;
     }
@@ -191,10 +198,28 @@ const eventZones = computed(() => {
     return props.zones;
 });
 
+const eventAreas = computed(() => {
+    if (selectedAttendee.value) {
+        return props.areas.filter(area => area.event_id === selectedAttendee.value.category.id)
+    }
+
+    if (checkedRows.value.length > 0 && props.eventId) {
+        return props.areas.filter(area => area.event_id === props.eventId)
+    }
+
+    return props.areas;
+});
+
 const onAssignZones = () => {
     props.eventId
         ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/assign-zones`, {zones: selectedZones.value})
         : router.post(`/attendees/${selectedAttendee.value.id}/assign-zones`, {zones: selectedZones.value})
+}
+
+const onAssignAreas = () => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/assign-areas`, {areas: selectedAreas.value})
+        : router.post(`/attendees/${selectedAttendee.value.id}/assign-areas`, {areas: selectedAreas.value})
 }
 
 const approveAttendees = () => {
@@ -214,6 +239,14 @@ const assignZonesToAttendees = () => {
             zones: selectedZones.value
         })
         : router.post(`/attendees/bulk-assign-zones`, {attendee_ids: checkedRows.value, zones: selectedZones.value})
+}
+const assignAreasToAttendees = () => {
+    props.eventId
+        ? router.post(`/event/${props.eventId}/attendees/bulk-assign-areas`, {
+            attendee_ids: checkedRows.value,
+            areas: selectedAreas.value
+        })
+        : router.post(`/attendees/bulk-assign-areas`, {attendee_ids: checkedRows.value, areas: selectedAreas.value})
 }
 
 const showEdit = answer => {
@@ -346,6 +379,19 @@ const onExportTemplate = async () => {
         console.log(e);
     }
 }
+
+const moveToAccessLevelId = ref('');
+const selectedAttendeeAccessLevelId = ref('');
+
+const otherAccessLevels = computed(() => excludeAccessLevelId => {
+    return props.accessLevels.filter(x => x.id !== excludeAccessLevelId);
+})
+
+const moveToAccessLevel = () => {
+    router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/change-access-level`, {
+        access_level_id: moveToAccessLevelId.value
+    });
+}
 </script>
 
 <template>
@@ -394,6 +440,8 @@ const onExportTemplate = async () => {
                                     class="ri-upload-2-line"></i>Upload Attendees</a>
                                 <a href="#" @click="exportModalShow = true" class="btn btn-outline-primary ml-2"><i
                                     class="ri-upload-2-line"></i>Export Template</a>
+                                <Link :href="`/event/${eventId}/attendees/register-applicant`" class="btn btn-outline-primary ml-2"><i
+                                    class="ri-user-3-line"></i>Register Applicant</Link>
                             </b-col>
                         </b-row>
 
@@ -413,6 +461,12 @@ const onExportTemplate = async () => {
 
                                 <b-btn @click="zonesModalShow = true; zonesForBulk = true; selectedAttendee = null"
                                        variant="outline-primary" class="mr-2">Assign zones to attendee{{
+                                        checkedRows.length !== 1 ? 's' : ''
+                                    }}
+                                </b-btn>
+
+                                <b-btn @click="areasModalShow = true; areasForBulk = true; selectedAttendee = null"
+                                       variant="outline-primary" class="mr-2">Assign areas to attendee{{
                                         checkedRows.length !== 1 ? 's' : ''
                                     }}
                                 </b-btn>
@@ -479,8 +533,13 @@ const onExportTemplate = async () => {
                                             <b-dropdown-item
                                                 @click.prevent="selectedAttendee = data.item; checkedRows = []; zonesModalShow = true; zonesForBulk = false; selectedZones = (data.item.zones || [])">Assign Zones</b-dropdown-item>
                                             <b-dropdown-item
+                                                @click.prevent="selectedAttendee = data.item; checkedRows = []; areasModalShow = true; areasForBulk = false; selectedAreas = (data.item.areas || [])">Assign Areas</b-dropdown-item>
+                                            <b-dropdown-item
                                                 v-if="data.item.badge"
                                                 @click.prevent="viewBadge(data.item.id, data.item.badge.id, data.item.status)">View Badge</b-dropdown-item>
+                                            <b-dropdown-item
+                                                v-if="eventId"
+                                                @click.prevent="selectedAttendee = data.item; selectedAttendeeAccessLevelId = data.item.access_level.id;  moveAttendeeModal = true">Move to Access Level</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>
@@ -626,6 +685,67 @@ const onExportTemplate = async () => {
                         variant="danger"
                         class="float-right ml-2"
                         @click="zonesModalShow = false"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="areasModalShow" id="areas-modal" title="Assign Areas">
+            <b-row class="mt-3">
+                <b-col sm="6" v-for="area in eventAreas" :key="area.id">
+                    <div class="form-group">
+                        <b-checkbox v-model="selectedAreas" :value="area.id">{{ area.area }}</b-checkbox>
+                    </div>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        @click="(checkedRows.length > 0 && !selectedAttendee) ? assignAreasToAttendees() : onAssignAreas()"
+                        :disabled="selectedAreas.length === 0"
+                        class="btn btn-primary float-right ml-2">Assign Areas
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="danger"
+                        class="float-right ml-2"
+                        @click="areasModalShow = false"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="moveAttendeeModal" id="move-attendee-modal" title="Move Attendee">
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <div class="form-group">
+                        <select class="form-control" v-model="moveToAccessLevelId">
+                            <option value="">Select Access Level</option>
+                            <option v-for="accessLevel in otherAccessLevels(selectedAttendeeAccessLevelId)" :key="accessLevel.id" :value="accessLevel.id">{{accessLevel.title}}</option>
+                        </select>
+                    </div>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        @click="moveToAccessLevel"
+                        :disabled="!moveToAccessLevelId"
+                        class="btn btn-primary float-right ml-2">Move
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="danger"
+                        class="float-right ml-2"
+                        @click="moveAttendeeModal = false"
                     >
                         Close
                     </b-button>

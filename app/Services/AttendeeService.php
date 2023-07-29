@@ -8,6 +8,7 @@ use App\Mail\CustomAttendeeMail;
 use App\Mail\InvitationMail;
 use App\Models\Area;
 use App\Models\Attendee;
+use App\Models\AttendeeArea;
 use App\Models\AttendeeZone;
 use App\Models\Invite;
 use App\Models\Zone;
@@ -106,6 +107,7 @@ class AttendeeService extends BaseRepository
                     'accept_status' => Attendee::ACCEPT_STATUS_READABLE[$attendee->accept_status],
                     'date_submitted' => $attendee->created_at->format('jS M, Y H:i'),
                     'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id),
+                    'areas' => $attendee->areas->map(fn($area) => $area->area_id),
                     'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge,
                     'printed' => !!$attendee->printed,
                     'collected' => !!$attendee->collected,
@@ -179,18 +181,22 @@ class AttendeeService extends BaseRepository
 
             $message = $lang === 'arabic' ? optional($settings)->success_message_arabic ?: 'Saved successfully' : (optional($settings)->success_message ?: 'Saved successfully');
 
+            $route = $request->route ? $request->route : "/form/{$accessLevelId}/success?lang=$lang";
+
             return $this->view(
                 data: ['message' => $message],
-                component: "/form/{$accessLevelId}/success?lang=$lang", returnType: 'redirect'
+                component: $route, returnType: 'redirect'
             );
         } catch (\Throwable $th) {
             \Log::error($th);
 
             $message = 'An error occurred while submitting the form.';
+            $route = $request->route ? $request->route : "/form/{$accessLevelId}?lang=$lang";
+
             return $this->view(
                 data: ['message' => $message],
                 flashMessage: $message, messageType: 'danger',
-                component: "/form/{$accessLevelId}?lang=$lang", returnType: 'redirect'
+                component: $route, returnType: 'redirect'
             );
         }
     }
@@ -293,6 +299,31 @@ class AttendeeService extends BaseRepository
         );
     }
 
+    public function assignAreas(array $areas, string $attendeeId, ?string $eventId = null)
+    {
+        $attendee = $this->find($attendeeId);
+
+        $attendee->areas()->delete();
+
+        $areas = collect($areas)->map(fn($area) => [
+            'id' => Str::uuid(),
+            'attendee_id' => $attendeeId,
+            'area_id' => $area,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        DB::table('attendee_areas')->insert($areas->toArray());
+
+        $message = 'Areas has been assigned to attendee';
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
     public function bulkAssignZones(array $attendeeIds, array $zones, ?string $eventId = null)
     {
         $attendees = $this->model->query()
@@ -312,6 +343,33 @@ class AttendeeService extends BaseRepository
         }
 
         $message = 'Zones has been assigned to attendees';
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
+    public function bulkAssignAreas(array $attendeeIds, array $areas, ?string $eventId = null)
+    {
+        $attendees = $this->model->query()
+            ->with('areas')
+            ->whereIn('id', $attendeeIds)
+            ->get();
+
+        foreach ($attendees as $attendee) {
+            $attendee->areas()->delete();
+
+            foreach ($areas as $area) {
+                AttendeeArea::create([
+                    'attendee_id' => $attendee->id,
+                    'area_id' => $area,
+                ]);
+            }
+        }
+
+        $message = 'Area has been assigned to attendees';
         $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
         return $this->view(
             data: ['message' => $message],
@@ -775,5 +833,18 @@ class AttendeeService extends BaseRepository
         return $this->view(
             data: ['message' => 'Updated downloads'],
         );
+    }
+
+    public function changeAccessLevel(string $eventId, string $attendeeId, string $access_level_id)
+    {
+        $this->update([
+            'access_level_id' => $access_level_id
+        ], $attendeeId);
+
+        $message = 'Attendee has been moved to access level.';
+
+        $route = "/event/$eventId/attendees";
+
+        return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
     }
 }
