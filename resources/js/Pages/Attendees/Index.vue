@@ -6,10 +6,11 @@ defineProps({
     sort: String,
     filter_by: String,
     zones: Array,
+    areas: Array,
     q: String,
 })
 </script>
 
 <template>
-    <attendee-component :attendees="attendees" :zones="zones" :sort="sort" :filter_by="filter_by" :q="q" />
+    <attendee-component :attendees="attendees" :zones="zones" :areas="areas" :sort="sort" :filter_by="filter_by" :q="q" />
 </template>

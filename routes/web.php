@@ -123,8 +123,10 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveEventAttendee']);
                 Route::post('/{attendee_id}/send-message', [AttendeesController::class, 'sendEventAttendeeMessage']);
                 Route::post('/bulk-assign-zones', [AttendeesController::class, 'bulkAssignEventZones']);
+                Route::post('/bulk-assign-areas', [AttendeesController::class, 'bulkAssignEventAreas']);
                 Route::post('/send-bulk-invitation', [AttendeesController::class, 'sendBulkEventInvitation']);
                 Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignEventZones']);
+                Route::post('/{attendee_id}/assign-areas', [AttendeesController::class, 'assignEventAreas']);
                 Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendEventInvitation']);
                 Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateEventAttendeeAnswers']);
                 Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadEventBadge']);
@@ -171,8 +173,10 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveAttendee']);
             Route::post('/{attendee_id}/send-message', [AttendeesController::class, 'sendAttendeeMessage']);
             Route::post('/bulk-assign-zones', [AttendeesController::class, 'bulkAssignZones']);
+            Route::post('/bulk-assign-areas', [AttendeesController::class, 'bulkAssignAreas']);
             Route::post('/send-bulk-invitation', [AttendeesController::class, 'sendBulkInvitation']);
             Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignZones']);
+            Route::post('/{attendee_id}/assign-areas', [AttendeesController::class, 'assignAreas']);
             Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendInvitation']);
             Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateAttendeeAnswers']);
             Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadBadge']);

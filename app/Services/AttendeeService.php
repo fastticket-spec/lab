@@ -8,6 +8,7 @@ use App\Mail\CustomAttendeeMail;
 use App\Mail\InvitationMail;
 use App\Models\Area;
 use App\Models\Attendee;
+use App\Models\AttendeeArea;
 use App\Models\AttendeeZone;
 use App\Models\Invite;
 use App\Models\Zone;
@@ -106,6 +107,7 @@ class AttendeeService extends BaseRepository
                     'accept_status' => Attendee::ACCEPT_STATUS_READABLE[$attendee->accept_status],
                     'date_submitted' => $attendee->created_at->format('jS M, Y H:i'),
                     'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id),
+                    'areas' => $attendee->areas->map(fn($area) => $area->area_id),
                     'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge,
                     'printed' => !!$attendee->printed,
                     'collected' => !!$attendee->collected,
@@ -297,6 +299,31 @@ class AttendeeService extends BaseRepository
         );
     }
 
+    public function assignAreas(array $areas, string $attendeeId, ?string $eventId = null)
+    {
+        $attendee = $this->find($attendeeId);
+
+        $attendee->areas()->delete();
+
+        $areas = collect($areas)->map(fn($area) => [
+            'id' => Str::uuid(),
+            'attendee_id' => $attendeeId,
+            'area_id' => $area,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        DB::table('attendee_areas')->insert($areas->toArray());
+
+        $message = 'Areas has been assigned to attendee';
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
     public function bulkAssignZones(array $attendeeIds, array $zones, ?string $eventId = null)
     {
         $attendees = $this->model->query()
@@ -316,6 +343,33 @@ class AttendeeService extends BaseRepository
         }
 
         $message = 'Zones has been assigned to attendees';
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        return $this->view(
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: $route, returnType: 'redirect'
+        );
+    }
+
+    public function bulkAssignAreas(array $attendeeIds, array $areas, ?string $eventId = null)
+    {
+        $attendees = $this->model->query()
+            ->with('areas')
+            ->whereIn('id', $attendeeIds)
+            ->get();
+
+        foreach ($attendees as $attendee) {
+            $attendee->areas()->delete();
+
+            foreach ($areas as $area) {
+                AttendeeArea::create([
+                    'attendee_id' => $attendee->id,
+                    'area_id' => $area,
+                ]);
+            }
+        }
+
+        $message = 'Area has been assigned to attendees';
         $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
         return $this->view(
             data: ['message' => $message],
