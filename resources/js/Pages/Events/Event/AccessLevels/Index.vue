@@ -138,7 +138,12 @@ const viewInvitations = async (accessLevelId) => {
                                @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/change-status`, 'post')"
                                :class="access_level.status === 0 ? 'text-success' : 'text-danger'"><i
                                 :class="access_level.status === 0 ? 'ri-play-line' : 'ri-pause-line'"></i>
-                                {{ access_level.status === 0 ? 'Activate' : 'Pause' }}</a>
+                                {{ access_level.status === 0 ? 'Activate' : 'Deactivate' }}</a>
+                            <a href="#"
+                               @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/change-public-status`, 'post')"
+                               :class="access_level.public_status === 0 ? 'text-success' : 'text-danger'"><i
+                                :class="access_level.public_status === 0 ? 'ri-play-line' : 'ri-pause-line'"></i>
+                                {{ access_level.public_status === 0 ? 'Activate(Public)' : 'Deactivate(Public)' }}</a>
                         </template>
 
                         <a href="#"
