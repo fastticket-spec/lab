@@ -129,6 +129,7 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('/{attendee_id}/assign-areas', [AttendeesController::class, 'assignEventAreas']);
                 Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendEventInvitation']);
                 Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateEventAttendeeAnswers']);
+                Route::post('/{attendee_id}/change-access-level', [AttendeesController::class, 'changeAccessLevel']);
                 Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadEventBadge']);
             });
 

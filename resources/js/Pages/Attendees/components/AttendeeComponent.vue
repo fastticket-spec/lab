@@ -26,6 +26,7 @@ const badgeModalShow = ref(false)
 const collectedModalShow = ref(false)
 const zonesModalShow = ref(false)
 const zonesForBulk = ref(false)
+const moveAttendeeModal = ref(false)
 const areasModalShow = ref(false)
 const areasForBulk = ref(false)
 const selectedSort = ref(props.sort || '');
@@ -94,6 +95,7 @@ onUpdated(() => {
     zonesModalShow.value = false;
     areasModalShow.value = false;
     messageModalShow.value = false;
+    moveAttendeeModal.value = false;
     if (Object.keys(props.errors).length === 0) {
         uploadModalShow.value = false;
     }
@@ -377,6 +379,19 @@ const onExportTemplate = async () => {
         console.log(e);
     }
 }
+
+const moveToAccessLevelId = ref('');
+const selectedAttendeeAccessLevelId = ref('');
+
+const otherAccessLevels = computed(() => excludeAccessLevelId => {
+    return props.accessLevels.filter(x => x.id !== excludeAccessLevelId);
+})
+
+const moveToAccessLevel = () => {
+    router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/change-access-level`, {
+        access_level_id: moveToAccessLevelId.value
+    });
+}
 </script>
 
 <template>
@@ -522,6 +537,9 @@ const onExportTemplate = async () => {
                                             <b-dropdown-item
                                                 v-if="data.item.badge"
                                                 @click.prevent="viewBadge(data.item.id, data.item.badge.id, data.item.status)">View Badge</b-dropdown-item>
+                                            <b-dropdown-item
+                                                v-if="eventId"
+                                                @click.prevent="selectedAttendee = data.item; selectedAttendeeAccessLevelId = data.item.access_level.id;  moveAttendeeModal = true">Move to Access Level</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>
@@ -696,6 +714,38 @@ const onExportTemplate = async () => {
                         variant="danger"
                         class="float-right ml-2"
                         @click="areasModalShow = false"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="moveAttendeeModal" id="move-attendee-modal" title="Move Attendee">
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <div class="form-group">
+                        <select class="form-control" v-model="moveToAccessLevelId">
+                            <option value="">Select Access Level</option>
+                            <option v-for="accessLevel in otherAccessLevels(selectedAttendeeAccessLevelId)" :key="accessLevel.id" :value="accessLevel.id">{{accessLevel.title}}</option>
+                        </select>
+                    </div>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        @click="moveToAccessLevel"
+                        :disabled="!moveToAccessLevelId"
+                        class="btn btn-primary float-right ml-2">Move
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="danger"
+                        class="float-right ml-2"
+                        @click="moveAttendeeModal = false"
                     >
                         Close
                     </b-button>

@@ -260,4 +260,11 @@ class AttendeesController extends Controller
             'surveys' => $surveys
         ]);
     }
+
+    public function changeAccessLevel(Request $request, string $eventId, string $attendeeId)
+    {
+        $request->validate(['access_level_id' => 'required|exists:access_levels,id']);
+
+        return $this->attendeeService->changeAccessLevel($eventId, $attendeeId, $request->access_level_id);
+    }
 }

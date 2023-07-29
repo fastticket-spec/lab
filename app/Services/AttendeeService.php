@@ -834,4 +834,17 @@ class AttendeeService extends BaseRepository
             data: ['message' => 'Updated downloads'],
         );
     }
+
+    public function changeAccessLevel(string $eventId, string $attendeeId, string $access_level_id)
+    {
+        $this->update([
+            'access_level_id' => $access_level_id
+        ], $attendeeId);
+
+        $message = 'Attendee has been moved to access level.';
+
+        $route = "/event/$eventId/attendees";
+
+        return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
+    }
 }
