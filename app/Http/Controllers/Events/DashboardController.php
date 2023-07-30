@@ -34,37 +34,43 @@ class DashboardController extends Controller
                 'name' => 'Attendees',
                 'iI8' => 'sidebar.attendees',
                 'icon' => 'ri-calendar-2-line',
-                'count' => $this->attendeeService->count(eventId: $eventId)
+                'count' => $this->attendeeService->count(eventId: $eventId),
+                'disabled_for' => []
             ],
             [
                 'name' => 'Accepted',
                 'iI8' => 'sidebar.accepted',
                 'icon' => 'ri-calendar-2-line',
-                'count' => $this->attendeeService->count(approved: true, eventId: $eventId)
+                'count' => $this->attendeeService->count(approved: true, eventId: $eventId),
+                'disabled_for' => ['Operations']
             ],
             [
                 'name' => 'Declined',
                 'iI8' => 'sidebar.declined',
                 'icon' => 'ri-calendar-2-line',
-                'count' => $this->attendeeService->count(declined: true, eventId: $eventId)
+                'count' => $this->attendeeService->count(declined: true, eventId: $eventId),
+                'disabled_for' => ['Operations']
             ],
             [
                 'name' => 'Downloads',
                 'iI8' => 'sidebar.downloads',
                 'icon' => 'ri-calendar-2-line',
-                'count' => $this->attendeeService->countDownloads($eventId)
+                'count' => $this->attendeeService->countDownloads($eventId),
+                'disabled_for' => ['Operations']
             ],
             [
                 'name' => 'Badges',
                 'iI8' => 'sidebar.badges',
                 'icon' => 'ri-calendar-2-line',
-                'count' => $this->badgeService->count($eventId)
+                'count' => $this->badgeService->count($eventId),
+                'disabled_for' => ['Operations']
             ],
             [
                 'name' => 'Zones',
                 'iI8' => 'sidebar.zones',
                 'icon' => 'ri-calendar-2-line',
-                'count' => $this->zoneService->count($eventId)
+                'count' => $this->zoneService->count($eventId),
+                'disabled_for' => ['Operations']
             ]
         ];
 
