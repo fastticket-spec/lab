@@ -434,7 +434,7 @@ const moveToAccessLevel = () => {
                     </template>
 
                     <template v-slot:body v-if="attendees.total">
-                        <b-row v-if="eventId && userRole !== 'Viewers'">
+                        <b-row v-if="eventId && userRole !== 'Viewers' && userRole !== 'Operations'">
                             <b-col sm="12">
                                 <a href="#" @click="uploadModalShow = true" class="btn btn-outline-primary"><i
                                     class="ri-upload-2-line"></i>Upload Attendees</a>
@@ -523,22 +523,26 @@ const moveToAccessLevel = () => {
                                           <b-dropdown id="dropdown-right" right text="Actions" size="sm"
                                                       variant="primary">
                                             <b-dropdown-item
+                                                v-if="userRole !== 'Operations'"
                                                 @click.prevent="selectedAttendee = data.item; answerModalShow = true">Answer</b-dropdown-item>
                                             <b-dropdown-item
+                                                v-if="userRole !== 'Operations'"
                                                 @click.prevent="selectedAttendee = data.item; messageModalShow = true">Message</b-dropdown-item>
-                                            <b-dropdown-item v-if="data.item.status !== 'declined'"
+                                            <b-dropdown-item v-if="data.item.status !== 'declined' && userRole !== 'Operations'"
                                                              @click.prevent="declineAttendee(data.item.id)">Decline</b-dropdown-item>
-                                            <b-dropdown-item v-if="data.item.status === 'declined'"
+                                            <b-dropdown-item v-if="data.item.status === 'declined' && userRole !== 'Operations'"
                                                              @click.prevent="reinstateAttendee(data.item.id)">Reinstate</b-dropdown-item>
                                             <b-dropdown-item
+                                                v-if="userRole !== 'Operations'"
                                                 @click.prevent="selectedAttendee = data.item; checkedRows = []; zonesModalShow = true; zonesForBulk = false; selectedZones = (data.item.zones || [])">Assign Zones</b-dropdown-item>
                                             <b-dropdown-item
+                                                v-if="userRole !== 'Operations'"
                                                 @click.prevent="selectedAttendee = data.item; checkedRows = []; areasModalShow = true; areasForBulk = false; selectedAreas = (data.item.areas || [])">Assign Areas</b-dropdown-item>
                                             <b-dropdown-item
-                                                v-if="data.item.badge"
+                                                v-if="data.item.badge && userRole !== 'Editors'"
                                                 @click.prevent="viewBadge(data.item.id, data.item.badge.id, data.item.status)">View Badge</b-dropdown-item>
                                             <b-dropdown-item
-                                                v-if="eventId"
+                                                v-if="eventId && userRole !== 'Operations'"
                                                 @click.prevent="selectedAttendee = data.item; selectedAttendeeAccessLevelId = data.item.access_level.id;  moveAttendeeModal = true">Move to Access Level</b-dropdown-item>
                                         </b-dropdown>
                                       </span>

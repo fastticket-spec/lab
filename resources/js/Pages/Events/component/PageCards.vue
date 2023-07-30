@@ -47,8 +47,8 @@
                         </b-popover>
                     </template>
 
-                    <template v-if="userRole === 'Editors' || userRole === 'Operations' || userRole === 'Viewers'">
-                        <a href="#" @click.prevent.stop="visit(`/event/${event.id}/access-levels`)"><i
+                    <template v-if="userRole === 'Editors' || userRole === 'Viewers' || userRole === 'Operations'">
+                        <a href="#" v-if="userRole !== 'Operations'" @click.prevent.stop="visit(`/event/${event.id}/access-levels`)"><i
                             class="ri-sound-module-line"></i>
                             Access Levels</a>
 
@@ -56,12 +56,12 @@
                             class="ri-group-2-line"></i>
                             Attendees</a>
 
-                        <a href="#" @click.prevent.stop="visit(`/event/${event.id}/badges`)"><i
+                        <a href="#" v-if="userRole !== 'Operations'" @click.prevent.stop="visit(`/event/${event.id}/badges`)"><i
                             class="ri-pencil-ruler-line"></i>
                             Badges</a>
                     </template>
 
-                    <template v-if="(!userRole || userRole === 'Admin Users' || userRole === 'Editors' || userRole === 'Operations')">
+                    <template v-if="(!userRole || userRole === 'Admin Users' || userRole === 'Editors')">
                         <a href="#" @click.prevent.stop="visit(`/event/${event.id}/event-surveys`)"><i
                             class="ri-ticket-line"></i>
                             Surveys</a>
