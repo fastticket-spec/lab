@@ -10,6 +10,8 @@ use App\Models\Area;
 use App\Models\Attendee;
 use App\Models\AttendeeArea;
 use App\Models\AttendeeZone;
+use App\Models\BadgesArea;
+use App\Models\BadgesZone;
 use App\Models\Invite;
 use App\Models\Zone;
 use App\Repositories\BaseRepository;
@@ -611,9 +613,8 @@ class AttendeeService extends BaseRepository
                 if (!empty($element->getAttribute('key')) && $element->getAttribute('key') == 'zone') {
                     $attXone = [];
                     foreach ($attendee->zones as $att_zone) {
-                        $attXone[] = optional(Zone::where('id', $att_zone->zone_id)->first())->id;
+                        $attXone[] = optional(BadgesZone::where('id', $att_zone->zone_id)->first())->id;
                     }
-
 
                     if (!in_array($element->getAttribute('id'), $attXone)) {
                         $element->setAttribute('style', 'display: none;');
@@ -623,7 +624,7 @@ class AttendeeService extends BaseRepository
                 if (!empty($element->getAttribute('key')) && $element->getAttribute('key') == 'area') {
                     $attXone = [];
                     foreach ($attendee->areas as $att_area) {
-                        $attXone[] = optional(Area::where('id', $att_area->area_id)->first())->id;
+                        $attXone[] = optional(BadgesArea::where('area_id', $att_area->area_id)->first())->id;
                     }
 
 
