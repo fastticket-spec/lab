@@ -86,6 +86,6 @@ export const eventSideBar = eventId => ([
         "is_icon_class": true,
         "component": ["Events/Event/Areas/Index", "Events/Event/Areas/Create"],
         "icon": "ri-command-line",
-        "disabled_for": ["Operations"]
+        "disabled_for": ["Operations", "Editors"]
     }
 ])
