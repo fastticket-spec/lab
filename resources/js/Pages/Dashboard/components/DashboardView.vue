@@ -1,120 +1,16 @@
 <script setup>
 import {computed, ref} from "vue";
 import {usePage} from "@inertiajs/vue3";
-// import HighCharts from 'highcharts'
-// import HighChart from "../../../Shared/components/core/charts/HighChart.vue";
-// import More from 'highcharts/highcharts-more';
-// import SearchBox from "../../../Shared/components/core/SearchBox/Index.vue";
-
-// More(HighCharts)
 
 const props = defineProps({
     data: Array,
     attendees: Array
 })
 
-// const charts = ref([
-//     {
-//         title: 'Tickets Sold',
-//         bodyData: {
-//             chart: {
-//                 type: 'spline',
-//                 animation: HighCharts.svg,
-//                 marginRight: 10,
-//             },
-//
-//             title: {
-//                 text: ''
-//             },
-//
-//             xAxis: {
-//                 type: 'categories',
-//                 categories: props.ticketChartData?.sales?.map(x => x.date),
-//             },
-//
-//             yAxis: {
-//                 title: {
-//                     text: ''
-//                 },
-//                 plotLines: [{
-//                     value: 0,
-//                     width: 1,
-//                     color: '#808080'
-//                 }]
-//             },
-//
-//             legend: {
-//                 enabled: false
-//             },
-//
-//             exporting: {
-//                 enabled: false
-//             },
-//
-//             series: [{
-//                 name: 'Quantity',
-//                 color: '#3376A2',
-//                 data: props.ticketChartData?.sales?.map(x => x.quantity)
-//             }]
-//         }
-//     },
-//
-//     {
-//         title: 'Tickets Volume',
-//         bodyData: {
-//             chart: {
-//                 type: 'spline',
-//                 animation: HighCharts.svg,
-//                 marginRight: 10,
-//             },
-//
-//             title: {
-//                 text: ''
-//             },
-//
-//             xAxis: {
-//                 type: 'categories',
-//                 categories: props.ticketChartData?.price?.map(x => x.date),
-//             },
-//
-//             yAxis: {
-//                 title: {
-//                     text: ''
-//                 },
-//                 plotLines: [{
-//                     value: 0,
-//                     width: 1,
-//                     color: '#808080'
-//                 }],
-//                 labels: {
-//                     formatter: function () {
-//                         return this.value + ' SAR';
-//                     }
-//                 }
-//
-//             },
-//
-//             legend: {
-//                 enabled: false
-//             },
-//
-//             exporting: {
-//                 enabled: false
-//             },
-//
-//             series: [{
-//                 name: 'Price',
-//                 color: '#3376A2',
-//                 data: props.ticketChartData?.price?.map(x => x.price)
-//             }]
-//         }
-//     },
-// ]);
-
 const userRole = computed(() => usePage().props.user_role);
 const activeOrganiser = computed(() => usePage().props.active_organiser);
 
-const showItem = (item) => {
+const showItem = item => {
     if (!userRole.value) {
         return true;
     }
@@ -129,7 +25,7 @@ const showItem = (item) => {
     <b-container fluid>
         <b-row>
             <template v-for="item in data" :key="item.name">
-                <b-col lg="3" md="6">
+                <b-col lg="3" md="6" v-if="showItem(item)">
                     <iq-card class="iq-card-block iq-card-stretch iq-card-height">
                         <template v-slot:body>
                             <div class="d-flex flex-column justify-content-center py-2">

@@ -27,7 +27,8 @@ export const eventSideBar = eventId => ([
         "class_name": "",
         "is_icon_class": true,
         "component": ["Events/Event/AccessLevels/Index", "Events/Event/AccessLevels/Create"],
-        "icon": "ri-sound-module-line"
+        "icon": "ri-sound-module-line",
+        "disabled_for": ["Operations"]
     },
     {
         "title": "Surveys",
@@ -37,7 +38,8 @@ export const eventSideBar = eventId => ([
         "class_name": "",
         "is_icon_class": true,
         "component": ["Events/Event/Surveys/EventSurveys", "Events/Event/Surveys/Index", "Events/Event/Surveys/Create"],
-        "icon": "ri-questionnaire-line"
+        "icon": "ri-questionnaire-line",
+        "disabled_for": ["Operations", "Editors"]
     },
     {
         "title": "Badges",
@@ -47,7 +49,8 @@ export const eventSideBar = eventId => ([
         "class_name": "",
         "is_icon_class": true,
         "component": ["Events/Event/Badges/Index", "Events/Event/Badges/Create"],
-        "icon": "ri-pencil-ruler-line"
+        "icon": "ri-pencil-ruler-line",
+        "disabled_for": ["Operations"]
     },
 
     {
@@ -70,7 +73,8 @@ export const eventSideBar = eventId => ([
         "class_name": "",
         "is_icon_class": true,
         "component": ["Events/Event/Zones/Index", "Events/Event/Zones/Create"],
-        "icon": "ri-command-line"
+        "icon": "ri-command-line",
+        "disabled_for": ["Operations", "Editors"]
     },
     {
         "title": "Areas",
@@ -81,6 +85,7 @@ export const eventSideBar = eventId => ([
         "class_name": "",
         "is_icon_class": true,
         "component": ["Events/Event/Areas/Index", "Events/Event/Areas/Create"],
-        "icon": "ri-command-line"
+        "icon": "ri-command-line",
+        "disabled_for": ["Operations"]
     }
 ])
