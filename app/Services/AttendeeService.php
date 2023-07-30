@@ -612,25 +612,34 @@ class AttendeeService extends BaseRepository
 
                 if (!empty($element->getAttribute('key')) && $element->getAttribute('key') == 'zone') {
                     $attXone = [];
+                    $nodeId = $element->getAttribute('id');
                     foreach ($attendee->zones as $att_zone) {
-                        $attXone[] = optional(BadgesZone::where('id', $att_zone->zone_id)->first())->id;
+                        $attXone[] = optional(BadgesZone::where('zone_id', $att_zone->zone_id)->first())->id;
                     }
 
-                    if (!in_array($element->getAttribute('id'), $attXone)) {
-                        $element->setAttribute('style', 'display: none;');
+//                    if (!in_array($element->getAttribute('id'), $attXone)) {
+//                        $element->setAttribute('style', 'display: none;');
+//                    }
+
+                    if (!in_array($nodeId, $attXone)) {
+                        $element->nodeValue = optional(Zone::find($nodeId))->zone;
                     }
                 }
 
                 if (!empty($element->getAttribute('key')) && $element->getAttribute('key') == 'area') {
                     $attXone = [];
+                    $nodeId = $element->getAttribute('id');
                     foreach ($attendee->areas as $att_area) {
                         $attXone[] = optional(BadgesArea::where('area_id', $att_area->area_id)->first())->id;
                     }
 
-
-                    if (!in_array($element->getAttribute('id'), $attXone)) {
-                        $element->setAttribute('style', 'display: none;');
+                    if (!in_array($nodeId, $attXone)) {
+                        $element->nodeValue = optional(Area::find($nodeId))->area;
                     }
+
+//                    if (!in_array($element->getAttribute('id'), $attXone)) {
+//                        $element->nodeValue = $area;
+//                    }
                 }
             }
         }
