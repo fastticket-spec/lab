@@ -2,9 +2,9 @@ name: SPL Deploy
 
 on:
   push:
-    branches: [ spl-prodold ]
+    branches: [ spl-prod ]
   pull_request:
-    branches: [ spl-prodold ]
+    branches: [ spl-prod ]
 
 jobs:
   SPL-Deploy:
@@ -20,7 +20,6 @@ jobs:
         key: ${{ secrets.STAGING_KEY }}
         port: ${{ secrets.STAGING_PORT }}
         script: |
-          cd /var/www/spl-prod && sudo su
           cd /var/www/spl-prod && ./spl_deploy.sh
-          cd /var/www/spl-prod && npm install
-          cd /var/www/spl-prod && npm run build
+          cd /var/www/spl-prod && sudo npm install
+          cd /var/www/spl-prod && sudo npm run build
