@@ -19,6 +19,8 @@ const props = defineProps({
 })
 
 const formData = reactive({});
+const buttonDisabled = ref(false)
+
 
 const isProccssing = false
 
@@ -332,7 +334,7 @@ label {
                                        :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
                                     {{
                                         lang === 'english' ? accessLevel?.page_design?.form_btn_value : accessLevel?.page_design?.form_btn_value_ar
-                                    }} {{ isSubmitting }}
+                                    }} 
                                 </b-btn>
                             </div>
                         </form>
