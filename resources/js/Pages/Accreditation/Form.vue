@@ -13,10 +13,16 @@ const props = defineProps({
     surveys: Array,
     reference: String,
     answers: Array,
-    countries: Array
+    countries: Array,
+    email: String,
+    isProccssing: Boolean
 })
 
 const formData = reactive({});
+const buttonDisabled = ref(false)
+
+
+const isProccssing = false
 
 onMounted(() => {
     document.querySelector('title').textContent = `${props.accessLevel.title} - ${props.accessLevel?.event?.organiser?.name}`
@@ -31,10 +37,12 @@ onMounted(() => {
 });
 
 const {handleSubmit, isSubmitting} = useForm({
+
     initialValues: (props.reference && props.answers)
         ? {
             surveys: props.surveys.filter(x => !x.private).map(x => {
                 const answer = props.answers.find(y => y.question === x.title)?.answer || '';
+
                 return {
                     type: x.type,
                     answer: answer || (x.type === '8' ? [] : ((x.type === '7') ? null : '')),
@@ -44,24 +52,27 @@ const {handleSubmit, isSubmitting} = useForm({
                     question: x.title,
                     is_private: x.private,
                     options: x.options,
-                    required: x.required
+                    required: x.required,
+                    disabled: x.title === 'Email Address' && props.email
                 }
             })
         }
         : {
-        surveys: props.surveys.filter(x => !x.private).map(x => ({
-            type: x.type,
-            answer: x.type === '8' ? [] : ((x.type === '7') ? null : ''),
-            title: x.title,
-            title_arabic: x.title_arabic,
-            id: x.id,
-            question: x.title,
-            is_private: x.private,
-            options: x.options,
-            required: x.required
-        }))
-    },
+            surveys: props.surveys.filter(x => !x.private).map(x => ({
+                type: x.type,
+                answer: x.title === 'Email Address' ? props.email : (x.type === '8' ? [] : ((x.type === '7') ? null : '')),
+                title: x.title,
+                title_arabic: x.title_arabic,
+                id: x.id,
+                question: x.title,
+                is_private: x.private,
+                options: x.options,
+                required: x.required,
+                disabled: x.title === 'Email Address' && props.email
+            }))
+        },
     validationSchema: accreditationFormSchema,
+
 });
 
 const onSubmit = handleSubmit(values => {
@@ -76,7 +87,6 @@ const onSubmit = handleSubmit(values => {
         }
         return d;
     });
-
 
     const privateAnswers = props.surveys.filter(x => x.private).map(x => ({
         type: x.type,
@@ -95,7 +105,8 @@ const onSubmit = handleSubmit(values => {
     const data = {
         answers,
         lang: props.lang,
-        reference: props.reference
+        reference: props.reference,
+       
     };
 
     router.post(`/form/${props.accessLevel.event_id}/${props.accessLevel.id}/submit`, data, {
@@ -114,9 +125,19 @@ export default {
 </script>
 
 <style>
+
 input.form-control, .form-control {
-    background: #f2f2f2;
-    background-color: #f2f2f2;
+    background: #324067;
+    background-color: #303d63 !important;
+    line-height: 27px !important;
+    color: #eaecef;
+}
+
+form-control:disabled, .form-control[readonly] {
+    background-color: #324067;
+    opacity: 1;
+    color: #eaecef;
+
 }
 
 .form-control {
@@ -135,11 +156,11 @@ input.form-control, .form-control {
 }
 
 .bg-white {
-    //background-color: #7d4f4c61 !important;
+//background-color: #7d4f4c61 !important;
 }
 
 label {
-    color: #ffffff;
+    color: #000;
 }
 
 @media screen and (max-width: 600px) {
@@ -151,7 +172,7 @@ label {
 </style>
 
 <template>
-    <b-container fluid class="mx-auto vag" style="width: 80%;"  :style="{
+    <b-container fluid class="mx-auto vag" style="width: 80%;" :style="{
                     backgroundColor: accessLevel?.page_design?.bg_type === 'color' && accessLevel?.page_design?.bg_color,
                     backgroundImage: accessLevel?.page_design?.bg_type === 'image'? 'url(' + accessLevel?.page_design?.bg_image + ')' : '',
                     backgroundSize: 'cover',
@@ -159,7 +180,9 @@ label {
                     backgroundPositionY: '50%',
                     paddingTop: '100px',
                     paddingBottom: '100px',
-                    minHeight: '100vh'
+                    minHeight: '100vh',
+                    textAlign: lang != 'english' ? 'right' : '',
+                    direction:  lang != 'english' ? 'rtl' : ''
                 }">
         <div class="row no-gutters accreditation-form" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
@@ -171,141 +194,150 @@ label {
 
                     <template v-else>
                         <div class="text-center">
-                            <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
+                            <img class="my-3 text-center img-fluid logo"
+                                 :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                         </div>
 
                         <form @submit.prevent="onSubmit" class="mx-5">
-                        <div class="col-12 m-0 p-0">
-                            <div class="row m-0">
-                                <FieldArray name="surveys" v-slot="{ fields, insert, remove, swap }">
-                                    <template v-for="(field, idx) in fields" :key="field.key">
-                                        <b-col :sm="field.value.type !== '10' ? '6' : '12'" class="pb-2">
-                                            <div class="form-group mb-0">
-                                                <label :for="`surveys-${idx}`" v-if="field.value.type !== '10'">{{
-                                                        lang === 'arabic' ? field.value.title_arabic : field.value.title
-                                                    }}:</label>
+                            <div class="col-12 m-0 p-0">
+                                <div class="row m-0">
+                                    <FieldArray name="surveys" v-slot="{ fields, insert, remove, swap }">
+                                        <template v-for="(field, idx) in fields" :key="field.key">
+                                            <b-col :sm="field.value.type !== '10' ? '6' : '12'" class="pb-2">
+                                                <div class="form-group mb-0">
+                                                    <label :for="`surveys-${idx}`" v-if="field.value.type !== '10'">{{
+                                                            lang === 'arabic' ? field.value.title_arabic : field.value.title
+                                                        }}:</label>
 
-                                                <Field type="text"
-                                                       v-if="field.value.type === '1'"
-                                                       :name="`surveys[${idx}].answer`"
-                                                       :id="`surveys-${idx}`"
-                                                       :class="`form-control mb-0`" :validateOnInput="true"/>
-
-                                                <Field as="textarea"
-                                                       v-if="field.value.type === '2'"
-                                                       rows="5"
-                                                       :name="`surveys[${idx}].answer`"
-                                                       :id="`surveys-${idx}`"
-                                                       :class="`form-control mb-0`" :validateOnInput="true"/>
-
-                                                <Field type="datetime-local"
-                                                       v-else-if="field.value.type === '3'"
-                                                       :name="`surveys[${idx}].answer`"
-                                                       :id="`surveys-${idx}`"
-                                                       :class="`form-control mb-0`" :validateOnInput="true"/>
-
-                                                <Field type="file"
-                                                       v-else-if="field.value.type === '4'"
-                                                       :name="`surveys[${idx}].answer`"
-                                                       :id="`surveys-${idx}`"
-                                                       :class="`form-control mb-0`" :validateOnInput="true"/>
-
-                                                <Field type="email"
-                                                       v-else-if="field.value.type === '5'"
-                                                       :name="`surveys[${idx}].answer`"
-                                                       :id="`surveys-${idx}`"
-                                                       :class="`form-control mb-0`" :validateOnInput="true"/>
-
-                                                <Field as="select"
-                                                       v-else-if="field.value.type === '6'"
-                                                       :name="`surveys[${idx}].answer`"
-                                                       :id="`surveys-${idx}`"
-                                                       :class="`form-control mb-0`" :validateOnInput="true">
-                                                    <option v-for="option in field.value.options"
-                                                            :key="`${field.value.id}-${option.name}`"
-                                                            :value="lang === 'arabic' ? option.name_arabic : option.name">
-                                                        {{ lang === 'arabic' ? option.name_arabic : option.name }}
-                                                    </option>
-                                                </Field>
-
-                                                <vue-select v-model="field.value.answer"
-                                                            v-else-if="field.value.type === '7'"
-                                                            :class="{'text-right': lang === 'arabic'}"
-                                                            class="form-control mb-0"
-                                                            sm="6"
-                                                            :options="field.value.options"
-                                                            :label="lang === 'arabic' ? 'name_arabic' : 'name'"
-                                                            multiple/>
-
-                                                <template v-if="field.value.type === '8'">
-                                                    <br>
-                                                    <Field type="checkbox"
-                                                           v-for="option in field.value.options"
-                                                           :key="`${field.value.id}-${option.id}`"
+                                                    <Field type="text"
+                                                           v-if="field.value.type === '1'"
                                                            :name="`surveys[${idx}].answer`"
-                                                           v-slot="{field: boxField}"
-                                                           :class="`checkbox custom-checkbox-color`"
-                                                           :validateOnInput="true"
-                                                           :value="lang === 'arabic' ? option.name_arabic : option.name">
-                                                        <label class="mr-3">
-                                                            <input type="checkbox" :name="`surveys[${idx}].answer`"
-                                                                   v-bind="boxField"
-                                                                   :value="lang === 'arabic' ? option.name_arabic : option.name"/>
-                                                            {{ lang === 'arabic' ? option.name_arabic : option.name }}
-                                                        </label>
-                                                    </Field>
-                                                </template>
+                                                           :id="`surveys-${idx}`"
+                                                           :class="`form-control mb-0`" :validateOnInput="true"/>
 
-                                                <template v-if="field.value.type === '9'">
-                                                    <br>
-                                                    <Field type="radio"
-                                                           v-for="option in field.value.options"
-                                                           :key="`${field.value.id}-${option.id}`"
+                                                    <Field as="textarea"
+                                                           v-if="field.value.type === '2'"
+                                                           rows="5"
                                                            :name="`surveys[${idx}].answer`"
-                                                           v-slot="{field: boxField}"
-                                                           :class="`checkbox custom-radio-color`"
-                                                           :validateOnInput="true"
-                                                           :value="lang === 'arabic' ? option.name_arabic : option.name">
-                                                        <label class="mr-3">
-                                                            <input type="radio" :name="`surveys[${idx}].answer`"
-                                                                   v-bind="boxField"
-                                                                   :value="lang === 'arabic' ? option.name_arabic : option.name"/>
+                                                           :id="`surveys-${idx}`"
+                                                           :class="`form-control mb-0`" :validateOnInput="true"/>
+
+                                                    <Field type="datetime-local"
+                                                           v-else-if="field.value.type === '3'"
+                                                           :name="`surveys[${idx}].answer`"
+                                                           :id="`surveys-${idx}`"
+                                                           :class="`form-control mb-0`" :validateOnInput="true"/>
+
+                                                    <Field type="file"
+                                                           v-else-if="field.value.type === '4'"
+                                                           :name="`surveys[${idx}].answer`"
+                                                           :id="`surveys-${idx}`"
+                                                           :class="`form-control mb-0`" :validateOnInput="true"/>
+
+                                                    <Field type="email"
+                                                           v-else-if="field.value.type === '5'"
+                                                           :name="`surveys[${idx}].answer`"
+                                                           :id="`surveys-${idx}`"
+                                                           :disabled="field.value.disabled"
+                                                           :class="`form-control mb-0`" :validateOnInput="true"/>
+
+                                                    <Field as="select"
+                                                           v-else-if="field.value.type === '6'"
+                                                           :name="`surveys[${idx}].answer`"
+                                                           :id="`surveys-${idx}`"
+                                                           :class="`form-control mb-0`" :validateOnInput="true">
+                                                        <option v-for="option in field.value.options"
+                                                                :key="`${field.value.id}-${option.name}`"
+                                                                :value="lang === 'arabic' ? option.name_arabic : option.name">
                                                             {{ lang === 'arabic' ? option.name_arabic : option.name }}
-                                                        </label>
+                                                        </option>
                                                     </Field>
-                                                </template>
 
-                                                <h5 v-if="field.value.type === '10'" class="mt-5 mb-2">{{
-                                                        lang === 'arabic' ? field.value.title_arabic : field.value.title
-                                                    }}</h5>
+                                                    <vue-select v-model="field.value.answer"
+                                                                v-else-if="field.value.type === '7'"
+                                                                :class="{'text-right': lang === 'arabic'}"
+                                                                class="form-control mb-0"
+                                                                sm="6"
+                                                                :options="field.value.options"
+                                                                :label="lang === 'arabic' ? 'name_arabic' : 'name'"
+                                                                multiple/>
 
-                                                <Field as="select"
-                                                       v-else-if="field.value.type === '11'"
-                                                       :name="`surveys[${idx}].answer`"
-                                                       :id="`surveys-${idx}`"
-                                                       :class="`form-control mb-0`" :validateOnInput="true">
-                                                    <option v-for="country in countries"
-                                                            :key="`${field.value.id}-${country.country}`"
-                                                            :value="country.country">
-                                                        {{ country.country }}
-                                                    </option>
-                                                </Field>
+                                                    <template v-if="field.value.type === '8'">
+                                                        <br>
+                                                        <Field type="checkbox"
+                                                               v-for="option in field.value.options"
+                                                               :key="`${field.value.id}-${option.id}`"
+                                                               :name="`surveys[${idx}].answer`"
+                                                               v-slot="{field: boxField}"
+                                                               :class="`checkbox custom-checkbox-color`"
+                                                               :validateOnInput="true"
+                                                               :value="lang === 'arabic' ? option.name_arabic : option.name">
+                                                            <label class="mr-3">
+                                                                <input type="checkbox" :name="`surveys[${idx}].answer`"
+                                                                       v-bind="boxField"
+                                                                       :value="lang === 'arabic' ? option.name_arabic : option.name"/>
+                                                                {{
+                                                                    lang === 'arabic' ? option.name_arabic : option.name
+                                                                }}
+                                                            </label>
+                                                        </Field>
+                                                    </template>
+
+                                                    <template v-if="field.value.type === '9'">
+                                                        <br>
+                                                        <Field type="radio"
+                                                               v-for="option in field.value.options"
+                                                               :key="`${field.value.id}-${option.id}`"
+                                                               :name="`surveys[${idx}].answer`"
+                                                               v-slot="{field: boxField}"
+                                                               :class="`checkbox custom-radio-color`"
+                                                               :validateOnInput="true"
+                                                               :value="lang === 'arabic' ? option.name_arabic : option.name">
+                                                            <label class="mr-3">
+                                                                <input type="radio" :name="`surveys[${idx}].answer`"
+                                                                       v-bind="boxField"
+                                                                       :value="lang === 'arabic' ? option.name_arabic : option.name"/>
+                                                                {{
+                                                                    lang === 'arabic' ? option.name_arabic : option.name
+                                                                }}
+                                                            </label>
+                                                        </Field>
+                                                    </template>
+
+                                                    <h5 v-if="field.value.type === '10'" class="mt-5 mb-2">{{
+                                                            lang === 'arabic' ? field.value.title_arabic : field.value.title
+                                                        }}</h5>
+
+                                                    <Field as="select"
+                                                           v-else-if="field.value.type === '11'"
+                                                           :name="`surveys[${idx}].answer`"
+                                                           :id="`surveys-${idx}`"
+                                                           :class="`form-control mb-0`" :validateOnInput="true">
+                                                        <option v-for="country in countries"
+                                                                :key="`${field.value.id}-${country.country}`"
+                                                                :value="country.country">
+                                                            {{ country.country }}
+                                                        </option>
+                                                    </Field>
 
 
-                                                <ErrorMessage :name="`surveys[${idx}].answer`" class="text-danger"/>
-                                            </div>
-                                        </b-col>
-                                    </template>
-                                </FieldArray>
+                                                    <ErrorMessage :name="`surveys[${idx}].answer`" class="text-danger"/>
+                                                </div>
+                                            </b-col>
+                                        </template>
+                                    </FieldArray>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-12 pb-5 text-center">
-                            <b-btn type="submit" size="lg" class="px-5 py-2"
-                                   :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
-                                {{ accessLevel?.page_design?.form_btn_value || 'Submit' }}
-                            </b-btn>
-                        </div>
-                    </form>
+
+                            <div class="col-12 pb-5 text-center">
+                                <b-btn type="submit" size="lg" class="px-5 py-2" :disabled="isSubmitting" v-if="!isSubmitting"
+                                       :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
+                                    {{
+                                        lang === 'english' ? accessLevel?.page_design?.form_btn_value : accessLevel?.page_design?.form_btn_value_ar
+                                    }} 
+                                </b-btn>
+                            </div>
+                        </form>
                     </template>
                 </div>
             </div>

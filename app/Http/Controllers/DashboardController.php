@@ -64,25 +64,29 @@ class DashboardController extends Controller
                 'name' => 'Accepted',
                 'iI8' => 'sidebar.accepted',
                 'icon' => 'ri-calendar-2-line',
-                'count' => $this->attendeeService->count(approved: true, allowedEventIds: $eventsAccessID)
+                'count' => $this->attendeeService->count(approved: true, allowedEventIds: $eventsAccessID),
+                'disabled_for' => ['Operations']
             ],
             [
                 'name' => 'Declined',
                 'iI8' => 'sidebar.declined',
                 'icon' => 'ri-calendar-2-line',
-                'count' => $this->attendeeService->count(declined: true, allowedEventIds: $eventsAccessID)
+                'count' => $this->attendeeService->count(declined: true, allowedEventIds: $eventsAccessID),
+                'disabled_for' => ['Operations']
             ],
             [
                 'name' => 'Downloads',
                 'iI8' => 'sidebar.downloads',
                 'icon' => 'ri-calendar-2-line',
-                'count' => $this->attendeeService->countDownloads(allowedEventIds: $eventsAccessID)
+                'count' => $this->attendeeService->countDownloads(allowedEventIds: $eventsAccessID),
+                'disabled_for' => ['Operations']
             ],
             [
                 'name' => 'Badges',
                 'iI8' => 'sidebar.badges',
                 'icon' => 'ri-calendar-2-line',
-                'count' => $this->badgeService->count(allowedEventIds: $eventsAccessID)
+                'count' => $this->badgeService->count(allowedEventIds: $eventsAccessID),
+                'disabled_for' => ['Operations']
             ]
         ];
 

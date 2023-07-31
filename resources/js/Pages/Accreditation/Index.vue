@@ -106,7 +106,7 @@ label {
                                  :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                         </div>
 
-                        <p class="pt-3 px-4" :class="{rtl: lang === 'arabic'}"
+                        <p class="pt-3 px-4" :style="{textAlign: lang != 'english' ? 'right' : '', direction:  lang != 'english' ? 'rtl' : ''}"  :class="{rtl: lang === 'arabic'}"
                            v-html="lang === 'english' ? accessLevel?.general_settings?.description : accessLevel?.general_settings?.description_arabic"/>
 
                         <div v-if="accessLevel.registration">
@@ -121,7 +121,7 @@ label {
                                             <Field type="text"
                                                    name="registration_number"
                                                    id="reg_no"
-                                                   placeholder="Enter your registration number"
+                                                   :placeholder="$t('input.enter_reg_no')"
                                                    class="form-control mb-0" :validateOnInput="true"/>
                                             <ErrorMessage name="registration_number" class="text-danger"/>
                                         </div>
@@ -133,7 +133,7 @@ label {
                                             <Field type="email"
                                                    name="email"
                                                    id="email"
-                                                   placeholder="Enter your email adderss"
+                                                   :placeholder="$t('input.enter_email')"
                                                    class="form-control mb-0" :validateOnInput="true"/>
                                             <ErrorMessage name="email" class="text-danger"/>
                                         </div>
@@ -165,7 +165,7 @@ label {
                         <div class="py-4 text-center" v-else>
                             <b-btn @click="goToForm" size="lg" class="px-5 py-2"
                                    :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
-                                {{ accessLevel?.page_design?.register_btn_value || 'Register' }}
+                                {{ lang === 'english' ? accessLevel?.page_design?.register_btn_value : accessLevel?.page_design?.register_btn_value_ar  }}
                             </b-btn>
                         </div>
                     </template>

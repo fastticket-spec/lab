@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AttendeeMessageRequest;
 use App\Http\Requests\AttendeeUploadRequest;
+use App\Models\Country;
 use App\Services\AccessLevelsService;
+use App\Services\AreaService;
 use App\Services\AttendeeService;
 use App\Services\ZoneService;
 use Illuminate\Http\Request;
@@ -13,7 +15,7 @@ use Throwable;
 
 class AttendeesController extends Controller
 {
-    public function __construct(public AttendeeService $attendeeService, private ZoneService $zoneService, private AccessLevelsService $accessLevelsService)
+    public function __construct(public AttendeeService $attendeeService, private ZoneService $zoneService, private AccessLevelsService $accessLevelsService, private AreaService $areaService)
     {
     }
 
@@ -22,6 +24,7 @@ class AttendeesController extends Controller
         return Inertia::render('Attendees/Index', [
             'attendees' => $this->attendeeService->fetchAttendees($request),
             'zones' => $this->zoneService->allZones(),
+            'areas' => $this->areaService->allAreas(),
             'sort' => $request->sort,
             'filter_by' => $request->filter,
             'q' => $request->q,
@@ -34,6 +37,7 @@ class AttendeesController extends Controller
         return Inertia::render('Events/Event/Attendees/Index', [
             'eventId' => $eventId,
             'zones' => $this->zoneService->allZones($eventId),
+            'areas' => $this->areaService->allAreas(),
             'attendees' => $this->attendeeService->fetchAttendees($request, $eventId),
             'sort' => $request->sort,
             'filter_by' => $request->filter,
@@ -76,6 +80,20 @@ class AttendeesController extends Controller
         return $this->attendeeService->assignZones($request->zones, $attendeeId, $eventId);
     }
 
+    public function assignAreas(Request $request, string $attendeeId)
+    {
+        $request->validate(['areas' => 'required|array', 'areas.*' => 'required|string']);
+
+        return $this->attendeeService->assignAreas($request->areas, $attendeeId);
+    }
+
+    public function assignEventAreas(Request $request, string $eventId, string $attendeeId)
+    {
+        $request->validate(['areas' => 'required|array', 'areas.*' => 'required|string']);
+
+        return $this->attendeeService->assignAreas($request->areas, $attendeeId, $eventId);
+    }
+
     public function bulkApproval(Request $request, int $status)
     {
         $request->validate(['attendee_ids' => 'array|required']);
@@ -102,6 +120,20 @@ class AttendeesController extends Controller
         $request->validate(['attendee_ids' => 'array|required', 'zones' => 'required|array', 'zones.*' => 'required|string']);
 
         return $this->attendeeService->bulkAssignZones($request->attendee_ids, $request->zones, $eventId);
+    }
+
+    public function bulkAssignAreas(Request $request)
+    {
+        $request->validate(['attendee_ids' => 'array|required', 'areas' => 'required|array', 'areas.*' => 'required|string']);
+
+        return $this->attendeeService->bulkAssignAreas($request->attendee_ids, $request->areas);
+    }
+
+    public function bulkAssignEventAreas(Request $request, string $eventId)
+    {
+        $request->validate(['attendee_ids' => 'array|required', 'areas' => 'required|array', 'areas.*' => 'required|string']);
+
+        return $this->attendeeService->bulkAssignAreas($request->attendee_ids, $request->areas, $eventId);
     }
 
     public function sendInvitation(string $attendeeId)
@@ -208,5 +240,31 @@ class AttendeesController extends Controller
     public function incrementBadgeDownload(string $attendeeId)
     {
         return $this->attendeeService->incrementDownloads($attendeeId);
+    }
+
+    public function registerApplicant(string $eventId): \Inertia\Response
+    {
+        $surveys = [];
+        if ($accessId = request()->accessId) {
+            $accessLevel = $this->accessLevelsService->find($accessId);
+            $surveys = $accessLevel->surveyAccessLevels->eventSurvey->surveys;
+        }
+
+        $countries = Country::all();
+
+        return Inertia::render('Attendees/RegisterApplicants', [
+            'accessLevels' => $this->accessLevelsService->allAccessLevels($eventId),
+            'eventId' => $eventId,
+            'accessId' => $accessId,
+            'countries' => $countries,
+            'surveys' => $surveys
+        ]);
+    }
+
+    public function changeAccessLevel(Request $request, string $eventId, string $attendeeId)
+    {
+        $request->validate(['access_level_id' => 'required|exists:access_levels,id']);
+
+        return $this->attendeeService->changeAccessLevel($eventId, $attendeeId, $request->access_level_id);
     }
 }

@@ -63,6 +63,13 @@ class AccessLevelsController extends Controller
         return $this->accessLevelsService->updateAccessLevel($request, $eventId, $accessLevelId);
     }
 
+
+
+    public function updatePublicStatus(Request $request, string $eventId, string $accessLevelId)
+    {
+        return $this->accessLevelsService->updateAccessLevelPublicStatus($request, $eventId, $accessLevelId);
+    }
+
     public function updateStatus(Request $request, string $eventId, string $accessLevelId)
     {
         return $this->accessLevelsService->updateAccessLevelStatus($request, $eventId, $accessLevelId);
@@ -147,5 +154,10 @@ class AccessLevelsController extends Controller
     public function getSurveys(string $eventId, string $accessLevelId)
     {
         return $this->accessLevelsService->getSurveys($accessLevelId);
+    }
+
+    public function getInvites(string $eventId, string $accessLevelId)
+    {
+        return $this->accessLevelsService->getInvites($accessLevelId);
     }
 }

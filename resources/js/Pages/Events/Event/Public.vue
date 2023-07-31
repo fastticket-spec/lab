@@ -17,7 +17,7 @@ defineProps({
 
 <template>
         <b-container fluid class="mx-auto vag" style="width: 50%;" :style="{
-                    backgroundColor: '#8b8ab1',
+                    backgroundImage: 'url(https://eticket.fra1.cdn.digitaloceanspaces.com/spl/BackG.jpg)',
                     backgroundSize: 'cover',
                     backgroundPositionX: '50%',
                     backgroundPositionY: '50%',
@@ -29,14 +29,14 @@ defineProps({
             <div class="col-12 align-self-center">
                 <div class="bg-div" :style="{backgroundColor: 'transparent'}">
                     <div class="text-center">
-                            <img class="my-3 text-center img-fluid logo" src="https://spl.com.sa/themes/custom/spl/assets/images/logo-new.png" alt="">
+                            <img class="my-3 text-center img-fluid logo" src="https://eticket.fra1.cdn.digitaloceanspaces.com/spl/Logo.png" alt="">
                         </div>
                         <b-row class="page-cards">
                             <b-col sm="4" v-for="access_level in data.data" :key="access_level.id">
-                                <b-card :title="access_level.title" class="iq-mb-3 text-center">
+                                <b-card :title="access_level.title" class="iq-mb-3 text-center" style=" height: 154px;">
                                     <div v-if="access_level.has_surveys && access_level.status == 1" class="card-date d-flex flex-column text-center"
                                         :class="{'card-date-ar': locale === 'ar'}">
-                                        <a :href="`/e/${access_level.event.id}/a/${access_level.id}`" target="_blank">Register</a>
+                                        <a :href="`/e/${access_level.event.id}/a/${access_level.id}`" class="btn btn-primary" target="_blank" >Register</a>
                                     </div>
 
                                 </b-card>

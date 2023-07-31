@@ -84,8 +84,10 @@ Route::group(['middleware' => 'auth'], function () {
                     Route::group(['prefix' => '{access_level_id}'], function () {
                         Route::get('/edit', [AccessLevelsController::class, 'edit']);
                         Route::get('/surveys', [AccessLevelsController::class, 'getSurveys']);
+                        Route::get('/invites', [AccessLevelsController::class, 'getInvites']);
                         Route::patch('/update', [AccessLevelsController::class, 'update']);
                         Route::post('/change-status', [AccessLevelsController::class, 'updateStatus']);
+                        Route::post('/change-public-status', [AccessLevelsController::class, 'updatePublicStatus']);
                         Route::get('/customize', [AccessLevelsController::class, 'customize']);
                         Route::post('/customize/general', [AccessLevelsController::class, 'customizeGeneral']);
                         Route::post('/customize/page-design', [AccessLevelsController::class, 'customizePageDesign']);
@@ -117,13 +119,17 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('/mark-as-printed', [AttendeesController::class, 'markAsPrintedEvent']);
                 Route::post('/mark-as-collected', [AttendeesController::class, 'markAsCollectedEvent']);
                 Route::post('/upload-attendees', [AttendeesController::class, 'uploadAttendees']);
+                Route::get('/register-applicant', [AttendeesController::class, 'registerApplicant']);
                 Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveEventAttendee']);
                 Route::post('/{attendee_id}/send-message', [AttendeesController::class, 'sendEventAttendeeMessage']);
                 Route::post('/bulk-assign-zones', [AttendeesController::class, 'bulkAssignEventZones']);
+                Route::post('/bulk-assign-areas', [AttendeesController::class, 'bulkAssignEventAreas']);
                 Route::post('/send-bulk-invitation', [AttendeesController::class, 'sendBulkEventInvitation']);
                 Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignEventZones']);
+                Route::post('/{attendee_id}/assign-areas', [AttendeesController::class, 'assignEventAreas']);
                 Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendEventInvitation']);
                 Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateEventAttendeeAnswers']);
+                Route::post('/{attendee_id}/change-access-level', [AttendeesController::class, 'changeAccessLevel']);
                 Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadEventBadge']);
             });
 
@@ -168,8 +174,10 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/{attendee_id}/approval/{status}', [AttendeesController::class, 'approveAttendee']);
             Route::post('/{attendee_id}/send-message', [AttendeesController::class, 'sendAttendeeMessage']);
             Route::post('/bulk-assign-zones', [AttendeesController::class, 'bulkAssignZones']);
+            Route::post('/bulk-assign-areas', [AttendeesController::class, 'bulkAssignAreas']);
             Route::post('/send-bulk-invitation', [AttendeesController::class, 'sendBulkInvitation']);
             Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignZones']);
+            Route::post('/{attendee_id}/assign-areas', [AttendeesController::class, 'assignAreas']);
             Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendInvitation']);
             Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateAttendeeAnswers']);
             Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadBadge']);

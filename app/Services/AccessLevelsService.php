@@ -49,6 +49,7 @@ class AccessLevelsService extends BaseRepository
                     'quantity_filled' => $accessLevel->attendees->count(),
                     'event' => $accessLevel->event,
                     'status' => $accessLevel->status,
+                    'public_status' => $accessLevel->public_status,
                     'registration' => $accessLevel->registration,
                     'attendees' => $accessLevel->attendees,
                     'has_surveys' => !!optional($accessLevel->surveyAccessLevels)->surveys
@@ -64,6 +65,8 @@ class AccessLevelsService extends BaseRepository
         return $this->model->query()
             ->with(['event', 'surveyAccessLevels.surveys', 'attendees'])
             ->whereIn('event_id', $getEvents)
+            ->whereStatus(1)
+            ->wherePublicStatus(1)
             ->latest()
             ->paginate($request->per_page ?: 10)
             ->withQueryString()
@@ -154,6 +157,26 @@ class AccessLevelsService extends BaseRepository
             return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: "/event/$eventId/access-levels/$accessLevelId/edit", returnType: 'redirect');
         }
     }
+
+    public function updateAccessLevelPublicStatus(Request $request, string $eventId, string $accessLevelId)
+    {
+        try {
+            $accessLevel = $this->find($accessLevelId);
+            $accessLevel->update(['public_status' => $accessLevel->public_status ? 0 : 1]);
+
+            $message = 'Access level status updated successfully.';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, component: "/event/$eventId/access-levels", returnType: 'redirect');
+        } catch (\Throwable $th) {
+            \Log::error($th);
+            $message = 'Could not update access level status';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: "/event/$eventId/access-levels/$accessLevelId/edit", returnType: 'redirect');
+        }
+    }
+
+
+
 
     public function updateGeneralCustomization(AccessLevelGeneralRequest $request, string $eventId, string $accessLevelId)
     {
@@ -357,5 +380,19 @@ class AccessLevelsService extends BaseRepository
         $surveys = optional(optional($accessLevel->surveyAccessLevels)->eventSurvey)->surveys;
 
         return $this->view(['surveys' => $surveys]);
+    }
+
+    public function getInvites(string $accessLevelId)
+    {
+        $accessLevel = $this->find($accessLevelId);
+
+        $invites = $accessLevel->invites()->latest()->get()->map(function ($invite) {
+            return [
+                'email' => $invite->email,
+                'date_sent' => $invite->created_at->format('jS M, Y h:i a')
+            ];
+        });
+
+        return $this->view(['invites' => $invites]);
     }
 }

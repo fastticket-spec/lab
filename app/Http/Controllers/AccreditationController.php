@@ -60,7 +60,19 @@ class AccreditationController extends Controller
             }
         }
 
-        $reference = strlen($request->ref) == 36 ? optional(Invite::find($request->ref))->ref : $request->ref ;
+        $email = null;
+        $reference = '';
+
+        if (strlen($request->ref) == 36) {
+            $invite = Invite::find($request->ref);
+            if ($invite) {
+                $reference = $invite->ref;
+                $email = $invite->email;
+            } else {
+                $reference = $request->ref;
+            }
+        }
+
         $answers = null;
         if ($reference) {
             $answers = optional($this->attendeeService->findOneBy(['ref' => $reference]))->answers;
@@ -73,7 +85,8 @@ class AccreditationController extends Controller
             'lang' => $request->lang,
             'reference' => $reference,
             'answers' => $answers,
-            'countries' => $countries
+            'countries' => $countries,
+            'email' => $email
         ]);
     }
 
