@@ -131,15 +131,18 @@ const viewInvitations = async (accessLevelId) => {
                                 class="ri-edit-line"></i>
                                 Edit</a>
                             <a href="#"
+                               v-if="userRole !== 'Editors'"
                                @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/customize`)"><i
                                 class="ri-settings-2-line"></i>
                                 Customize</a>
                             <a href="#"
+                               v-if="userRole !== 'Editors'"
                                @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/change-status`, 'post')"
                                :class="access_level.status === 0 ? 'text-success' : 'text-danger'"><i
                                 :class="access_level.status === 0 ? 'ri-play-line' : 'ri-pause-line'"></i>
                                 {{ access_level.status === 0 ? 'Activate' : 'Deactivate' }}</a>
                             <a href="#"
+                               v-if="userRole !== 'Editors'"
                                @click.prevent.stop="visit(`/event/${event_id}/access-levels/${access_level.id}/change-public-status`, 'post')"
                                :class="access_level.public_status === 0 ? 'text-success' : 'text-danger'"><i
                                 :class="access_level.public_status === 0 ? 'ri-play-line' : 'ri-pause-line'"></i>
@@ -147,13 +150,13 @@ const viewInvitations = async (accessLevelId) => {
                         </template>
 
                         <a href="#"
-                           v-if="access_level.has_surveys && userRole !== 'Viewers'"
+                           v-if="access_level.has_surveys && userRole !== 'Viewers' && userRole !== 'Editors'"
                            @click.prevent.stop="invitationModal = true; selectedAccessLevel = access_level.id"><i
                             class="ri-settings-2-line"></i>
                             Send Invitation</a>
 
                         <a href="#"
-                           v-if="access_level.has_surveys && userRole !== 'Viewers'"
+                           v-if="access_level.has_surveys && userRole !== 'Viewers' && userRole !== 'Editors'"
                            @click.prevent.stop="viewInvitations(access_level.id)"><i
                             class="ri-eye-line"></i>
                             View Invites</a>

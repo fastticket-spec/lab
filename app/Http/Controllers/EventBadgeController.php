@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\BadgeColumn;
+use App\Models\BadgesArea;
+use App\Models\BadgesZone;
 use App\Models\EventBadge;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,18 +27,23 @@ class EventBadgeController extends Controller
         $doc->loadHTML($request->html);
         $columns = [];
         $ids = [];
+        $areaIds = [];
 
         foreach ($doc->getElementsByTagName('*') as $element) {
             if (!empty($element->getAttribute('key'))) {
                 $columns[] = $element->getAttribute('key');
                 if (!empty($element->getAttribute('id'))  && $element->getAttribute('key') == 'zone') {
                     $ids[] = $element->getAttribute('id');
+                    $areaIds[] = '';
+                } else if (!empty($element->getAttribute('id'))  && $element->getAttribute('key') == 'area') {
+                    $areaIds[] = $element->getAttribute('id');
+                    $ids[] = '';
                 } else {
                     $ids[] = '';
+                    $areaIds[] = '';
                 }
             }
         }
-
 
         if (!$check) {
             $create = new EventBadge();
@@ -87,8 +94,9 @@ class EventBadgeController extends Controller
                 }
                 File::put(public_path() . '/' . $extracted, $request->html);
 
-//                if (BadgeColumn::where('event_id', $event_id)->where('badge_id', $badge_id)->count() > 0) BadgeColumn::where('event_id', $event_id)->where('badge_id', $badge_id)->delete();
-//                if (BadgesZone::where('event_id', $event_id)->where('badge_id', $badge_id)->count() > 0) BadgesZone::where('event_id', $event_id)->where('badge_id', $badge_id)->delete();
+                if (BadgeColumn::where('event_id', $event_id)->where('badge_id', $badge_id)->count() > 0) BadgeColumn::where('event_id', $event_id)->where('badge_id', $badge_id)->delete();
+                if (BadgesZone::where('event_id', $event_id)->where('badge_id', $badge_id)->count() > 0) BadgesZone::where('event_id', $event_id)->where('badge_id', $badge_id)->delete();
+                if (BadgesArea::where('event_id', $event_id)->where('badge_id', $badge_id)->count() > 0) BadgesArea::where('event_id', $event_id)->where('badge_id', $badge_id)->delete();
 
                 foreach ($columns as $k => $col) {
                     if ($col == 'zone') {
@@ -96,6 +104,13 @@ class EventBadgeController extends Controller
                             'event_id' => $event_id,
                             'badge_id' => $badge_id,
                             'zone_id' => $ids[$k]
+                        ]);
+                    }
+                    if ($col == 'area') {
+                        BadgesArea::create([
+                            'event_id' => $event_id,
+                            'badge_id' => $badge_id,
+                            'area_id' => $areaIds[$k]
                         ]);
                     }
                     BadgeColumn::create([

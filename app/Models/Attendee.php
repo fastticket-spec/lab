@@ -57,4 +57,9 @@ class Attendee extends Model
     {
         return $this->hasMany(AttendeeZone::class);
     }
+
+    public function areas(): HasMany
+    {
+        return $this->hasMany(AttendeeArea::class);
+    }
 }
