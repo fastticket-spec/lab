@@ -330,7 +330,7 @@ label {
                             </div>
 
                             <div class="col-12 pb-5 text-center">
-                                <b-btn type="submit" size="lg" class="px-5 py-2" :disabled="isSubmitting"
+                                <b-btn type="submit" size="lg" class="px-5 py-2" :disabled="isSubmitting" v-if="!isSubmitting"
                                        :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
                                     {{
                                         lang === 'english' ? accessLevel?.page_design?.form_btn_value : accessLevel?.page_design?.form_btn_value_ar
