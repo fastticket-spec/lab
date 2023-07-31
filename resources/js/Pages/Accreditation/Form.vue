@@ -14,10 +14,13 @@ const props = defineProps({
     reference: String,
     answers: Array,
     countries: Array,
-    email: String
+    email: String,
+    isProccssing: Boolean
 })
 
 const formData = reactive({});
+
+const isProccssing = false
 
 onMounted(() => {
     document.querySelector('title').textContent = `${props.accessLevel.title} - ${props.accessLevel?.event?.organiser?.name}`
@@ -32,6 +35,7 @@ onMounted(() => {
 });
 
 const {handleSubmit, isSubmitting} = useForm({
+
     initialValues: (props.reference && props.answers)
         ? {
             surveys: props.surveys.filter(x => !x.private).map(x => {
@@ -66,6 +70,7 @@ const {handleSubmit, isSubmitting} = useForm({
             }))
         },
     validationSchema: accreditationFormSchema,
+
 });
 
 const onSubmit = handleSubmit(values => {
@@ -98,7 +103,8 @@ const onSubmit = handleSubmit(values => {
     const data = {
         answers,
         lang: props.lang,
-        reference: props.reference
+        reference: props.reference,
+       
     };
 
     router.post(`/form/${props.accessLevel.event_id}/${props.accessLevel.id}/submit`, data, {
@@ -320,15 +326,15 @@ label {
                                     </FieldArray>
                                 </div>
                             </div>
-                            <div class="col-12 pb-5 text-center">
-                                <b-btn type="submit" size="lg" class="px-5 py-2"
-                                       :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
-                                    {{
-                                        lang === 'english' ? accessLevel?.page_design?.form_btn_value : accessLevel?.page_design?.form_btn_value_ar
-                                    }}
-                                </b-btn>
-                            </div>
-                        </form>
+                        </div>
+                        <div class="col-12 pb-5 text-center">
+                            <b-btn type="submit" size="lg" class="px-5 py-2" :disabled="isSubmitting"
+                                   :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
+                                {{ lang === 'english' ? accessLevel?.page_design?.form_btn_value : accessLevel?.page_design?.form_btn_value_ar }}
+                            </b-btn>
+                        </div>
+                    </form>
+
                     </template>
                 </div>
             </div>
