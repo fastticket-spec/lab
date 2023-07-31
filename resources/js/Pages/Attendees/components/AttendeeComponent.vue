@@ -591,7 +591,7 @@ const moveToAccessLevel = () => {
                                         Array.isArray(data.item.answer) ? data.item.answer.join(', ') : data.item.answer
                                     }}
                                 </span>
-                                <a v-else-if="data.item.type === '4' || data.item.answer.includes('http')" :href="data.item.answer" target="_blank">View
+                                <a v-else="data.item.type === '4' || data.item.answer.includes('http')" :href="data.item.answer" target="_blank">View
                                     File</a>
                             </template>
                         </template>
