@@ -55,7 +55,7 @@ watch(badgeData, (val) => {
 
 const userRole = computed(() => usePage().props.user_role);
 
-const fields = [(userRole.value !== 'Viewers' && 'check'), 'access_level', 'category', 'ref', 'info', 'downloads', 'status', 'accept_status', 'date_submitted', (userRole.value !== 'Viewers' && 'action')]
+const fields = [(userRole.value !== 'Viewers' && 'check'), 'access_level', 'category', 'ref', 'info', 'downloads', 'status', 'regulation_video', 'date_submitted', (userRole.value !== 'Viewers' && 'action')]
 
 const answerFields = ['question', 'answers', '⠀'];
 
@@ -584,14 +584,14 @@ const moveToAccessLevel = () => {
                             </div>
 
                             <template v-else>
-                                <a v-else-if="data.item.answer.includes('http')" :href="data.item.answer" target="_blank">View
+                                <a v-if="data.item.answer.includes('http')" :href="data.item.answer" target="_blank">View
                                     File</a>
-                                <span v-if="data.item.type !== '4' || !data.item.answer.includes('http') ">
+                                <span v-if="data.item.type !== '4'">
                                     {{
                                         Array.isArray(data.item.answer) ? data.item.answer.join(', ') : data.item.answer
                                     }}
                                 </span>
-                                <a v-else-if="data.item.type === '4' || data.item.answer.includes('http')" :href="data.item.answer" target="_blank">View
+                                <a v-else-if="data.item.type === '4'" :href="data.item.answer" target="_blank">View
                                     File</a>
                             </template>
                         </template>
