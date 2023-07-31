@@ -585,7 +585,7 @@ const moveToAccessLevel = () => {
 
                             <template v-else>
                              
-                                <span v-if="data.item.type !== '4'">
+                                <span v-if="data.item.type !== '4' || !data.item.answer.includes('http')">
                                     {{
                                         Array.isArray(data.item.answer) ? data.item.answer.join(', ') : data.item.answer
                                     }}
