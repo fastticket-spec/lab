@@ -228,7 +228,7 @@ label {
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :validateOnInput="true"/>
 
-                                                    <Field type="file"
+                                                    <Field type="file" title=" "
                                                            v-else-if="field.value.type === '4'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
