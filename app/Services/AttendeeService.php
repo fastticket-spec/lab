@@ -763,14 +763,14 @@ class AttendeeService extends BaseRepository
 
             $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
 
-            Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
-                settings: $settings,
-                surveyLink: "$surveyLink?ref=$inviteId",
-                organiser: $organiser,
-                firstName: $first_name,
-                registration: $accessLevel->registration,
-                ref: $ref
-            ));
+            // Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
+            //     settings: $settings,
+            //     surveyLink: "$surveyLink?ref=$inviteId",
+            //     organiser: $organiser,
+            //     firstName: $first_name,
+            //     registration: $accessLevel->registration,
+            //     ref: $ref
+            // ));
         }
 
         $message = 'Attendees uploaded successfully!';
