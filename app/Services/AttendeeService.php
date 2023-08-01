@@ -518,7 +518,7 @@ class AttendeeService extends BaseRepository
 
         foreach ($badgeColumn as $k => $col) {
             foreach ($survey as $i => $question) {
-                if ($question['type'] == 4 && in_array(strtolower(str_replace(' ', '_', $question['question'])), ['personal_photo', 'personal_picture', 'bhhgggg']) && $answer = $question['answer']) {
+                if (in_array(strtolower(str_replace(' ', '_', $question['question'])), ['personal_photo', 'personal_picture', 'bhhgggg']) && $answer = $question['answer']) {
                     $attendee->user_photo = $answer;
                 }
                 if ($answer = $question['answer']) {
@@ -602,10 +602,10 @@ class AttendeeService extends BaseRepository
                 $tag->setAttribute('src', config('app.url') . '/storage/badge_qrs/' . $filename);
                 $tag->setAttribute('data-src', $old_src);
             }
-
             if ($tag->getAttribute('class') === 'user_photo' && !is_null($attendee->user_photo)) {
                 $old_src = $tag->getAttribute('src');
                 $new_src_url = $attendee->user_photo;
+
                 $type = pathinfo($new_src_url, PATHINFO_EXTENSION);
                 $data = file_get_contents($new_src_url);
                 $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
