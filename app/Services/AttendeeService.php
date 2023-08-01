@@ -605,7 +605,7 @@ class AttendeeService extends BaseRepository
 
             if ($tag->getAttribute('class') === 'user_photo' && !is_null($attendee->user_photo)) {
                 $old_src = $tag->getAttribute('src');
-                $new_src_url = (strpos($attendee->user_photo, 'https') !== false || strpos($attendee->user_photo, 'question_files') !== false) ? $attendee->user_photo : env('DO_URL') . config('attendize.event_images_path') . '/' . $attendee->user_photo;
+                $new_src_url = $attendee->user_photo;
                 $type = pathinfo($new_src_url, PATHINFO_EXTENSION);
                 $data = file_get_contents($new_src_url);
                 $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
