@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+    <style>
+        .circle {
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            background-color:red;
+            position: absolute;
+        }
+        .square {
+            width: 100px;
+            height: 100px;
+            background: red;
+        }
+        img {
+  max-width: 100%; /* This rule is very important, please do not ignore this! */
+}
+    </style>
+
+
+  </head>
+
+  <body>
+      <div id="hold" style="display: none; height: 200px; width: 140px;"></div>
+    <div id="badgeContainer" style="background-color: rgb(0, 151, 102); position: absolute; height: 7600px; width: 5320px;"><p id="last_name" class="last_name" key="last_name" style="">Last Name</p><p id="first_name" class="first_name" key="first_name" style="">First Name</p><p id="image" class="image" key="image" style="">PIC</p>
+
+    </div>
+
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+
+
+    <script>
+	var LoaderCss = function (param) {
+        var headID = document.getElementsByTagName('head')[0];
+        var link = document.createElement('link');
+        link.type = 'text/css';
+        link.rel = 'stylesheet';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.href = 'https://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+	var LoaderScript = function (param) {
+        var headID = document.getElementsByTagName('body')[0];
+        var link = document.createElement('script');
+        link.type = 'text/javascript';
+
+        //link.href = 'http://fonts.googleapis.com/css?family=Oswald&effect=neon';
+        headID.appendChild(link);
+
+        link.src = 'https://'+window.location.hostname+(location.port ? ':'+location.port: '')+'/'+param;
+
+
+    };
+
+
+
+    var url_string = window.location.href
+    url_string = url_string.replace('&amp;', '&')
+    var url = new URL(url_string);
+    var width = url.searchParams.get("width");
+    var height = url.searchParams.get("height");
+
+    document.getElementById("hold").style.height = height+'px';
+    document.getElementById("hold").style.width = width+'px';
+
+
+    width = width * 38
+    height = height * 38
+    document.getElementById("badgeContainer").style.height = height+'px';
+    document.getElementById("badgeContainer").style.width = width+'px';
+
+
+
+	LoaderCss("EasyticketJs-master/css/editor.css");
+	LoaderCss("EasyticketJs-master/css/product.css");
+	LoaderScript("EasyticketJs-master/js/bootstrap.min.js");
+    </script><script type="text/javascript" src="https://accred-v3.e-ticket.app/EasyticketJs-master/js/bootstrap.min.js"></script><script type="text/javascript" src="https://accred-v3.e-ticket.app/EasyticketJs-master/js/bootstrap.min.js"></script>
+
+  
+
+
+</body>
+</html>
