@@ -882,12 +882,56 @@
 <script>
     Easyticket.ComponentsGroup['Components'].push("html/registration_reference")
     Easyticket.ComponentsGroup['Components'].push("html/function")
+    Easyticket.ComponentsGroup['Components'].push("html/full_name")
 
     Easyticket.Components.extend("_base", "html/registration_reference", {
         nodes: ["p"],
         name:  "Registration Reference",
         image: "../../../../../../EasyticketJs-master/libs/builder/icons/heading.svg",
         html: "<p  class='registration_reference' key='registration_reference'>EWIFH34H</p>",
+        properties: [{
+            name: "Text align",
+            key: "text-align",
+            htmlAttr: "class",
+            inputtype: SelectInput,
+            validValues: ["", "text-left", "text-center", "text-right"],
+            inputtype: RadioButtonInput,
+            data: {
+                extraclass:"btn-group-sm btn-group-fullwidth",
+                options: [{
+                    value: "",
+                    icon:"la la-close",
+                    //text: "None",
+                    title: "None",
+                    checked:true,
+                }, {
+                    value: "left",
+                    //text: "Left",
+                    title: "text-left",
+                    icon:"la la-align-left",
+                    checked:false,
+                }, {
+                    value: "text-center",
+                    //text: "Center",
+                    title: "Center",
+                    icon:"la la-align-center",
+                    checked:false,
+                }, {
+                    value: "text-right",
+                    //text: "Right",
+                    title: "Right",
+                    icon:"la la-align-right",
+                    checked:false,
+                }],
+            },
+        }]
+    });
+
+    Easyticket.Components.extend("_base", "html/full_name", {
+        nodes: ["p"],
+        name:  "Fullname",
+        image: "../../../../../../EasyticketJs-master/libs/builder/icons/heading.svg",
+        html: "<p  class='function' key='function'>Function</p>",
         properties: [{
             name: "Text align",
             key: "text-align",

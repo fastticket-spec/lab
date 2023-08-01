@@ -106,7 +106,7 @@ const onSubmit = handleSubmit(values => {
         answers,
         lang: props.lang,
         reference: props.reference,
-       
+
     };
 
     router.post(`/form/${props.accessLevel.event_id}/${props.accessLevel.id}/submit`, data, {
@@ -222,7 +222,7 @@ label {
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :validateOnInput="true"/>
 
-                                                    <Field type="datetime-local"
+                                                    <Field type="date"
                                                            v-else-if="field.value.type === '3'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
@@ -334,7 +334,7 @@ label {
                                        :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
                                     {{
                                         lang === 'english' ? accessLevel?.page_design?.form_btn_value : accessLevel?.page_design?.form_btn_value_ar
-                                    }} 
+                                    }}
                                 </b-btn>
                             </div>
                         </form>
