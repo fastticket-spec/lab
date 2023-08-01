@@ -13,7 +13,8 @@ class CountrySeeder extends Seeder
         DB::table('countries')->truncate();
 
         DB::insert("insert into countries (id, country, iso2, iso3, currency, currency_symbol, created_at, updated_at)
-values  (1, 'Afghanistan', null, null, null, null, null, null),
+values  (191, 'Afghanistan', null, null, null, null, null, null),
+        (1, 'Saudi Arabia', null, null, null, null, null, null),
         (2, 'Albania', null, null, null, null, null, null),
         (3, 'Algeria', null, null, null, null, null, null),
         (4, 'American Samoa', null, null, null, null, null, null),
@@ -202,7 +203,6 @@ values  (1, 'Afghanistan', null, null, null, null, null, null),
         (188, 'Samoa', null, null, null, null, null, null),
         (189, 'San Marino', null, null, null, null, null, null),
         (190, 'Sao Tome and Principe', null, null, null, null, null, null),
-        (191, 'Saudi Arabia', null, null, null, null, null, null),
         (192, 'Senegal', null, null, null, null, null, null),
         (193, 'Serbia', null, null, null, null, null, null),
         (194, 'Seychelles', null, null, null, null, null, null),

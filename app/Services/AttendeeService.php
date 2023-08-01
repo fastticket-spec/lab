@@ -45,7 +45,7 @@ class AttendeeService extends BaseRepository
 
         $eventsAccessID = null;
         if ($roleId) {
-            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn($access) => $access->event_id);
+            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn ($access) => $access->event_id);
         }
 
         return $this->model->query()
@@ -108,8 +108,8 @@ class AttendeeService extends BaseRepository
                     'status' => Attendee::STATUS_READABLE[$attendee->status],
                     'accept_status' => Attendee::ACCEPT_STATUS_READABLE[$attendee->accept_status],
                     'date_submitted' => $attendee->created_at->format('jS M, Y H:i'),
-                    'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id),
-                    'areas' => $attendee->areas->map(fn($area) => $area->area_id),
+                    'zones' => $attendee->zones->map(fn ($zone) => $zone->zone_id),
+                    'areas' => $attendee->areas->map(fn ($area) => $area->area_id),
                     'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge,
                     'printed' => !!$attendee->printed,
                     'collected' => !!$attendee->collected,
@@ -187,7 +187,8 @@ class AttendeeService extends BaseRepository
 
             return $this->view(
                 data: ['message' => $message],
-                component: $route, returnType: 'redirect'
+                component: $route,
+                returnType: 'redirect'
             );
         } catch (\Throwable $th) {
             \Log::error($th);
@@ -197,8 +198,10 @@ class AttendeeService extends BaseRepository
 
             return $this->view(
                 data: ['message' => $message],
-                flashMessage: $message, messageType: 'danger',
-                component: $route, returnType: 'redirect'
+                flashMessage: $message,
+                messageType: 'danger',
+                component: $route,
+                returnType: 'redirect'
             );
         }
     }
@@ -221,7 +224,8 @@ class AttendeeService extends BaseRepository
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
-            component: $route, returnType: 'redirect'
+            component: $route,
+            returnType: 'redirect'
         );
     }
 
@@ -245,7 +249,8 @@ class AttendeeService extends BaseRepository
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
-            component: $route, returnType: 'redirect'
+            component: $route,
+            returnType: 'redirect'
         );
     }
 
@@ -272,7 +277,8 @@ class AttendeeService extends BaseRepository
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
-            component: $route, returnType: 'redirect'
+            component: $route,
+            returnType: 'redirect'
         );
     }
 
@@ -282,7 +288,7 @@ class AttendeeService extends BaseRepository
 
         $attendee->zones()->delete();
 
-        $zones = collect($zones)->map(fn($zone) => [
+        $zones = collect($zones)->map(fn ($zone) => [
             'id' => Str::uuid(),
             'attendee_id' => $attendeeId,
             'zone_id' => $zone,
@@ -297,7 +303,8 @@ class AttendeeService extends BaseRepository
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
-            component: $route, returnType: 'redirect'
+            component: $route,
+            returnType: 'redirect'
         );
     }
 
@@ -307,7 +314,7 @@ class AttendeeService extends BaseRepository
 
         $attendee->areas()->delete();
 
-        $areas = collect($areas)->map(fn($area) => [
+        $areas = collect($areas)->map(fn ($area) => [
             'id' => Str::uuid(),
             'attendee_id' => $attendeeId,
             'area_id' => $area,
@@ -322,7 +329,8 @@ class AttendeeService extends BaseRepository
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
-            component: $route, returnType: 'redirect'
+            component: $route,
+            returnType: 'redirect'
         );
     }
 
@@ -349,7 +357,8 @@ class AttendeeService extends BaseRepository
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
-            component: $route, returnType: 'redirect'
+            component: $route,
+            returnType: 'redirect'
         );
     }
 
@@ -376,7 +385,8 @@ class AttendeeService extends BaseRepository
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
-            component: $route, returnType: 'redirect'
+            component: $route,
+            returnType: 'redirect'
         );
     }
 
@@ -395,7 +405,8 @@ class AttendeeService extends BaseRepository
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
-            component: $route, returnType: 'redirect'
+            component: $route,
+            returnType: 'redirect'
         );
     }
 
@@ -419,14 +430,15 @@ class AttendeeService extends BaseRepository
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
-            component: $route, returnType: 'redirect'
+            component: $route,
+            returnType: 'redirect'
         );
     }
 
     private function sendInvitationMail($attendee, $settings, $surveyLink): void
     {
-//        Mail::to($attendee->email)
-//            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink));
+        //        Mail::to($attendee->email)
+        //            ->later(now()->addSeconds(5), new InvitationMail($settings, $surveyLink));
     }
 
     public function updateAnswer(Request $request, string $attendeeId, ?string $eventId = null)
@@ -477,8 +489,10 @@ class AttendeeService extends BaseRepository
             $message = 'An error occurred while updating answer!.';
             return $this->view(
                 data: ['message' => $message],
-                flashMessage: $message, messageType: 'danger',
-                component: $route, returnType: 'redirect'
+                flashMessage: $message,
+                messageType: 'danger',
+                component: $route,
+                returnType: 'redirect'
             );
         }
     }
@@ -492,14 +506,14 @@ class AttendeeService extends BaseRepository
         $badgeColumn = $badge->badgeColumns;
 
 
-//        $badgeColumn = BadgeColumn::where('badge_id', $badgeId)->get();
-//        $badge = Badges::where('id', $badgeId)->first();
-//        $getBadge = Event_badge::where('badge_id', $badgeId)->first();
-//        $badgeDatas = BadgeData::where('event_id', $eventId)->where('badge_id', $badgeId)->where('attendee_id', $attendeeId)->get()->toArray() ?? [];
-//        $surveyAnswer = $attendee->answers;
+        //        $badgeColumn = BadgeColumn::where('badge_id', $badgeId)->get();
+        //        $badge = Badges::where('id', $badgeId)->first();
+        //        $getBadge = Event_badge::where('badge_id', $badgeId)->first();
+        //        $badgeDatas = BadgeData::where('event_id', $eventId)->where('badge_id', $badgeId)->where('attendee_id', $attendeeId)->get()->toArray() ?? [];
+        //        $surveyAnswer = $attendee->answers;
         $badgeDatas = [];
         $survey = $attendee->answers;
-//        dd($survey);
+        //        dd($survey);
 
 
         foreach ($badgeColumn as $k => $col) {
@@ -507,62 +521,64 @@ class AttendeeService extends BaseRepository
                 if ($answer = $question['answer']) {
                     $badgeDatas[] = (object)['column_title' => strtolower(str_replace(' ', '_', $question['question'])), 'column_value' => $answer];
                 }
-//                if ($question->question_type_id != 8) {
-//                    $answer = QuestionAnswer::where('question_id', $question->id)->where('attendee_id', $attendee->id)->first();
-//                    if ($answer) {
-//                        // $badgeDatas[$k] = (object) [
-//                        //     'column_value' => $answer->answer_text,
-//                        //     'column_title' => strtolower(str_replace(' ', '_', $question->title))
-//                        // ];
-//
-//                        array_push($badgeDatas, (object)['column_title' => strtolower(str_replace(' ', '_', $question->title)), 'column_value' => $answer->answer_text]);
-//                    }
-//                }
+                //                if ($question->question_type_id != 8) {
+                //                    $answer = QuestionAnswer::where('question_id', $question->id)->where('attendee_id', $attendee->id)->first();
+                //                    if ($answer) {
+                //                        // $badgeDatas[$k] = (object) [
+                //                        //     'column_value' => $answer->answer_text,
+                //                        //     'column_title' => strtolower(str_replace(' ', '_', $question->title))
+                //                        // ];
+                //
+                //                        array_push($badgeDatas, (object)['column_title' => strtolower(str_replace(' ', '_', $question->title)), 'column_value' => $answer->answer_text]);
+                //                    }
+                //                }
 
 
-//                if ($question->question_type_id == 8) {
-//                    $answer = QuestionAnswer::where('question_id', $question->id)->where('attendee_id', $attendee->id)->first();
-//                    if ($answer) {
-//                        if (is_image(public_path() . '/user_content/' . $answer->answer_text)) {
-//                            $attendee->user_photo = public_path() . '/user_content/' . $answer->answer_text;
-//                        }
-//                    }
-//                }
+                //                if ($question->question_type_id == 8) {
+                //                    $answer = QuestionAnswer::where('question_id', $question->id)->where('attendee_id', $attendee->id)->first();
+                //                    if ($answer) {
+                //                        if (is_image(public_path() . '/user_content/' . $answer->answer_text)) {
+                //                            $attendee->user_photo = public_path() . '/user_content/' . $answer->answer_text;
+                //                        }
+                //                    }
+                //                }
             }
         }
 
         $badgeDatas[] = (object)['column_title' => 'function', 'column_value' => $event->title];
-//        $badgeDatas[] = (object)['column_title' => 'registration_reference', 'column_value' => $attendee->order->order_reference];
+        //        $badgeDatas[] = (object)['column_title' => 'registration_reference', 'column_value' => $attendee->order->order_reference];
         $badgeDatas[] = (object)['column_title' => 'first_name', 'column_value' => $attendee->first_name];
         $badgeDatas[] = (object)['column_title' => 'last_name', 'column_value' => $attendee->last_name];
         $badgeDatas[] = (object)['column_title' => 'email', 'column_value' => $attendee->email];
+        $badgeDatas[] = (object)['column_title' => 'full_name', 'column_value' => $attendee->first_name . str_repeat('&nbsp;', 1) . $attendee->last_name];
 
-//        if (!$attendee) {
-//            abort(404);
-//        }
+
+        //        if (!$attendee) {
+        //            abort(404);
+        //        }
 
         $badge_html = $getBadge->html;
 
-//        $path = config('attendize.event_images_path');
+        //        $path = config('attendize.event_images_path');
         $filename = $attendee->ref . '.png';
         $file_full_path = storage_path() . '/app/public/badge_qrs/' . $filename;
-//        if ($event->organiser_id == 53) {
-//            $mobile = $attendee->answers->wherein('question_id', 898, 896, 894, 891)->first()->answer_text;
-//            $d = "BEGIN:VCARD
-//            VERSION:4.0
-//            FN:$attendee->first_name  $attendee->last_name
-//            EMAIL;TYPE=work:$attendee->email
-//            TEL:
-//            END:VCARD";
-//            $d = "BEGIN:VCARD
-//VERSION:2.1
-//N:$attendee->first_name $attendee->last_name
-//EMAIL:$attendee->email
-//TEL;HOME;VOICE:$mobile
-//END:VCARD";
-//
-//            Card::encoding('UTF-8')->format('png')->generate($d, $file_full_path);
-//        } else {
+        //        if ($event->organiser_id == 53) {
+        //            $mobile = $attendee->answers->wherein('question_id', 898, 896, 894, 891)->first()->answer_text;
+        //            $d = "BEGIN:VCARD
+        //            VERSION:4.0
+        //            FN:$attendee->first_name  $attendee->last_name
+        //            EMAIL;TYPE=work:$attendee->email
+        //            TEL:
+        //            END:VCARD";
+        //            $d = "BEGIN:VCARD
+        //VERSION:2.1
+        //N:$attendee->first_name $attendee->last_name
+        //EMAIL:$attendee->email
+        //TEL;HOME;VOICE:$mobile
+        //END:VCARD";
+        //
+        //            Card::encoding('UTF-8')->format('png')->generate($d, $file_full_path);
+        //        } else {
         $qrCode = new QrCode($attendee->ref);
         $qrCode->setSize(300);
         $qrCode->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0]);
@@ -572,7 +588,7 @@ class AttendeeService extends BaseRepository
         // dd($file_full_path);
         // Save it to a file
         $qrCode->writeFile($file_full_path);
-//        }
+        //        }
         libxml_use_internal_errors(true);
         $doc = new \DOMDocument();
         $doc->loadHTML($badge_html);
@@ -585,16 +601,15 @@ class AttendeeService extends BaseRepository
             }
 
             if ($tag->getAttribute('class') === 'user_photo' && !is_null($attendee->user_photo)) {
-//                Log::info($attendee->user_photo);
-//                $old_src = $tag->getAttribute('src');
-//                $new_src_url = (strpos($attendee->user_photo, 'https') !== false || strpos($attendee->user_photo, 'question_files') !== false) ? $attendee->user_photo : env('DO_URL') . config('attendize.event_images_path') . '/' . $attendee->user_photo;
-//                $type = pathinfo($new_src_url, PATHINFO_EXTENSION);
-//                $data = file_get_contents($new_src_url);
-//                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-//                // $urlparts = parse_url($new_src_url);
-//                // $extracted = $urlparts['path'];
-//                $tag->setAttribute('src', $base64);
-//                $tag->setAttribute('data-src', $old_src);
+                $old_src = $tag->getAttribute('src');
+                $new_src_url = (strpos($attendee->user_photo, 'https') !== false || strpos($attendee->user_photo, 'question_files') !== false) ? $attendee->user_photo : env('DO_URL') . config('attendize.event_images_path') . '/' . $attendee->user_photo;
+                $type = pathinfo($new_src_url, PATHINFO_EXTENSION);
+                $data = file_get_contents($new_src_url);
+                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                // $urlparts = parse_url($new_src_url);
+                // $extracted = $urlparts['path'];
+                $tag->setAttribute('src', $base64);
+                $tag->setAttribute('data-src', $old_src);
             }
         }
 
@@ -617,9 +632,9 @@ class AttendeeService extends BaseRepository
                         $attXone[] = optional(BadgesZone::where('zone_id', $att_zone->zone_id)->first())->id;
                     }
 
-//                    if (!in_array($element->getAttribute('id'), $attXone)) {
-//                        $element->setAttribute('style', 'display: none;');
-//                    }
+                    //                    if (!in_array($element->getAttribute('id'), $attXone)) {
+                    //                        $element->setAttribute('style', 'display: none;');
+                    //                    }
 
                     if (!in_array($nodeId, $attXone)) {
                         $element->nodeValue = optional(Zone::find($nodeId))->zone;
@@ -637,9 +652,9 @@ class AttendeeService extends BaseRepository
                         $element->nodeValue = optional(Area::find($nodeId))->area;
                     }
 
-//                    if (!in_array($element->getAttribute('id'), $attXone)) {
-//                        $element->nodeValue = $area;
-//                    }
+                    //                    if (!in_array($element->getAttribute('id'), $attXone)) {
+                    //                        $element->nodeValue = $area;
+                    //                    }
                 }
             }
         }
@@ -791,7 +806,6 @@ class AttendeeService extends BaseRepository
             }
             throw $th;
         }
-
     }
 
     public function togglePrinted(array $attendee_ids, bool $printed = true, ?string $eventId = null)
