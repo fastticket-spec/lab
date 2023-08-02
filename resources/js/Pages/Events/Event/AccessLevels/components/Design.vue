@@ -199,13 +199,25 @@ const onSubmit = () => {
                                         <b-collapse id="field-font" visible accordion="my-accordion" role="tabpanel">
                                             <b-card-body>
                                                 <b-form-group label="Field Color" label-for="btn-color">
-                                                    <b-form-input v-model="state.field_color" type="color" size="sm"
-                                                                  id="btn-color" placeholder=""></b-form-input>
+                                                    <color-picker
+                                                        class="form-control"
+                                                        v-model:pureColor="state.field_color"
+                                                        v-model:gradientColor="gradientColor"
+                                                        format="hex8"
+                                                        picker-type="chrome"
+                                                    />
+                                                   
                                                 </b-form-group>
 
                                                 <b-form-group label="Font Color" label-for="font-color">
-                                                    <b-form-input v-model="state.font_color" type="color" size="sm"
-                                                                  id="font-color" placeholder=""></b-form-input>
+                                                    <color-picker
+                                                        class="form-control"
+                                                        v-model:pureColor="state.font_color"
+                                                        v-model:gradientColor="gradientColor"
+                                                        format="hex8"
+                                                        picker-type="chrome"
+                                                    />
+                                                    
                                                 </b-form-group>
                                             </b-card-body>
                                         </b-collapse>
