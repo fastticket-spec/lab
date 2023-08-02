@@ -520,8 +520,7 @@ class AttendeeService extends BaseRepository
             foreach ($survey as $i => $question) {
                 if (in_array(strtolower(str_replace(' ', '_', $question['question'])), ['personal_photo', 'personal_picture', 'bhhgggg']) && $answer = $question['answer']) {
                     $attendee->user_photo = $answer;
-                }
-                if ($answer = $question['answer']) {
+                }elseif ($answer = $question['answer']) {
                     $badgeDatas[] = (object)['column_title' => strtolower(str_replace(' ', '_', $question['question'])), 'column_value' => $answer];
                 }
                 //                if ($question->question_type_id != 8) {
