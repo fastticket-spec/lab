@@ -124,19 +124,19 @@ export default {
 }
 </script>
 
-<style>
 
+<style>
 input.form-control, .form-control {
-    background: #324067;
-    background-color: #303d63 !important;
+    background: accessLevel?.page_design?.field_color;
+    backgroundColor: accessLevel?.page_design?.field_color !important;
     line-height: 27px !important;
-    color: #eaecef;
+    /* color: {{ accessLevel?.page_design?.font_color }}; */
 }
 
 form-control:disabled, .form-control[readonly] {
-    background-color: #324067;
+    /* background-color: {{ accessLevel?.page_design?.field_color }}; */
     opacity: 1;
-    color: #eaecef;
+    /* color: {{ accessLevel?.page_design?.font_color }}; */
 
 }
 
@@ -160,7 +160,7 @@ form-control:disabled, .form-control[readonly] {
 }
 
 label {
-    color: #000;
+    /* color: accessLevel?.page_design?.font_color ; */
 }
 
 @media screen and (max-width: 600px) {
@@ -182,7 +182,7 @@ label {
                     paddingBottom: '100px',
                     minHeight: '100vh',
                     textAlign: lang != 'english' ? 'right' : '',
-                    direction:  lang != 'english' ? 'rtl' : ''
+                    direction:  lang != 'english' ? 'rtl' : '',
                 }">
         <div class="row no-gutters accreditation-form" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
@@ -205,7 +205,7 @@ label {
                                         <template v-for="(field, idx) in fields" :key="field.key">
                                             <b-col :sm="field.value.type !== '10' ? '6' : '12'" class="pb-2">
                                                 <div class="form-group mb-0">
-                                                    <label :for="`surveys-${idx}`" v-if="field.value.type !== '10'">{{
+                                                    <label :for="`surveys-${idx}`" v-if="field.value.type !== '10'" :style="{ color: accessLevel?.page_design?.font_color}">{{
                                                             lang === 'arabic' ? field.value.title_arabic : field.value.title
                                                         }}:</label>
 
@@ -213,39 +213,39 @@ label {
                                                            v-if="field.value.type === '1'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
-                                                           :class="`form-control mb-0`" :validateOnInput="true"/>
+                                                           :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }" :validateOnInput="true"/>
 
                                                     <Field as="textarea"
                                                            v-if="field.value.type === '2'"
                                                            rows="5"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
-                                                           :class="`form-control mb-0`" :validateOnInput="true"/>
+                                                           :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
 
                                                     <Field type="date"
                                                            v-else-if="field.value.type === '3'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
-                                                           :class="`form-control mb-0`" :validateOnInput="true"/>
+                                                           :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
 
-                                                    <Field type="file"
+                                                    <Field type="file" title=" "
                                                            v-else-if="field.value.type === '4'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
-                                                           :class="`form-control mb-0`" :validateOnInput="true"/>
+                                                           :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
 
                                                     <Field type="email"
                                                            v-else-if="field.value.type === '5'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
                                                            :disabled="field.value.disabled"
-                                                           :class="`form-control mb-0`" :validateOnInput="true"/>
+                                                           :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
 
                                                     <Field as="select"
                                                            v-else-if="field.value.type === '6'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
-                                                           :class="`form-control mb-0`" :validateOnInput="true">
+                                                           :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true">
                                                         <option v-for="option in field.value.options"
                                                                 :key="`${field.value.id}-${option.name}`"
                                                                 :value="lang === 'arabic' ? option.name_arabic : option.name">
@@ -257,6 +257,7 @@ label {
                                                                 v-else-if="field.value.type === '7'"
                                                                 :class="{'text-right': lang === 'arabic'}"
                                                                 class="form-control mb-0"
+                                                                :style="{backgroundColor: accessLevel?.page_design?.field_color}"
                                                                 sm="6"
                                                                 :options="field.value.options"
                                                                 :label="lang === 'arabic' ? 'name_arabic' : 'name'"
@@ -271,6 +272,7 @@ label {
                                                                v-slot="{field: boxField}"
                                                                :class="`checkbox custom-checkbox-color`"
                                                                :validateOnInput="true"
+                                                               :style="{backgroundColor: accessLevel?.page_design?.field_color}"
                                                                :value="lang === 'arabic' ? option.name_arabic : option.name">
                                                             <label class="mr-3">
                                                                 <input type="checkbox" :name="`surveys[${idx}].answer`"

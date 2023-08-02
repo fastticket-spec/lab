@@ -518,7 +518,8 @@ class AttendeeService extends BaseRepository
 
         foreach ($badgeColumn as $k => $col) {
             foreach ($survey as $i => $question) {
-                if ($question['type'] == 4 && in_array(strtolower(str_replace(' ', '_', $question['question'])), ['personal_photo', 'personal_picture', 'bhhgggg']) && $answer = $question['answer']) {
+
+                if (in_array(strtolower(str_replace(' ', '_', $question['question'])), ['personal_photo', 'personal_picture', 'bhhgggg']) && $answer = $question['answer']) {
                     $attendee->user_photo = $answer;
                 }
                 if ($answer = $question['answer']) {
@@ -602,10 +603,10 @@ class AttendeeService extends BaseRepository
                 $tag->setAttribute('src', config('app.url') . '/storage/badge_qrs/' . $filename);
                 $tag->setAttribute('data-src', $old_src);
             }
-
             if ($tag->getAttribute('class') === 'user_photo' && !is_null($attendee->user_photo)) {
                 $old_src = $tag->getAttribute('src');
-                $new_src_url = (strpos($attendee->user_photo, 'https') !== false || strpos($attendee->user_photo, 'question_files') !== false) ? $attendee->user_photo : env('DO_URL') . config('attendize.event_images_path') . '/' . $attendee->user_photo;
+                $new_src_url = $attendee->user_photo;
+
                 $type = pathinfo($new_src_url, PATHINFO_EXTENSION);
                 $data = file_get_contents($new_src_url);
                 $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
@@ -763,14 +764,14 @@ class AttendeeService extends BaseRepository
 
             $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
 
-            Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
-                settings: $settings,
-                surveyLink: "$surveyLink?ref=$inviteId",
-                organiser: $organiser,
-                firstName: $first_name,
-                registration: $accessLevel->registration,
-                ref: $ref
-            ));
+            // Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
+            //     settings: $settings,
+            //     surveyLink: "$surveyLink?ref=$inviteId",
+            //     organiser: $organiser,
+            //     firstName: $first_name,
+            //     registration: $accessLevel->registration,
+            //     ref: $ref
+            // ));
         }
 
         $message = 'Attendees uploaded successfully!';

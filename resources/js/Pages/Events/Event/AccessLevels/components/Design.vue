@@ -82,6 +82,8 @@ const state = reactive({
         color: props.data?.bg_color || '#1682d4',
         bgImage: {}
     },
+    field_color: props.data?.field_color || '#000000',
+    font_color: props.data?.font_color || '#000000',
     backgroundImages: [
         {
             full: 'https://img.freepik.com/free-photo/moon-light-shine-through-window-into-islamic-mosque-interior_1217-2597.jpg?w=2000&t=st=1680706788~exp=1680707388~hmac=003db5592c0f6bd411f53337537d46d0d967930748990ce50c0e8f1407c4f068',
@@ -145,7 +147,9 @@ const onSubmit = () => {
         bg_type: state.background.type,
         bg_image: state.background.bgImage?.full,
         form_btn_value: state.formButton.english,
-        form_btn_value_ar: state.formButton.arabic
+        form_btn_value_ar: state.formButton.arabic,
+        font_color: state.font_color,
+        field_color: state.field_color
     }
 
     router.post(`/event/${props.event.id}/access-levels/${props.accessLevel.id}/customize/page-design`, data);
@@ -182,6 +186,38 @@ const onSubmit = () => {
                                                 <b-form-group label="Font Color" label-for="font-color">
                                                     <b-form-input v-model="state.btn.font_color" type="color" size="sm"
                                                                   id="font-color" placeholder=""></b-form-input>
+                                                </b-form-group>
+                                            </b-card-body>
+                                        </b-collapse>
+                                    </b-card>
+
+                                    <b-card no-body class="mb-3">
+                                        <b-card-header header-tag="header" class="p-1" role="tab"
+                                                       header-bg-variant="primary">
+                                            <div v-b-toggle.field-font class="py-1 px-2">Font/Field color</div>
+                                        </b-card-header>
+                                        <b-collapse id="field-font" visible accordion="my-accordion" role="tabpanel">
+                                            <b-card-body>
+                                                <b-form-group label="Field Color" label-for="btn-color">
+                                                    <color-picker
+                                                        class="form-control"
+                                                        v-model:pureColor="state.field_color"
+                                                        v-model:gradientColor="gradientColor"
+                                                        format="hex8"
+                                                        picker-type="chrome"
+                                                    />
+                                                   
+                                                </b-form-group>
+
+                                                <b-form-group label="Font Color" label-for="font-color">
+                                                    <color-picker
+                                                        class="form-control"
+                                                        v-model:pureColor="state.font_color"
+                                                        v-model:gradientColor="gradientColor"
+                                                        format="hex8"
+                                                        picker-type="chrome"
+                                                    />
+                                                    
                                                 </b-form-group>
                                             </b-card-body>
                                         </b-collapse>
