@@ -1,0 +1,25 @@
+name: Beta Deploy
+
+on:
+  push:
+    branches: [ beta ]
+  pull_request:
+    branches: [ beta ]
+
+jobs:
+  Beta-Deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to Beta
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.BETA_HOST }}
+        username: ${{ secrets.STAGING_USERNAME }}
+        key: ${{ secrets.STAGING_KEY }}
+        port: ${{ secrets.STAGING_PORT }}
+        script: |
+          cd /var/www/beta && ./beta_deploy.sh
+          cd /var/www/beta && npm install
+          cd /var/www/beta && npm run build
