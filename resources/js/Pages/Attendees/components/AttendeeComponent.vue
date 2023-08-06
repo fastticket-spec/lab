@@ -895,6 +895,10 @@ const moveToAccessLevel = () => {
                 <b-col sm="12" v-html="badgeData.html_data" :style="{height: `${badgeData.badge.height * 38}px`}" />
             </b-row>
 
+
+            <img id="hold1" src="">
+            <img id="hold2" src="">
+
             <template #modal-footer>
                 <div class="w-100" v-if="badgeData.status === 'approved'">
                     <b-button
@@ -956,8 +960,5 @@ const moveToAccessLevel = () => {
             </template>
         </b-modal>
 
-
-        <img id="hold1" src="">
-        <img id="hold2" src="">
     </b-container>
 </template>
