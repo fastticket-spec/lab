@@ -180,6 +180,7 @@ const downloadBadge = async (type = 'full') => {
                 y: rect.top,
                 width: source.clientWidth,
                 height: (source.clientHeight / 2),
+                scale: 35
             }).then(canvas => {
                 document.querySelector("#hold1").src = canvas.toDataURL('image/jpeg')
             });
@@ -191,6 +192,7 @@ const downloadBadge = async (type = 'full') => {
                 y: rect.top + 238,
                 width: source.clientWidth,
                 height: source.clientHeight / 2,
+                scale: 35
             }).then(canvas => {
                 document.querySelector("#hold2").src = canvas.toDataURL('image/jpeg')
             });
@@ -210,6 +212,8 @@ const downloadBadge = async (type = 'full') => {
 
                 pdf.save('MYPdf.pdf');
 
+                document.querySelector("#hold1").src = '';
+                document.querySelector("#hold2").src = '';
             }
         }
 
