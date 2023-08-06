@@ -1,6 +1,6 @@
 <script setup>
 import {router, usePage} from "@inertiajs/vue3";
-import {ref, onUpdated, reactive, computed, watch} from "vue";
+import {computed, onUpdated, reactive, ref, watch} from "vue";
 import SearchBox from '../../../Shared/components/core/SearchBox/Index.vue';
 import axios from "axios";
 import * as XLSX from "xlsx";
@@ -148,33 +148,79 @@ const viewBadge = async (attendeeId, badgeId, status) => {
     }
 }
 
-const downloadBadge = () => {
+const downloadBadge = async (type = 'full') => {
     try {
         let source = document.getElementById('badgeContainer')
         source.classList.remove("container");
 
-        html2canvas(source, {useCORS: true, allowTaint: true, scale: 5}).then(async canvas => {
-            const imgWidth = badgeData.value.badge.width;
-            const imgHeight = badgeData.value.badge.height
+        if (type === 'full') {
+            html2canvas(source, {useCORS: true, allowTaint: true, scale: 5}).then(canvas => {
+                const imgWidth = badgeData.value.badge.width;
+                const imgHeight = badgeData.value.badge.height;
+                const contentDataURL = canvas.toDataURL('image/jpeg')
 
-            const contentDataURL = canvas.toDataURL('image/jpeg')
 
-            document.body.appendChild(canvas);
-            const {jsPDF} = window.jspdf;
+                document.body.appendChild(canvas);
+                const {jsPDF} = window.jspdf;
 
-            let pdf = new jsPDF('p', 'cm', [imgWidth, imgHeight]); // A4 size page of PDF
-            pdf.addImage(contentDataURL, 'JPEG', 0, 0, imgWidth, imgHeight)
+                let pdf = new jsPDF('p', 'cm', [imgWidth, imgHeight]); // A4 size page of PDF
+                pdf.addImage(contentDataURL, 'JPEG', 0, 0, imgWidth, imgHeight)
 
-            pdf.save('MYPdf.pdf');
+                pdf.save('MYPdf.pdf');
+            });
+        } else if (type === 'split') {
+            const rect = source.getBoundingClientRect();
+            setTimeout(gpdf, 5000);
 
-            await axios.post(`/attendees/${selectedAttendee.value}/download-badge-increment`)
+            window.scrollTo(0,0)
+            html2canvas(source, {
+                useCORS: true,
+                allowTaint: false,
+                x: rect.left,
+                y: rect.top,
+                width: source.clientWidth,
+                height: (source.clientHeight / 2),
+            }).then(canvas => {
+                document.querySelector("#hold1").src = canvas.toDataURL('image/jpeg')
+            });
 
-            const attendeeIndex = props.attendees.data.findIndex(x => x.id === selectedAttendee.value);
+            html2canvas(source, {
+                useCORS: true,
+                allowTaint: false,
+                x: rect.left,
+                y: rect.top + 238,
+                width: source.clientWidth,
+                height: source.clientHeight / 2,
+            }).then(canvas => {
+                document.querySelector("#hold2").src = canvas.toDataURL('image/jpeg')
+            });
 
-            if (attendeeIndex >= 0) {
-                props.attendees.data[attendeeIndex].downloads = props.attendees.data[attendeeIndex].downloads + 1
+            function gpdf() {
+                const {jsPDF} = window.jspdf;
+                const imgWidth = source.clientWidth
+                const imgHeight = source.clientHeight;
+
+                let pdf = new jsPDF('L', 'px', [imgWidth, imgHeight / 2]); // A4 size page of PDF
+
+                let s = document.querySelector("#hold1").src
+
+                pdf.addImage(s, 'JPEG', 0, 0, imgWidth, imgHeight / 2)
+                pdf.addPage();
+                pdf.addImage(document.querySelector("#hold2").src, 'JPEG', 0, 0, imgWidth, imgHeight / 2)
+
+                pdf.save('MYPdf.pdf');
+
             }
-        });
+        }
+
+        await axios.post(`/attendees/${selectedAttendee.value}/download-badge-increment`)
+
+        const attendeeIndex = props.attendees.data.findIndex(x => x.id === selectedAttendee.value);
+
+        if (attendeeIndex >= 0) {
+            props.attendees.data[attendeeIndex].downloads = props.attendees.data[attendeeIndex].downloads + 1
+        }
+
     } catch (e) {
         console.log(e);
     }
@@ -871,9 +917,15 @@ const moveToAccessLevel = () => {
                     </b-button>
                     <b-button
                         variant="primary"
-                        @click="downloadBadge"
+                        @click="downloadBadge('split')"
                         :disabled="badgeData.downloaded === 1"
-                        class="btn btn-primary float-right ml-2">Download
+                        class="btn btn-primary float-right ml-2">Download (Split)
+                    </b-button>
+                    <b-button
+                        variant="primary"
+                        @click="downloadBadge()"
+                        :disabled="badgeData.downloaded === 1"
+                        class="btn btn-primary float-right ml-2">Download (Full)
                     </b-button>
                 </div>
             </template>
@@ -905,5 +957,7 @@ const moveToAccessLevel = () => {
         </b-modal>
 
 
+        <img id="hold1" src="">
+        <img id="hold2" src="">
     </b-container>
 </template>
