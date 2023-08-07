@@ -146,6 +146,8 @@ class AttendeeService extends BaseRepository
                 if ($answer['type'] == '4' && ($file = $answer['answer'])) {
                     $fileUrl = $this->uploadFile($file, $answer['question'], '-accreditation-file-');
                     $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => Storage::disk(config('filesystems.default'))->url($fileUrl)];
+                } elseif ($answer['type'] == '12') {
+                    $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' =>  $answer['country_code'] . '-' . $answer['answer'] ?? ''];
                 } else {
                     $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => $answer['answer'] ?? ''];
                 }
@@ -520,7 +522,7 @@ class AttendeeService extends BaseRepository
             foreach ($survey as $i => $question) {
                 if (in_array(strtolower(str_replace(' ', '_', $question['question'])), ['personal_photo', 'personal_picture', 'bhhgggg']) && $answer = $question['answer']) {
                     $attendee->user_photo = $answer;
-                }elseif ($answer = $question['answer']) {
+                } elseif ($answer = $question['answer']) {
                     $badgeDatas[] = (object)['column_title' => strtolower(str_replace(' ', '_', $question['question'])), 'column_value' => $answer];
                 }
                 //                if ($question->question_type_id != 8) {
