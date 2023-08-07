@@ -110,7 +110,6 @@ class CountryCodeSeeder extends Seeder
             ['code' => '98', 'country_en' => 'Iran (+98)', 'country_ar' => 'إيران (+98)'],
             ['code' => '964', 'country_en' => 'Iraq (+964)', 'country_ar' => 'العراق (+964)'],
             ['code' => '353', 'country_en' => 'Ireland (+353)', 'country_ar' => 'أيرلندا (+353)'],
-            ['code' => '972', 'country_en' => 'Israel (+972)', 'country_ar' => 'إسرائيل (+972)'],
             ['code' => '39', 'country_en' => 'Italy (+39)', 'country_ar' => 'إيطاليا (+39)'],
             ['code' => '1876', 'country_en' => 'Jamaica (+1876)', 'country_ar' => 'جامايكا (+1876)'],
             ['code' => '81', 'country_en' => 'Japan (+81)', 'country_ar' => 'اليابان (+81)'],
