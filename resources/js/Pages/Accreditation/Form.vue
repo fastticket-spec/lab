@@ -348,7 +348,7 @@ label {
                                                            :class="`form-control mb-0`" :validateOnInput="true">
                                                         <option v-for="country in countries"
                                                                 :key="`${field.value.id}-${country.country}`"
-                                                                :value="country.country">
+                                                                :value="lang === 'arabic' ?  country.country_ar : country.country">
                                                             {{ country.country }}
                                                         </option>
                                                     </Field>
