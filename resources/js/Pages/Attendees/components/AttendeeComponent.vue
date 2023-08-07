@@ -27,6 +27,7 @@ const collectedModalShow = ref(false)
 const zonesModalShow = ref(false)
 const zonesForBulk = ref(false)
 const moveAttendeeModal = ref(false)
+const deleteModalShow = ref(false)
 const areasModalShow = ref(false)
 const areasForBulk = ref(false)
 const selectedSort = ref(props.sort || '');
@@ -60,6 +61,15 @@ const fields = [(userRole.value !== 'Viewers' && 'check'), 'access_level', 'cate
 const answerFields = ['question', 'answers', '⠀'];
 
 const checkedRows = ref([]);
+const checkAllRows = ref(false);
+
+watch(checkAllRows, val => {
+    if (val) {
+        checkedRows.value = props.attendees.data.map(x => x.id);
+    } else {
+        checkedRows.value = [];
+    }
+})
 
 const upload = reactive({
     access_level_id: '',
@@ -96,7 +106,8 @@ onUpdated(() => {
     areasModalShow.value = false;
     messageModalShow.value = false;
     moveAttendeeModal.value = false;
-    if (Object.keys(props.errors).length === 0) {
+    deleteModalShow.value = false;
+    if (props.errors && Object.keys(props.errors).length === 0) {
         uploadModalShow.value = false;
     }
 })
@@ -392,6 +403,12 @@ const moveToAccessLevel = () => {
         access_level_id: moveToAccessLevelId.value
     });
 }
+
+const deleteAttendee = () => {
+    props.eventId
+        ? router.delete(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}`)
+        : router.delete(`/attendees/${selectedAttendee.value.id}`)
+}
 </script>
 
 <template>
@@ -482,6 +499,9 @@ const moveToAccessLevel = () => {
                             <b-col sm="12" class="table-responsive">
                                 <b-table :items="attendees.data" :fields="fields"
                                          class="table-responsive-sm table-borderless">
+                                    <template v-slot:head(check)="data">
+                                        <b-form-checkbox v-model="checkAllRows" :value="true" inline/>
+                                    </template>
                                     <template #cell(check)="data">
                                         <b-form-checkbox v-model="checkedRows" :value="data.item.id" inline/>
                                     </template>
@@ -543,7 +563,11 @@ const moveToAccessLevel = () => {
                                                 @click.prevent="viewBadge(data.item.id, data.item.badge.id, data.item.status)">View Badge</b-dropdown-item>
                                             <b-dropdown-item
                                                 v-if="eventId && userRole !== 'Operations'"
-                                                @click.prevent="selectedAttendee = data.item; selectedAttendeeAccessLevelId = data.item.access_level.id;  moveAttendeeModal = true">Move to Access Level</b-dropdown-item>
+                                                @click.prevent="selectedAttendee = data.item; selectedAttendeeAccessLevelId = data.item.access_level.id; moveAttendeeModal = true">Move to Access Level</b-dropdown-item>
+                                            <b-dropdown-item
+                                                v-if="userRole !== 'Operations'"
+                                                variant="danger"
+                                                @click.prevent="selectedAttendee = data.item; deleteModalShow = true">Delete</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>
@@ -897,6 +921,32 @@ const moveToAccessLevel = () => {
                         type="button"
                         variant="danger"
                         class="float-right ml-2"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="deleteModalShow" id="delete-modal" title="Delete Attendee">
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <h5 class="mb-2">Are you sure you want to delete this attendee?</h5>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="danger"
+                        @click="deleteAttendee"
+                        class="btn btn-primary float-right ml-2">Yes
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="primary"
+                        class="float-right ml-2"
+                        @click="deleteModalShow = false"
                     >
                         Close
                     </b-button>

@@ -14,7 +14,7 @@
 
         <b-row class="page-cards">
             <b-col sm="6" v-for="organiser in organisers.data" :key="organiser.id">
-                <b-card :title="organiser.name" class="iq-mb-3">
+                <b-card :title="lang === 'ar' ? (organiser.name_arabic || organiser.name) : organiser.name" class="iq-mb-3">
                     <b-card-sub-title>
                         <div><small><a :href="`mailto:${organiser.email}`"><i class="ri-mail-line"></i> {{ organiser.email }}</a></small></div>
                         <div><small><a :href="`tel:${organiser.phone}`"><i class="ri-phone-line"></i> {{ organiser.phone }}</a></small></div>
@@ -38,13 +38,15 @@
 <script setup>
 
 import {router, usePage} from "@inertiajs/vue3";
-import {onUpdated} from "vue";
+import {onUpdated, ref} from "vue";
 
 onUpdated(() => {
     if (usePage().props.active_organiser) {
         location.href = '/dashboard';
     }
 })
+
+const lang = ref(localStorage.getItem('locale'));
 
 let props = defineProps({organisers: {}, filters: {}})
 
