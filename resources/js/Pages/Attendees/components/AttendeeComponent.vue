@@ -1,6 +1,6 @@
 <script setup>
 import {router, usePage} from "@inertiajs/vue3";
-import {ref, onUpdated, reactive, computed, watch} from "vue";
+import {computed, onUpdated, reactive, ref, watch} from "vue";
 import SearchBox from '../../../Shared/components/core/SearchBox/Index.vue';
 import axios from "axios";
 import * as XLSX from "xlsx";
@@ -27,6 +27,7 @@ const collectedModalShow = ref(false)
 const zonesModalShow = ref(false)
 const zonesForBulk = ref(false)
 const moveAttendeeModal = ref(false)
+const deleteModalShow = ref(false)
 const areasModalShow = ref(false)
 const areasForBulk = ref(false)
 const selectedSort = ref(props.sort || '');
@@ -60,6 +61,15 @@ const fields = [(userRole.value !== 'Viewers' && 'check'), 'access_level', 'cate
 const answerFields = ['question', 'answers', '⠀'];
 
 const checkedRows = ref([]);
+const checkAllRows = ref(false);
+
+watch(checkAllRows, val => {
+    if (val) {
+        checkedRows.value = props.attendees.data.map(x => x.id);
+    } else {
+        checkedRows.value = [];
+    }
+})
 
 const upload = reactive({
     access_level_id: '',
@@ -96,7 +106,8 @@ onUpdated(() => {
     areasModalShow.value = false;
     messageModalShow.value = false;
     moveAttendeeModal.value = false;
-    if (Object.keys(props.errors).length === 0) {
+    deleteModalShow.value = false;
+    if (props.errors && Object.keys(props.errors).length === 0) {
         uploadModalShow.value = false;
     }
 })
@@ -148,33 +159,83 @@ const viewBadge = async (attendeeId, badgeId, status) => {
     }
 }
 
-const downloadBadge = () => {
+const downloadBadge = async (type = 'full') => {
     try {
         let source = document.getElementById('badgeContainer')
         source.classList.remove("container");
 
-        html2canvas(source, {useCORS: true, allowTaint: true, scale: 5}).then(async canvas => {
-            const imgWidth = badgeData.value.badge.width;
-            const imgHeight = badgeData.value.badge.height
+        if (type === 'full') {
+            html2canvas(source, {useCORS: true, allowTaint: true, scale: 5}).then(canvas => {
+                const imgWidth = badgeData.value.badge.width;
+                const imgHeight = badgeData.value.badge.height;
+                const contentDataURL = canvas.toDataURL('image/jpeg')
 
-            const contentDataURL = canvas.toDataURL('image/jpeg')
 
-            document.body.appendChild(canvas);
-            const {jsPDF} = window.jspdf;
+                document.body.appendChild(canvas);
+                const {jsPDF} = window.jspdf;
 
-            let pdf = new jsPDF('p', 'cm', [imgWidth, imgHeight]); // A4 size page of PDF
-            pdf.addImage(contentDataURL, 'JPEG', 0, 0, imgWidth, imgHeight)
+                let pdf = new jsPDF('p', 'cm', [imgWidth, imgHeight]); // A4 size page of PDF
+                pdf.addImage(contentDataURL, 'JPEG', 0, 0, imgWidth, imgHeight)
 
-            pdf.save('MYPdf.pdf');
+                pdf.save('MYPdf.pdf');
+            });
+        } else if (type === 'split') {
+            const rect = source.getBoundingClientRect();
+            setTimeout(gpdf, 5000);
 
-            await axios.post(`/attendees/${selectedAttendee.value}/download-badge-increment`)
+            window.scrollTo(0,0)
+            html2canvas(source, {
+                useCORS: true,
+                allowTaint: false,
+                x: rect.left,
+                y: rect.top,
+                width: source.clientWidth,
+                height: (source.clientHeight / 2),
+                scale: 35
+            }).then(canvas => {
+                document.querySelector("#hold1").src = canvas.toDataURL('image/jpeg')
+            });
 
-            const attendeeIndex = props.attendees.data.findIndex(x => x.id === selectedAttendee.value);
+            html2canvas(source, {
+                useCORS: true,
+                allowTaint: false,
+                x: rect.left,
+                y: rect.top + 238,
+                width: source.clientWidth,
+                height: source.clientHeight / 2,
+                scale: 35
+            }).then(canvas => {
+                document.querySelector("#hold2").src = canvas.toDataURL('image/jpeg')
+            });
 
-            if (attendeeIndex >= 0) {
-                props.attendees.data[attendeeIndex].downloads = props.attendees.data[attendeeIndex].downloads + 1
+            function gpdf() {
+                const {jsPDF} = window.jspdf;
+                const imgWidth = source.clientWidth
+                const imgHeight = source.clientHeight;
+
+                let pdf = new jsPDF('L', 'px', [imgWidth, imgHeight / 2]); // A4 size page of PDF
+
+                let s = document.querySelector("#hold1").src
+
+                pdf.addImage(s, 'JPEG', 0, 0, imgWidth, imgHeight / 2)
+                pdf.addPage();
+                pdf.addImage(document.querySelector("#hold2").src, 'JPEG', 0, 0, imgWidth, imgHeight / 2)
+
+                pdf.save('MYPdf.pdf');
+
+                document.querySelector("#hold1").src = '';
+                document.querySelector("#hold2").src = '';
             }
-        });
+        }
+
+        await axios.post(`/attendees/${selectedAttendee.value}/download-badge-increment`)
+
+        const attendeeIndex = props.attendees.data.findIndex(x => x.id === selectedAttendee.value);
+
+        if (attendeeIndex >= 0) {
+            props.attendees.data[attendeeIndex].downloads = props.attendees.data[attendeeIndex].downloads + 1
+        }
+
     } catch (e) {
         console.log(e);
     }
@@ -392,6 +453,12 @@ const moveToAccessLevel = () => {
         access_level_id: moveToAccessLevelId.value
     });
 }
+
+const deleteAttendee = () => {
+    props.eventId
+        ? router.delete(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}`)
+        : router.delete(`/attendees/${selectedAttendee.value.id}`)
+}
 </script>
 
 <template>
@@ -482,6 +549,9 @@ const moveToAccessLevel = () => {
                             <b-col sm="12" class="table-responsive">
                                 <b-table :items="attendees.data" :fields="fields"
                                          class="table-responsive-sm table-borderless">
+                                    <template v-slot:head(check)="data">
+                                        <b-form-checkbox v-model="checkAllRows" :value="true" inline/>
+                                    </template>
                                     <template #cell(check)="data">
                                         <b-form-checkbox v-model="checkedRows" :value="data.item.id" inline/>
                                     </template>
@@ -543,7 +613,11 @@ const moveToAccessLevel = () => {
                                                 @click.prevent="viewBadge(data.item.id, data.item.badge.id, data.item.status)">View Badge</b-dropdown-item>
                                             <b-dropdown-item
                                                 v-if="eventId && userRole !== 'Operations'"
-                                                @click.prevent="selectedAttendee = data.item; selectedAttendeeAccessLevelId = data.item.access_level.id;  moveAttendeeModal = true">Move to Access Level</b-dropdown-item>
+                                                @click.prevent="selectedAttendee = data.item; selectedAttendeeAccessLevelId = data.item.access_level.id; moveAttendeeModal = true">Move to Access Level</b-dropdown-item>
+                                            <b-dropdown-item
+                                                v-if="userRole !== 'Operations'"
+                                                variant="danger"
+                                                @click.prevent="selectedAttendee = data.item; deleteModalShow = true">Delete</b-dropdown-item>
                                         </b-dropdown>
                                       </span>
                                     </template>
@@ -849,6 +923,10 @@ const moveToAccessLevel = () => {
                 <b-col sm="12" v-html="badgeData.html_data" :style="{height: `${badgeData.badge.height * 38}px`}" />
             </b-row>
 
+
+            <img id="hold1" src="">
+            <img id="hold2" src="">
+
             <template #modal-footer>
                 <div class="w-100" v-if="badgeData.status === 'approved'">
                     <b-button
@@ -871,9 +949,15 @@ const moveToAccessLevel = () => {
                     </b-button>
                     <b-button
                         variant="primary"
-                        @click="downloadBadge"
+                        @click="downloadBadge('split')"
                         :disabled="badgeData.downloaded === 1"
-                        class="btn btn-primary float-right ml-2">Download
+                        class="btn btn-primary float-right ml-2">Download (Split)
+                    </b-button>
+                    <b-button
+                        variant="primary"
+                        @click="downloadBadge()"
+                        :disabled="badgeData.downloaded === 1"
+                        class="btn btn-primary float-right ml-2">Download (Full)
                     </b-button>
                 </div>
             </template>
@@ -904,6 +988,30 @@ const moveToAccessLevel = () => {
             </template>
         </b-modal>
 
+        <b-modal v-model="deleteModalShow" id="delete-modal" title="Delete Attendee">
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <h5 class="mb-2">Are you sure you want to delete this attendee?</h5>
+                </b-col>
+            </b-row>
 
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="danger"
+                        @click="deleteAttendee"
+                        class="btn btn-primary float-right ml-2">Yes
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="primary"
+                        class="float-right ml-2"
+                        @click="deleteModalShow = false"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
     </b-container>
 </template>

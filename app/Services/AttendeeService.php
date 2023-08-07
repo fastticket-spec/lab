@@ -873,4 +873,14 @@ class AttendeeService extends BaseRepository
 
         return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
     }
+
+    public function deleteAttendee(string $attendeeId, ?string $eventId = null)
+    {
+        $this->delete($attendeeId);
+
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $message = 'Attendee deleted successfully!';
+
+        return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
+    }
 }
