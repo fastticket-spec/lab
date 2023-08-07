@@ -12,7 +12,7 @@ const props = defineProps({
     reference: String
 })
 
-const lang = ref('english');
+const lang = ref('arabic');
 
 onMounted(() => {
     document.querySelector('title').textContent = `${props.accessLevel.title} - ${props.accessLevel?.event?.organiser?.name}`
