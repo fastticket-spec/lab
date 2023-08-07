@@ -1,7 +1,7 @@
 <template>
     <b-row class="page-cards">
         <b-col sm="6" v-for="event in events" :key="event.id">
-            <b-card :title="event.title" class="iq-mb-3">
+            <b-card :title="locale === 'ar' ? (event.title_arabic || event.title) : event.title" class="iq-mb-3">
                 <b-card-sub-title>
                     <div><small>By {{ event.organiser_name }}</small></div>
                 </b-card-sub-title>

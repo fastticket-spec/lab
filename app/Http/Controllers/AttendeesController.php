@@ -267,4 +267,14 @@ class AttendeesController extends Controller
 
         return $this->attendeeService->changeAccessLevel($eventId, $attendeeId, $request->access_level_id);
     }
+
+    public function destroyAttendee(string $attendeeId)
+    {
+        return $this->attendeeService->deleteAttendee($attendeeId);
+    }
+
+    public function destroyEventAttendee(string $eventId, string $attendeeId)
+    {
+        return $this->attendeeService->deleteAttendee($attendeeId, $eventId);
+    }
 }
