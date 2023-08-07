@@ -131,6 +131,7 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateEventAttendeeAnswers']);
                 Route::post('/{attendee_id}/change-access-level', [AttendeesController::class, 'changeAccessLevel']);
                 Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadEventBadge']);
+                Route::delete('/{attendee_id}', [AttendeesController::class, 'destroyEventAttendee']);
             });
 
             Route::prefix('/zones')->group(function () {
@@ -182,6 +183,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/{attendee_id}/update-answers', [AttendeesController::class, 'updateAttendeeAnswers']);
             Route::get('/{attendee_id}/download-badge/{badge_id}', [AttendeesController::class, 'downloadBadge']);
             Route::post('/{attendee_id}/download-badge-increment', [AttendeesController::class, 'incrementBadgeDownload']);
+            Route::delete('/{attendee_id}', [AttendeesController::class, 'destroyAttendee']);
         });
     });
 

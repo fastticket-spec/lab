@@ -12,6 +12,8 @@ const props = defineProps({
 
 const selectedSort = ref('');
 
+const locale = ref(localStorage.getItem('locale'));
+
 const sortAccessLevels = () => {
     visit(`/event/${props.event_id}/access-levels?sort=${selectedSort.value}`)
 }
@@ -102,7 +104,7 @@ const viewInvitations = async (accessLevelId) => {
 
         <b-row class="page-cards">
             <b-col sm="6" v-for="access_level in access_levels.data" :key="access_level.id">
-                <b-card :title="access_level.title" class="iq-mb-3">
+                <b-card :title="locale === 'ar' ? (access_level.title_arabic || access_level.title) : access_level.title" class="iq-mb-3">
 
                     <b-card-text class="d-flex w-100 justify-content-around my-5">
                         <div class="text-center">
