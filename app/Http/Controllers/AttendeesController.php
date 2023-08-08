@@ -12,6 +12,8 @@ use App\Services\ZoneService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Throwable;
+use Rap2hpoutre\FastExcel\FastExcel;
+
 
 class AttendeesController extends Controller
 {
@@ -276,5 +278,52 @@ class AttendeesController extends Controller
     public function destroyEventAttendee(string $eventId, string $attendeeId)
     {
         return $this->attendeeService->deleteAttendee($attendeeId, $eventId);
+    }
+
+    public function pullSplDataPlayers(Request $request, $id)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://splis.spl.com.sa/api/competition/preliminary/StageID/55/TeamID/' . $id,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $response = json_decode($response, true);
+        $response = collect($response);
+        return (new FastExcel($response))->download($id . '-player.xlsx');
+    }
+
+
+    public function pullSplDataOfficials(Request $request, $id)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://splis.spl.com.sa/api/competition/preliminaryofficial/StageID/55/TeamID/' . $id,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $response = json_decode($response, true);
+        $response = collect($response);
+        return (new FastExcel($response))->download($id . '-official.xlsx');
     }
 }
