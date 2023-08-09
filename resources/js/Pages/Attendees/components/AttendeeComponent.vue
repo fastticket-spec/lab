@@ -465,14 +465,14 @@ const deleteAttendee = () => {
     <b-container fluid>
         <b-row>
             <b-col sm="12">
-                <iq-card v-if="attendees.total || (!attendees.total && q) || (!attendees.total && filter_by)">
+                <iq-card>
                     <template v-slot:headerTitle>
                         <div class="d-flex justify-content-between">
                             <h4 class="card-title">{{ $t('sidebar.attendees') }}</h4>
                         </div>
                     </template>
 
-                    <template v-slot:headerAction>
+                    <template v-if="attendees.total" v-slot:headerAction>
                         <div class="d-flex justify-content-center align-items-center" style="width: 670px">
                             <search-box
                                 placeholder="Search by first name, last name, email, ref or event"
@@ -500,19 +500,19 @@ const deleteAttendee = () => {
                         </div>
                     </template>
 
-                    <template v-slot:body v-if="attendees.total">
+                    <template v-slot:body>
                         <b-row v-if="eventId && userRole !== 'Viewers' && userRole !== 'Operations'">
                             <b-col sm="12">
                                 <a href="#" @click="uploadModalShow = true" class="btn btn-outline-primary"><i
                                     class="ri-upload-2-line"></i>Upload Attendees</a>
-                                <a href="#" @click="exportModalShow = true" class="btn btn-outline-primary ml-2"><i
+                                <a href="#" v-if="attendees.total" @click="exportModalShow = true" class="btn btn-outline-primary ml-2"><i
                                     class="ri-upload-2-line"></i>Export Template</a>
                                 <Link :href="`/event/${eventId}/attendees/register-applicant`" class="btn btn-outline-primary ml-2"><i
                                     class="ri-user-3-line"></i>Register Applicant</Link>
                             </b-col>
                         </b-row>
 
-                        <b-row class="mt-3">
+                        <b-row v-if="attendees.total || (!attendees.total && q) || (!attendees.total && filter_by)" class="mt-3">
                             <b-col sm="12" class="mb-3" v-show="checkedRows.length > 0">
                                 <b-btn @click="approveAttendees"
                                        variant="outline-primary" class="mr-2">Approve attendee{{
