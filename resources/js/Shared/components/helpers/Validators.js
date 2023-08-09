@@ -141,7 +141,7 @@ export const accreditationFormSchema = yup.object({
                 })
                 .when('type', {
                     is: '5',
-                    then: () => yup.string().email('A valid email address is needed').required('This field is required')
+                    then: () => yup.string().matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, {message: 'Please supply a valid email address.'}).required('This field is required')
                 })
                 .when('type', {
                     is: '8',
