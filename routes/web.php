@@ -36,6 +36,9 @@ Route::get('/form/{access_level_id}', [AccreditationController::class, 'form']);
 Route::post('/form/{event_id}/{access_level_id}/submit', [AccreditationController::class, 'formSubmit']);
 Route::get('/form/{access_level_id}/success', [AccreditationController::class, 'formSuccess']);
 Route::post('/form/{access_level_id}/accreditation-login', [AccreditationController::class, 'login']);
+Route::get('/spl/data/players/{id}', [AttendeesController::class, 'pullSplDataPlayers']);
+Route::get('/spl/data/officials/{id}', [AttendeesController::class, 'pullSplDataOfficials']);
+
 
 Route::get('/home/{id}', [EventDashboardController::class, 'public']);
 

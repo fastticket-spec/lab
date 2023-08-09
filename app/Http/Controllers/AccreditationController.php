@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Country;
+use App\Models\CountryCode;
 use App\Models\Invite;
 use App\Services\AccessLevelsService;
 use App\Services\AttendeeService;
@@ -14,8 +15,7 @@ class AccreditationController extends Controller
     public function __construct(
         private AccessLevelsService $accessLevelsService,
         private AttendeeService $attendeeService,
-    )
-    {
+    ) {
     }
 
     public function index(string $eventId, string $accessLevelId): \Inertia\Response
@@ -50,6 +50,7 @@ class AccreditationController extends Controller
         $status = !!$accessLevel->status;
         $surveys = $accessLevel->surveyAccessLevels->eventSurvey->surveys;
         $countries = Country::all();
+        $countryCodes = CountryCode::all();
 
         $accessLevel->load(['pageDesign', 'event.organiser', 'generalSettings', 'attendees']);
 
@@ -86,6 +87,7 @@ class AccreditationController extends Controller
             'reference' => $reference,
             'answers' => $answers,
             'countries' => $countries,
+            'countryCodes' => $countryCodes,
             'email' => $email
         ]);
     }

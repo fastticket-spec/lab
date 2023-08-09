@@ -5,6 +5,10 @@ import {onMounted, reactive, ref} from "vue";
 import {router} from "@inertiajs/vue3";
 import {ErrorMessage, Field, FieldArray, useForm} from "vee-validate";
 import {accreditationFormSchema} from "../../Shared/components/helpers/Validators.js";
+import VueCountryCode from "vue-country-code";
+import VuePhoneNumberInput from 'vue-phone-number-input';
+import 'vue-phone-number-input/dist/vue-phone-number-input.css';
+
 
 const props = defineProps({
     accessLevel: Object,
@@ -14,6 +18,7 @@ const props = defineProps({
     reference: String,
     answers: Array,
     countries: Array,
+    countryCodes: Array,
     email: String,
     isProccssing: Boolean
 })
@@ -31,13 +36,12 @@ onMounted(() => {
             type: survey.type,
             answer: survey.type === '8' ? [] : '',
             id: survey.id,
-            question: survey.title
+            question: survey.title,
         }
     })
 });
 
 const {handleSubmit, isSubmitting} = useForm({
-
     initialValues: (props.reference && props.answers)
         ? {
             surveys: props.surveys.filter(x => !x.private).map(x => {
@@ -53,7 +57,8 @@ const {handleSubmit, isSubmitting} = useForm({
                     is_private: x.private,
                     options: x.options,
                     required: x.required,
-                    disabled: x.title === 'Email Address' && props.email
+                    disabled: x.title === 'Email Address' && props.email,
+                    country_code: x.country_code ?  x.country_code  : '+966'
                 }
             })
         }
@@ -68,7 +73,8 @@ const {handleSubmit, isSubmitting} = useForm({
                 is_private: x.private,
                 options: x.options,
                 required: x.required,
-                disabled: x.title === 'Email Address' && props.email
+                disabled: x.title === 'Email Address' && props.email,
+                country_code: x.country_code ?  x.country_code  : '+966'
             }))
         },
     validationSchema: accreditationFormSchema,
@@ -76,6 +82,7 @@ const {handleSubmit, isSubmitting} = useForm({
 });
 
 const onSubmit = handleSubmit(values => {
+    console.log(values)
     let answers = values.surveys.map(d => {
         if (d.type === '7') {
             d.answer = d.answer.map(x => {
@@ -154,10 +161,22 @@ form-control:disabled, .form-control[readonly] {
     border-radius: 0.25rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
-
-.bg-white {
-//background-color: #7d4f4c61 !important;
+.mobile_number {
+    display: flex;
 }
+
+.mobile_number select{
+    width: 30%;
+    height: auto;
+}
+
+.mobile_number input{
+    width: 80%;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+
 
 label {
     /* color: accessLevel?.page_design?.font_color ; */
@@ -201,6 +220,7 @@ label {
                         <form @submit.prevent="onSubmit" class="mx-5">
                             <div class="col-12 m-0 p-0">
                                 <div class="row m-0">
+
                                     <FieldArray name="surveys" v-slot="{ fields, insert, remove, swap }">
                                         <template v-for="(field, idx) in fields" :key="field.key">
                                             <b-col :sm="field.value.type !== '10' ? '6' : '12'" class="pb-2">
@@ -208,6 +228,17 @@ label {
                                                     <label :for="`surveys-${idx}`" v-if="field.value.type !== '10'" :style="{ color: accessLevel?.page_design?.font_color}">{{
                                                             lang === 'arabic' ? field.value.title_arabic : field.value.title
                                                         }}:</label>
+
+                                                    <div class="mobile_number"  v-if="field.value.type === '12'">
+                                                        <b-select :name="`surveys[${idx}].country_code`"  :class="`mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }" >
+                                                            <b-select-option v-for="code in countryCodes" :key="code.id" :value="'+' + code.code"> {{ lang === 'english' ? code.name_en : code.name_ar}}</b-select-option>
+                                                        </b-select>
+                                                        <Field type="number"
+                                                           :name="`surveys[${idx}].answer`"
+                                                           :id="`surveys-${idx}`"
+                                                           :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }" :validateOnInput="true"/>
+
+                                                    </div>
 
                                                     <Field type="text"
                                                            v-if="field.value.type === '1'"
@@ -306,7 +337,7 @@ label {
                                                         </Field>
                                                     </template>
 
-                                                    <h5 v-if="field.value.type === '10'" class="mt-5 mb-2">{{
+                                                    <h5 v-if="field.value.type === '10'" class="mt-5 mb-2" :style="{color: accessLevel?.page_design?.font_color }">{{
                                                             lang === 'arabic' ? field.value.title_arabic : field.value.title
                                                         }}</h5>
 
@@ -317,7 +348,7 @@ label {
                                                            :class="`form-control mb-0`" :validateOnInput="true">
                                                         <option v-for="country in countries"
                                                                 :key="`${field.value.id}-${country.country}`"
-                                                                :value="country.country">
+                                                                :value="lang === 'arabic' ?  country.country_ar : country.country">
                                                             {{ country.country }}
                                                         </option>
                                                     </Field>
