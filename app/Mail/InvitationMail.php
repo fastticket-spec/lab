@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -15,19 +16,23 @@ class InvitationMail extends Mailable
     use Queueable, SerializesModels;
 
     public string $content;
-    public string  $title;
+    public string $title;
     public ?string $organiserName;
     public ?string $organiserLogo;
     public ?string $firstName;
     private bool $registration;
+    public bool $isArabic;
+    public mixed $attachment;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($settings, $surveyLink, $organiser, $firstName = 'Applicant', $registration = false, $ref = null)
+    public function __construct($settings, $surveyLink, $organiser, $firstName, $registration = false, $ref = null, $attachment = null)
     {
         $this->organiserName = $organiser->name ?? null;
+        $this->attachment = $attachment;
         $this->organiserLogo = $organiser->logo_url ?? null;
+        $this->isArabic = !!optional($settings)->arabic_invitation;
 
         $content = $settings->invitation_message ?? '';
         $this->title = $settings->invitation_title ?? 'Invitation Link';
@@ -46,7 +51,6 @@ class InvitationMail extends Mailable
                     $this->content
                 );
             }
-
         } else {
             $this->content = "<span>Your survey link is <strong><a href='$surveyLink'>$surveyLink</a></strong></span>";
 
@@ -85,6 +89,12 @@ class InvitationMail extends Mailable
      */
     public function attachments(): array
     {
+        if ($this->attachment) {
+            return [
+                Attachment::fromStorageDisk('spaces', $this->attachment)
+            ];
+        }
+
         return [];
     }
 }
