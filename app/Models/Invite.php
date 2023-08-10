@@ -10,5 +10,5 @@ class Invite extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['event_id', 'access_level_id', 'ref', 'email'];
+    protected $fillable = ['event_id', 'access_level_id', 'ref', 'first_name', 'last_name', 'email', 'attachment'];
 }

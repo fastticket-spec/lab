@@ -29,5 +29,6 @@ class AccessLevelGeneralSetting extends Model
         "invitation_message",
         "start_on",
         "end_on",
+        "arabic_invitation"
     ];
 }
