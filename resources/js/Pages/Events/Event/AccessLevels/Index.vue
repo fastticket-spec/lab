@@ -65,7 +65,7 @@ const quantityAvailable = computed(() => (quantityAvailable, quantityFilled) => 
     return available >= 0 ? available : 0
 })
 
-const inviteFields = ['first_name', 'last_name', 'email', 'date_sent'];
+const inviteFields = ['first_name', 'last_name', 'email', 'attachment', 'date_sent'];
 const accessLevelInvites = ref([]);
 
 const viewInvitations = async (accessLevelId) => {
@@ -256,11 +256,15 @@ const disableInviteSubmit = computed(() => {
             </template>
         </b-modal>
 
-        <b-modal v-model="invitesModal" id="message-modal" title="View Invites" scrollable>
+        <b-modal v-model="invitesModal" size="xl" id="message-modal" title="View Invites" scrollable>
             <b-row class="mt-3">
                 <b-col sm="12">
                     <b-table v-if="accessLevelInvites.length > 0" :items="accessLevelInvites" :fields="inviteFields"
-                             class="table-responsive-sm table-borderless"/>
+                             class="table-responsive-sm table-borderless">
+                        <template #cell(attachment)="data">
+                            <a v-if="data.item.attachment" :href="data.item.attachment" target="_blank">View</a>
+                        </template>
+                    </b-table>
                     <h5 v-else class="text-center mb-3">Invites will appear here</h5>
                 </b-col>
             </b-row>
