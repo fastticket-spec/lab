@@ -34,12 +34,7 @@ export default {
     border-radius: 0.25rem;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
-.bg-white {
-    background-color: #7d4f4c61 !important;
-}
-label {
-    color: #ffffff;
-}
+
 </style>
 
 

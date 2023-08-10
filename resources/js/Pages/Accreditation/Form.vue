@@ -134,17 +134,11 @@ export default {
 
 <style>
 input.form-control, .form-control {
-    background: accessLevel?.page_design?.field_color;
-    backgroundColor: accessLevel?.page_design?.field_color !important;
     line-height: 27px !important;
-    /* color: {{ accessLevel?.page_design?.font_color }}; */
 }
 
 form-control:disabled, .form-control[readonly] {
-    /* background-color: {{ accessLevel?.page_design?.field_color }}; */
     opacity: 1;
-    /* color: {{ accessLevel?.page_design?.font_color }}; */
-
 }
 
 .form-control {
@@ -178,9 +172,7 @@ form-control:disabled, .form-control[readonly] {
 
 
 
-label {
-    /* color: accessLevel?.page_design?.font_color ; */
-}
+
 
 @media screen and (max-width: 600px) {
     .vag {
