@@ -77,12 +77,11 @@ const {handleSubmit, isSubmitting} = useForm({
                 country_code: x.country_code ?  x.country_code  : '+966'
             }))
         },
-    validationSchema: accreditationFormSchema,
+    validationSchema: accreditationFormSchema(props.lang),
 
 });
 
 const onSubmit = handleSubmit(values => {
-    console.log(values)
     let answers = values.surveys.map(d => {
         if (d.type === '7') {
             d.answer = d.answer.map(x => {

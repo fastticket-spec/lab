@@ -148,7 +148,9 @@ class AccessLevelsController extends Controller
 
     public function sendInvitationLink(Request $request, string $eventId, string $accessLevelId)
     {
-        return $this->accessLevelsService->sendLink($request->emails, $eventId, $accessLevelId);
+        $request->validate(['invitations' => 'array|required', 'invitations.*.email' => 'required|email']);
+
+        return $this->accessLevelsService->sendLink($request, $eventId, $accessLevelId);
     }
 
     public function getSurveys(string $eventId, string $accessLevelId)

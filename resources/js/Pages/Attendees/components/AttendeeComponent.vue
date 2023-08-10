@@ -73,7 +73,8 @@ watch(checkAllRows, val => {
 
 const upload = reactive({
     access_level_id: '',
-    approve: false
+    approve: false,
+    mail: false
 });
 
 const exportData = reactive({
@@ -100,6 +101,8 @@ const filterEvents = () => {
     visit(props.eventId ? `/event/${props.eventId}/attendees?filter=${selectedFilter.value}` : `/attendees?filter=${selectedFilter.value}`)
 }
 
+const submittingAttendees = ref(false);
+
 onUpdated(() => {
     answerModalShow.value = false;
     zonesModalShow.value = false;
@@ -110,6 +113,7 @@ onUpdated(() => {
     if (props.errors && Object.keys(props.errors).length === 0) {
         uploadModalShow.value = false;
     }
+    submittingAttendees.value = false;
 })
 
 const visit = (link, method = 'get') => {
@@ -410,10 +414,13 @@ const onUploadFile = e => {
 }
 
 const onUploadAttendees = () => {
+    submittingAttendees.value = true;
+
     router.post(`/event/${props.eventId}/attendees/upload-attendees`, {
         attendees: uploadedAttendees.value,
         access_level_id: upload.access_level_id,
-        approve: upload.approve
+        approve: upload.approve,
+        mail: upload.mail
     })
 }
 
@@ -858,6 +865,13 @@ const deleteAttendee = () => {
                         <b-checkbox v-model="upload.approve" class="custom-checkbox-color"
                                     name="approve-check" inline>
                             Approve Attendees
+                        </b-checkbox>
+                    </div>
+
+                    <div class="form-group">
+                        <b-checkbox v-model="upload.mail" class="custom-checkbox-color"
+                                    name="mail-check" inline>
+                            Send Invitation Mail
                         </b-checkbox>
                     </div>
                 </b-col>
