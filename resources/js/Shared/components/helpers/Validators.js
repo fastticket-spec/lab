@@ -126,7 +126,7 @@ export const createBadgeSchema = yup.object({
     height: yup.number().required(),
 })
 
-export const accreditationFormSchema = yup.object({
+export const accreditationFormSchema = lang => yup.object({
     surveys: array().of(
         yup.object().shape({
             required: yup.number().required(),
@@ -137,19 +137,19 @@ export const accreditationFormSchema = yup.object({
                     is: (required, type, is_private) => {
                         return required === 1 && type !== '10' && !is_private;
                     },
-                    then: () => yup.string().required('This field is required')
+                    then: () => yup.string().required(lang === 'english' ? 'This field is required' : 'هذه الخانة مطلوبه')
                 })
                 .when('type', {
                     is: '5',
-                    then: () => yup.string().matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, {message: 'Please supply a valid email address.'}).required('This field is required')
+                    then: () => yup.string().matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, {message: lang === 'english' ? 'Please supply a valid email address.' : 'يرجى تقديم عنوان بريد إلكتروني صالح'}).required(lang === 'english' ? 'This field is required' : 'هذه الخانة مطلوبه')
                 })
                 .when('type', {
                     is: '8',
-                    then: () => yup.array().required('This field is required')
+                    then: () => yup.array().required(lang === 'english' ? 'This field is required' : 'هذه الخانة مطلوبه')
                 })
                 .when('type', {
                     is: '7',
-                    then: () => yup.array().required('This field is required')
+                    then: () => yup.array().required(lang === 'english' ? 'This field is required' : 'هذه الخانة مطلوبه')
                 })
                 .nullable()
         })

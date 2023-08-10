@@ -34,13 +34,16 @@ const visit = (link, method = 'get') => {
 const invitationModal = ref(false);
 const invitesModal = ref(false);
 
-const invitation = reactive({
-    emails: []
-});
+const invitations = ref([{email: '', first_name: '', last_name: ''}]);
+const inviteAttachment = ref(null);
+const isSubmittingInvite = ref(false);
 
 onUpdated(() => {
-    invitation.emails = [];
     invitationModal.value = false
+
+    invitations.value = [{email: '', first_name: '', last_name: ''}];
+    inviteAttachment.value = null
+    isSubmittingInvite.value = false
 })
 
 const selectedAccessLevel = ref('')
@@ -50,7 +53,11 @@ const onPaginate = page => {
 }
 
 const sendInvite = () => {
-    router.post(`/event/${props.event_id}/access-levels/${selectedAccessLevel.value}/send-invitation`, invitation)
+    isSubmittingInvite.value = true;
+    router.post(`/event/${props.event_id}/access-levels/${selectedAccessLevel.value}/send-invitation`, {
+        invitations: invitations.value,
+        attachment: inviteAttachment.value ? inviteAttachment.value.files[0] : null
+    })
 }
 
 const quantityAvailable = computed(() => (quantityAvailable, quantityFilled) => {
@@ -58,7 +65,7 @@ const quantityAvailable = computed(() => (quantityAvailable, quantityFilled) => 
     return available >= 0 ? available : 0
 })
 
-const inviteFields = ['email', 'date_sent'];
+const inviteFields = ['first_name', 'last_name', 'email', 'date_sent'];
 const accessLevelInvites = ref([]);
 
 const viewInvitations = async (accessLevelId) => {
@@ -73,6 +80,17 @@ const viewInvitations = async (accessLevelId) => {
     }
 }
 
+const insert = i => {
+    invitations.value.splice(i, 0, {email: '', first_name: '', last_name: ''})
+}
+
+const remove = i => {
+    invitations.value.splice(i, 1)
+}
+
+const disableInviteSubmit = computed(() => {
+    return !!invitations.value.find(x => !x.email);
+});
 </script>
 
 <template>
@@ -105,7 +123,9 @@ const viewInvitations = async (accessLevelId) => {
 
         <b-row class="page-cards">
             <b-col sm="6" v-for="access_level in access_levels.data" :key="access_level.id">
-                <b-card :title="locale === 'ar' ? (access_level.title_arabic || access_level.title) : access_level.title" class="iq-mb-3">
+                <b-card
+                    :title="locale === 'ar' ? (access_level.title_arabic || access_level.title) : access_level.title"
+                    class="iq-mb-3">
 
                     <b-card-text class="d-flex w-100 justify-content-around my-5">
                         <div class="text-center">
@@ -173,19 +193,46 @@ const viewInvitations = async (accessLevelId) => {
                       @change="onPaginate"
                       :total-rows="access_levels.total" :per-page="access_levels.per_page" align="center"/>
 
-        <b-modal v-model="invitationModal" id="message-modal" title="Send Invitation">
-            <b-row class="mt-3">
-                <b-col sm="12">
-                    <span>Supply the emails you want to send invite to.</span>
+        <b-modal v-model="invitationModal" id="invitation-modal" title="Send Invitation" size="lg">
+            <b-row class="mt-3" v-for="(invitation, i) in invitations" :key="`invitation-${i}`">
+                <b-col sm="3">
                     <div class="form-group">
-                        <label for="subject">Emails</label>
-                        <vue-select v-model="invitation.emails" class="form-control mb-0"
-                                    :options="[]"
-                                    multiple taggable>
-                            <template v-slot:no-options>Type emails and press enter.</template>
-                        </vue-select>
+                        <label for="subject">First Name</label>
+                        <input type="text" class="form-control" v-model="invitation.first_name">
                     </div>
+                </b-col>
+                <b-col sm="3">
+                    <div class="form-group">
+                        <label for="subject">Last Name</label>
+                        <input type="text" class="form-control" v-model="invitation.last_name">
+                    </div>
+                </b-col>
+                <b-col sm="4">
+                    <div class="form-group">
+                        <label for="subject">Email</label>
+                        <input type="email" class="form-control" v-model="invitation.email">
+                    </div>
+                </b-col>
+                <b-col sm="2" class="mb-3 pt-5">
+                    <b-btn variant="outline-primary"
+                           @click="insert(i + 1)">
+                        <i class="ri-add-line p-0"></i>
+                    </b-btn>
+                    <b-btn v-if="invitations.length > 1"
+                           variant="outline-danger"
+                           @click="remove(i)"
+                           class="ml-2"><i
+                        class="ri-delete-bin-2-line p-0"></i>
+                    </b-btn>
+                </b-col>
+            </b-row>
 
+            <b-row>
+                <b-col size="12">
+                    <div class="form-group">
+                        <label>Attachment</label><br>
+                        <input type="file" ref="inviteAttachment" accept="application/pdf">
+                    </div>
                 </b-col>
             </b-row>
 
@@ -194,7 +241,7 @@ const viewInvitations = async (accessLevelId) => {
                     <b-button
                         variant="primary"
                         @click="sendInvite"
-                        :disabled="invitation.emails.length === 0"
+                        :disabled="disableInviteSubmit || isSubmittingInvite"
                         class="btn btn-primary float-right ml-2">Send Invite
                     </b-button>
                     <b-button
@@ -213,7 +260,7 @@ const viewInvitations = async (accessLevelId) => {
             <b-row class="mt-3">
                 <b-col sm="12">
                     <b-table v-if="accessLevelInvites.length > 0" :items="accessLevelInvites" :fields="inviteFields"
-                             class="table-responsive-sm table-borderless" />
+                             class="table-responsive-sm table-borderless"/>
                     <h5 v-else class="text-center mb-3">Invites will appear here</h5>
                 </b-col>
             </b-row>
