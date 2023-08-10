@@ -360,7 +360,6 @@ class AccessLevelsService extends BaseRepository
         $path = '';
         if ($request->hasFile('attachment')) {
             $path = $this->uploadFile($request->attachment, 'invitation-', '-attachment-');
-//            $path = Storage::disk(config('filesystems.default'))->url($path);
         }
 
         foreach ($invitations as $invitation) {
@@ -410,7 +409,8 @@ class AccessLevelsService extends BaseRepository
                 'first_name' => $invite->first_name,
                 'last_name' => $invite->last_name,
                 'email' => $invite->email,
-                'date_sent' => $invite->created_at->format('jS M, Y h:i a')
+                'date_sent' => $invite->created_at->format('jS M, Y h:i a'),
+                'attachment' => $invite->attachment
             ];
         });
 
