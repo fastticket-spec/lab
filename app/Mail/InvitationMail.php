@@ -90,6 +90,10 @@ class InvitationMail extends Mailable
     public function attachments(): array
     {
         if ($this->attachment) {
+            \Log::debug('in here');
+            \Log::debug($this->attachment);
+            
+            
             return [
                 Attachment::fromStorageDisk('spaces', $this->attachment)
             ];
