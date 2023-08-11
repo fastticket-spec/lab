@@ -92,8 +92,7 @@ class BadgeService extends BaseRepository
     public function count(?string $eventId = null, array|Collection|null $allowedEventIds = null): int
     {
         $user = auth()->user();
-        $account = $user->account;
-        $activeOrganiser = $account->active_organiser;
+        $activeOrganiser = $user->activeOrganiser();
 
         if ($eventId) {
             $eventIds = [$eventId];

@@ -165,3 +165,9 @@ export const createUserSchema = yup.object({
     all_events: yup.boolean().nullable()
 })
 
+export const createManagerSchema = yup.object({
+    first_name: yup.string().required(),
+    last_name: yup.string().required(),
+    email: yup.string().email().required(),
+})
+

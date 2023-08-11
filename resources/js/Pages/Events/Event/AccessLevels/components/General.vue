@@ -39,7 +39,7 @@ const {handleSubmit, isSubmitting} = useForm({
 });
 
 onMounted(() => {
-    showArabicInvitation.value = !!props.data.arabic_invitation
+    showArabicInvitation.value = !!props.data?.arabic_invitation
 })
 
 
