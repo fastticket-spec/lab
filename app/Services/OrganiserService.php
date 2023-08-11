@@ -21,11 +21,12 @@ class OrganiserService extends BaseRepository
 
     public function fetchOrganisers(Request $request): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        $accountId = auth()->user()->account->id;
+        $user = auth()->user();
+        $account = $user->parentAccount ?: $user->account;
 
         return $this->model->query()
             ->latest()
-            ->where('account_id', $accountId)
+            ->where('account_id', $account->id)
             ->when(($searchTerm = $request->q), function ($q) use ($searchTerm) {
                 $q->where(function ($sQ) use ($searchTerm) {
                     $sQ->where('name', 'like', "%$searchTerm%")
@@ -76,7 +77,10 @@ class OrganiserService extends BaseRepository
         $data['banner'] = $organiserBanner;
         $data['banner_arabic'] = $organiserBannerArabic;
 
-        $organiser = $user->account->organiser()->create($data);
+        $account = $user->parentAccount ?: $user->account;
+
+
+        $organiser = $account->organiser()->create($data);
 
         if (!$organiser) {
             $this->removeUploadedFile($organiserLogo);
@@ -145,10 +149,12 @@ class OrganiserService extends BaseRepository
 
     public function count(bool $all = false): int
     {
+        $user = auth()->user();
+        $account = $user->parentAccount ?: $user->account;
+
         return $this->model->query()
-            ->when(!$all, function ($query) {
-                $accountId = auth()->user()->account->id;
-                $query->whereAccountId($accountId);
+            ->when(!$all, function ($query) use ($account) {
+                $query->whereAccountId($account->id);
             })
             ->count();
     }

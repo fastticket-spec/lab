@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountManagerController;
 use App\Http\Controllers\AccreditationController;
 use App\Http\Controllers\AreasController;
 use App\Http\Controllers\AttendeesController;
@@ -57,6 +58,13 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::post('/{id}/set-organiser', [OrganiserController::class, 'loginOrganiser']);
         Route::post('/{id}/unset-organiser', [OrganiserController::class, 'logoutOrganiser']);
+    });
+
+    Route::group(['prefix' => 'account-managers'], function () {
+        Route::get('/', [AccountManagerController::class, 'index']);
+        Route::get('/create', [AccountManagerController::class, 'create']);
+        Route::post('/', [AccountManagerController::class, 'store']);
+        Route::delete('/{accountManagerId}', [AccountManagerController::class, 'destroy']);
     });
 
     Route::group(['middleware' => 'active-organiser'], function () {

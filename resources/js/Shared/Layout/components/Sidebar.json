@@ -54,5 +54,41 @@
                 "type": "account manager"
             }
         ]
+    },
+    {
+        "title": "Account Managers",
+        "name": "sidebar.accountManagers",
+        "is_heading": false,
+        "is_active": false,
+        "link": "#",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": "AccountManagers/Index",
+        "icon": "ri-user-line",
+        "type": "account manager",
+        "children": [
+            {
+                "title": "View",
+                "name": "sidebar.view",
+                "is_active": false,
+                "link": "/account-managers",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "AccountManagers/Index",
+                "icon": "",
+                "type": "account manager"
+            },
+            {
+                "title": "Create",
+                "name": "sidebar.create",
+                "is_active": false,
+                "link": "/account-managers/create",
+                "class_name": "",
+                "is_icon_class": true,
+                "component": "AccountManagers/Create",
+                "icon": "",
+                "type": "account manager"
+            }
+        ]
     }
 ]

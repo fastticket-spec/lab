@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\User\AddUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Mail\NewManager;
 use App\Mail\NewOrganiserUser;
 use App\Models\User;
 use App\Repositories\BaseRepository;
@@ -23,7 +24,7 @@ class UserService extends BaseRepository
 
     public function organiserUsers(Request $request): LengthAwarePaginator
     {
-        $activeOrganiser = auth()->user()->account->active_organiser;
+        $activeOrganiser = auth()->user()->activeOrganiser();
 
         return $this->model->query()
             ->with('account.eventAccess.event', 'account.role')
@@ -197,6 +198,101 @@ class UserService extends BaseRepository
             ],
             flashMessage: $message,
             component: '/users',
+            returnType: 'redirect'
+        );
+    }
+
+    public function fetchAccountManagers(Request $request): LengthAwarePaginator
+    {
+        $user = auth()->user();
+
+        if ($parent = $user->parentAccount) {
+            $parentUserId = $parent->owner;
+            $parentAccountId = $user->parent_account_id;
+
+            $query = $this->model->query()
+                ->where('parent_account_id', $parentAccountId)
+                ->orWhere('id', $parentUserId);
+        } else {
+            $query = $this->model->query()
+                ->where('parent_account_id', $user->account->id)
+                ->orWhere('id', $user->id);
+        }
+
+        return $query
+            ->latest()
+            ->paginate($request->perPage ?: 10)
+            ->withQueryString()
+            ->through(fn($u) => [
+                'id' => $u->id,
+                'first_name' => $u->first_name,
+                'last_name' => $u->last_name,
+                'email' => $u->email,
+                'parent_account_id' => $u->parent_account_id,
+                'is_current_user' => $user->id == $u->id
+            ]);
+    }
+
+    public function createAccountManager(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            $account = $user->parentAccount ?: $user->account;
+            $password = Str::password(length: 10, symbols: false);
+            $manager = $this->create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($password),
+                'parent_account_id' => $account->id
+            ]);
+
+            $manager->account()->create([
+                'active_organiser' => null,
+                'timezone_id' => config('settings.default_timezone'),
+                'currency_id' => config('settings.default_currency'),
+            ]);
+
+            Mail::to($manager->email)->later(now()->addSeconds(3), new NewManager("$manager->first_name $manager->last_name", $manager->email, $password));
+
+            $message = 'Account manager created successfully';
+
+            return $this->view(
+                data: [
+                    'message' => $message
+                ],
+                flashMessage: $message,
+                component: '/account-managers',
+                returnType: 'redirect'
+            );
+        } catch (\Throwable $th) {
+            \Log::error($th);
+
+            return $this->view(
+                data: [
+                    'message' => 'An error occurred'
+                ],
+                flashMessage: 'An error occurred',
+                component: '/account-managers',
+                returnType: 'redirect'
+            );
+        }
+    }
+
+    public function deleteAccountManager(string $accountManagerId)
+    {
+        $accountManager = $this->find($accountManagerId);
+        if ($accountManager->parent_account_id) {
+            $this->delete($accountManagerId);
+        }
+
+        $message = 'Account manager deleted';
+        return $this->view(
+            data: [
+                'message' => $message
+            ],
+            flashMessage: $message,
+            component: '/account-managers',
             returnType: 'redirect'
         );
     }
