@@ -55,7 +55,7 @@ const onPaginate = page => {
 }
 
 const sendInvite = () => {
-    isSubmittingInvite.value = true;
+    // isSubmittingInvite.value = true;
     router.post(`/event/${props.event_id}/access-levels/${selectedAccessLevel.value.id}/send-invitation`, {
         invitations: invitations.value,
         invitation_type: inviteType.value,

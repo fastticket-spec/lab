@@ -60,13 +60,21 @@ class InvitationMail extends Mailable
                 $this->content
             );
 
+
             if ($registration) {
                 $this->content = str_replace(
                     '%registration_number%',
                     $ref,
                     $this->content
                 );
+
+                $this->content = str_replace(
+                    '٪registration_number٪',
+                    $ref,
+                    $this->content
+                );
             }
+
         } else {
             $this->content = "<span>Your survey link is <strong><a href='$surveyLink'>$surveyLink</a></strong></span>";
 
