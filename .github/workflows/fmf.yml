@@ -1,0 +1,25 @@
+name: FMF Deploy
+
+on:
+  push:
+    branches: [ fmf-prod ]
+  pull_request:
+    branches: [ fmf-prod ]
+
+jobs:
+  FMF-Deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to FMF-Prod
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.FMF_HOST }}
+        username: ${{ secrets.SPL_USERNAME }}
+        key: ${{ secrets.STAGING_KEY }}
+        port: ${{ secrets.STAGING_PORT }}
+        script: |
+          cd /var/www/fmf-prod && ./fmf_deploy.sh
+          cd /var/www/fmf-prod && sudo npm install
+          cd /var/www/fmf-prod && sudo npm run build
