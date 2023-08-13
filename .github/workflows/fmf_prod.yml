@@ -2,9 +2,9 @@ name: FMF Deploy
 
 on:
   push:
-    branches: [ fmf-prod ]
+    branches: [ fmf-branch ]
   pull_request:
-    branches: [ fmf-prod ]
+    branches: [ fmf-branch ]
 
 jobs:
   FMF-Deploy:
