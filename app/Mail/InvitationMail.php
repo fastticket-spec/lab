@@ -19,7 +19,6 @@ class InvitationMail extends Mailable
     public string $title;
     public ?string $organiserName;
     public ?string $organiserLogo;
-    public ?string $firstName;
     private bool $registration;
     public bool $isArabic;
     public mixed $attachment;
@@ -27,7 +26,7 @@ class InvitationMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($settings, $surveyLink, $organiser, $firstName, $registration = false, $ref = null, $attachment = null)
+    public function __construct($settings, $surveyLink, $organiser, $firstName, $lastName, $registration = false, $ref = null, $attachment = null)
     {
         $this->organiserName = $organiser->name ?? null;
         $this->attachment = $attachment;
@@ -36,12 +35,29 @@ class InvitationMail extends Mailable
 
         $content = $settings->invitation_message ?? '';
         $this->title = $settings->invitation_title ?? 'Invitation Link';
-        $this->firstName = $firstName;
         if ($content) {
             $this->content = str_replace(
                 '%invitation_link%',
                 "<a href='$surveyLink'>$surveyLink</a>",
                 $content
+            );
+
+            $this->content = str_replace(
+                '%first_name%',
+                $firstName,
+                $this->content
+            );
+
+            $this->content = str_replace(
+                '%last_name%',
+                $lastName,
+                $this->content
+            );
+
+            $this->content = str_replace(
+                '%full_name%',
+                "$firstName $lastName",
+                $this->content
             );
 
             if ($registration) {
@@ -92,8 +108,8 @@ class InvitationMail extends Mailable
         if ($this->attachment) {
             \Log::debug('in here');
             \Log::debug($this->attachment);
-            
-            
+
+
             return [
                 Attachment::fromStorageDisk('spaces', $this->attachment)
             ];

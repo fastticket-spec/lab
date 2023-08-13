@@ -768,6 +768,7 @@ class AttendeeService extends BaseRepository
                     surveyLink: "$surveyLink?ref=$inviteId",
                     organiser: $organiser,
                     firstName: $first_name,
+                    lastName: $last_name,
                     registration: $accessLevel->registration,
                     ref: $ref
                 ));
