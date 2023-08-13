@@ -137,3 +137,8 @@ body.sidebar-main .content-page.ar, body.two-sidebar.sidebar-main .content-page,
         padding-left: 15px !important;
     }
 }
+
+.arabic-input {
+    direction: rtl;
+    text-align: right;
+}
