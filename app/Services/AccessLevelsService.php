@@ -457,6 +457,7 @@ class AccessLevelsService extends BaseRepository
                 'first_name' => $invite->first_name,
                 'last_name' => $invite->last_name,
                 'email' => $invite->email,
+                'phone' => $invite->phone,
                 'date_sent' => $invite->created_at->format('jS M, Y h:i a'),
                 'attachment' => $invite->attachment
             ];
