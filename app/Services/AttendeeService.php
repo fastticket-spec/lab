@@ -677,8 +677,7 @@ class AttendeeService extends BaseRepository
         if ($all) return $this->model->query()->count();
 
         $user = auth()->user();
-        $account = $user->account;
-        $activeOrganiser = $account->active_organiser;
+        $activeOrganiser = $user->activeOrganiser();
 
         return $this->model->query()
             ->when(!$activeOrganiser, function ($query) use ($user) {
@@ -705,8 +704,7 @@ class AttendeeService extends BaseRepository
     public function countDownloads(?string $eventId = null, array|Collection|null $allowedEventIds = null): int
     {
         $user = auth()->user();
-        $account = $user->account;
-        $activeOrganiser = $account->active_organiser;
+        $activeOrganiser = $user->activeOrganiser();
 
         return $this->model->query()
             ->when(!$activeOrganiser, function ($query) use ($user) {
@@ -724,9 +722,9 @@ class AttendeeService extends BaseRepository
             ->sum('downloads');
     }
 
-    public function uploadAttendees(string $eventId, array $attendees, string $accessLevelId, bool $approve)
+    public function uploadAttendees(string $eventId, array $attendees, string $accessLevelId, bool $approve, bool $mail)
     {
-        $organiserId = auth()->user()->account->active_organiser;
+        $organiserId = auth()->user()->activeOrganiser();
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
         $surveyLink = config('app.url') . '/a/' . $accessLevelId;
         $settings = $accessLevel->generalSettings;
@@ -764,14 +762,16 @@ class AttendeeService extends BaseRepository
 
             $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
 
-            // Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
-            //     settings: $settings,
-            //     surveyLink: "$surveyLink?ref=$inviteId",
-            //     organiser: $organiser,
-            //     firstName: $first_name,
-            //     registration: $accessLevel->registration,
-            //     ref: $ref
-            // ));
+            if ($mail) {
+                Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
+                    settings: $settings,
+                    surveyLink: "$surveyLink?ref=$inviteId",
+                    organiser: $organiser,
+                    firstName: $first_name,
+                    registration: $accessLevel->registration,
+                    ref: $ref
+                ));
+            }
         }
 
         $message = 'Attendees uploaded successfully!';

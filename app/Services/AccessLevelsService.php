@@ -344,8 +344,9 @@ class AccessLevelsService extends BaseRepository
         }
     }
 
-    public function sendLink(array $emails, string $eventId, string $accessLevelId)
+    public function sendLink(Request $request, string $eventId, string $accessLevelId)
     {
+        $invitations = $request->invitations;
         $route = "/event/$eventId/access-levels";
 
         $accessLevel = $this->find($accessLevelId);
@@ -356,15 +357,32 @@ class AccessLevelsService extends BaseRepository
 
         $organiser = $accessLevel->event->organiser;
 
-        foreach ($emails as $email) {
-            $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
+        $path = '';
+        if ($request->hasFile('attachment')) {
+            $path = $this->uploadFile($request->attachment, 'invitation-', '-attachment-');
+        }
+
+        foreach ($invitations as $invitation) {
+            $email = $invitation['email'];
+            $inviteId = Invite::create([
+                'first_name' => $invitation['first_name'],
+                'last_name' => $invitation['last_name'],
+                'email' => $email,
+                'ref' => $ref,
+                'event_id' => $eventId,
+                'access_level_id' => $accessLevelId,
+                'attachment' => $path ? Storage::disk(config('filesystems.default'))->url($path) : null
+            ])->id;
+
             Mail::to($email)
                 ->later(now()->addSeconds(5), new InvitationMail(
                     settings: $settings,
                     surveyLink: "$surveyLink?ref=$inviteId",
                     organiser: $organiser,
+                    firstName: $invitation['first_name'] ?: ($invitation['last_name'] ?: 'Applicant'),
                     registration: $accessLevel->registration,
-                    ref: $ref
+                    ref: $ref,
+                    attachment: $path
                 ));
         }
 
@@ -388,8 +406,11 @@ class AccessLevelsService extends BaseRepository
 
         $invites = $accessLevel->invites()->latest()->get()->map(function ($invite) {
             return [
+                'first_name' => $invite->first_name,
+                'last_name' => $invite->last_name,
                 'email' => $invite->email,
-                'date_sent' => $invite->created_at->format('jS M, Y h:i a')
+                'date_sent' => $invite->created_at->format('jS M, Y h:i a'),
+                'attachment' => $invite->attachment
             ];
         });
 

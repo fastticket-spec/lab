@@ -4,7 +4,7 @@ import {useForm, Field, ErrorMessage, useField} from "vee-validate";
 import {accessLevelGeneralSchema} from "../../../../../Shared/components/helpers/Validators.js";
 import {QuillEditor} from "@vueup/vue-quill";
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -14,6 +14,7 @@ const props = defineProps({
 })
 
 const showArabicInputs = ref(true)
+const showArabicInvitation = ref(false)
 
 const initialValues = props.data
     ? {
@@ -37,6 +38,10 @@ const {handleSubmit, isSubmitting} = useForm({
     validationSchema: accessLevelGeneralSchema,
 });
 
+onMounted(() => {
+    showArabicInvitation.value = !!props.data?.arabic_invitation
+})
+
 
 const {value: description} = useField("description");
 const {value: description_arabic} = useField("description_arabic");
@@ -48,7 +53,7 @@ const {value: email_message_arabic} = useField("email_message_arabic");
 const {value: invitation_message} = useField("invitation_message");
 
 const onSubmit = handleSubmit(values => {
-    router.post(`/event/${props.eventId}/access-levels/${props.accessLevel.id}/customize/general`, values);
+    router.post(`/event/${props.eventId}/access-levels/${props.accessLevel.id}/customize/general`, {...values, arabic_invitation: showArabicInvitation.value});
 })
 </script>
 
@@ -263,6 +268,13 @@ const onSubmit = handleSubmit(values => {
                                                :class="`form-control mb-0`" :validateOnInput="true"/>
                                         <ErrorMessage name="invitation_title" class="text-danger"/>
                                     </div>
+                                </b-col>
+
+                                <b-col>
+                                    <b-checkbox v-model="showArabicInvitation" class="custom-checkbox-color"
+                                                name="check-button" inline>
+                                        Arabic Invitation?
+                                    </b-checkbox>
                                 </b-col>
 
                                 <b-col sm="12">
