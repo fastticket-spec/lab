@@ -93,7 +93,7 @@ class AttendeeService extends BaseRepository
                 $query->whereStatus($request->filter);
             })
             ->latest()
-            ->paginate($request->per_page ?: 10)
+            ->paginate(1000)
             ->withQueryString()
             ->through(function ($attendee) {
                 return [
