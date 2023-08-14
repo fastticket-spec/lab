@@ -287,7 +287,7 @@ label {
                                                                 v-else-if="field.value.type === '7'"
                                                                 :class="{'text-right': lang === 'arabic'}"
                                                                 class="form-control mb-0"
-                                                                :style="{backgroundColor: accessLevel?.page_design?.field_color}"
+                                                                :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                                 sm="6"
                                                                 :options="field.value.options"
                                                                 :label="lang === 'arabic' ? 'name_arabic' : 'name'"
@@ -302,7 +302,7 @@ label {
                                                                v-slot="{field: boxField}"
                                                                :class="`checkbox custom-checkbox-color`"
                                                                :validateOnInput="true"
-                                                               :style="{backgroundColor: accessLevel?.page_design?.field_color}"
+                                                               :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                                :value="lang === 'arabic' ? option.name_arabic : option.name">
                                                             <label class="mr-3">
                                                                 <input type="checkbox" :name="`surveys[${idx}].answer`"
@@ -324,6 +324,7 @@ label {
                                                                v-slot="{field: boxField}"
                                                                :class="`checkbox custom-radio-color`"
                                                                :validateOnInput="true"
+                                                               :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                                :value="lang === 'arabic' ? option.name_arabic : option.name">
                                                             <label class="mr-3">
                                                                 <input type="radio" :name="`surveys[${idx}].answer`"
@@ -344,6 +345,7 @@ label {
                                                            v-else-if="field.value.type === '11'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
+                                                           :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                            :class="`form-control mb-0`" :validateOnInput="true">
                                                         <option v-for="country in countries"
                                                                 :key="`${field.value.id}-${country.country}`"
