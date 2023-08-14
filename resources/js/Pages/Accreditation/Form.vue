@@ -146,6 +146,9 @@ form-control:disabled, .form-control[readonly] {
     /* color: {{ accessLevel?.page_design?.font_color }}; */
 
 }
+select {
+    height: 46px !important;
+}
 
 .form-control {
     display: block;
