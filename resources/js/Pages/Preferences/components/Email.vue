@@ -68,6 +68,8 @@ const onSubmit = () => {
                                                   id="qr-color" placeholder=""></b-form-input>
                                 </b-form-group>
 
+                                <b-img thumbnail v-if="state.logo" :src="state.logo" />
+
                                 <b-form-group label="Logo" label-for="logo-file">
                                     <b-form-file type="file" size="sm" id="logo-file"
                                                  accept="image/*" multiple @change="uploadLogo"/>
