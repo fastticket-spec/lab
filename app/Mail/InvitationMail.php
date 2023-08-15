@@ -18,10 +18,11 @@ class InvitationMail extends Mailable
     public string $content;
     public string $title;
     public ?string $organiserName;
-    public ?string $organiserLogo;
     private bool $registration;
     public bool $isArabic;
     public mixed $attachment;
+    public $preferences;
+
 
     /**
      * Create a new message instance.
@@ -30,8 +31,15 @@ class InvitationMail extends Mailable
     {
         $this->organiserName = $organiser->name ?? null;
         $this->attachment = $attachment;
-        $this->organiserLogo = $organiser->logo_url ?? null;
+        $organiserLogo = $organiser->logo_url ?? null;
         $this->isArabic = !!optional($settings)->arabic_invitation;
+
+        $this->preferences = $organiser->preferences ?: [
+            'email_bg_color' => 'transparent',
+            'email_font_color' => '#000000',
+            'email_qr_color' => '#000000',
+            'email_logo_url' => $organiserLogo
+        ];
 
         $content = $settings->invitation_message ?? '';
         $this->title = $settings->invitation_title ?? 'Invitation Link';
