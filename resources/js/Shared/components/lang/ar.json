@@ -220,7 +220,12 @@
         "all_events": "الدخول لجميع الأحداث",
         "attend_date": "تاريخ الحضور",
         "enter_email": "Enter your email address",
-        "enter_reg_no": "Enter your registration number"
+        "enter_reg_no": "Enter your registration number",
+        "approval_message": "Approval Message",
+        "success_message": "Success Message",
+        "success_messageArabic": "Success Message (Arabic)",
+        "email_message": "Email Message",
+        "email_message_arabic": "Email Message (Arabic)"
     },
     "button": {
         "create": "إنشاء",
