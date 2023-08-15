@@ -7,10 +7,10 @@ const props = defineProps({
 })
 
 const state = reactive({
-    bg_color: props.data.email_bg_color || '#ffffff',
-    font_color: props.data.email_font_color || '#000000',
-    qr_color: props.data.email_qr_color || '#000000',
-    logo: props.data.email_logo_url || ''
+    bg_color: props.data?.email_bg_color || '#ffffff',
+    font_color: props.data?.email_font_color || '#000000',
+    qr_color: props.data?.email_qr_color || '#000000',
+    logo: props.data?.email_logo_url || ''
 })
 
 onUpdated(() => {
