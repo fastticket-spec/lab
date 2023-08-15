@@ -31,6 +31,15 @@ class AttendeeMail extends Mailable
         $this->content = $lang == 'arabic' ? ($settings->email_message_arabic ?? '<p></p>') : ($settings->email_message ?? '<p></p>');
         $this->title = $settings->email_message_title ?? 'Attendee Mail';
         $this->firstName = $firstName;
+
+
+
+        $this->content = str_replace(
+            '%first_name%',
+            $firstName,
+            $this->content
+        );
+
     }
 
     /**
@@ -39,7 +48,7 @@ class AttendeeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('register@accreditation.achieveone.sa', $this->organiserName),
+            from: new Address('noreply@nidlp.gov.sa', $this->organiserName),
             subject: $this->title,
         );
     }
