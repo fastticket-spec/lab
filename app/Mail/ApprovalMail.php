@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Helpers\QRCodeHelper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -22,12 +23,19 @@ class ApprovalMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($settings, $organiser)
+    public function __construct($settings, $organiser, $attendeeRef)
     {
         $this->organiserName = $organiser->name ?? null;
         $this->organiserLogo = $organiser->logo_url ?? null;
 
+        $qr = QRCodeHelper::getQRCode($attendeeRef);
+
         $this->content = $settings->approval_message ?? '<p></p>';
+        $this->content = str_replace(
+            '%qrcode%',
+            "<img src='$qr' alt='' width='150px'>",
+            $this->content
+        );
         $this->title = $settings->approval_message_title ?? 'Approval Mail';
     }
 
@@ -37,7 +45,7 @@ class ApprovalMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('register@accreditation.achieveone.sa', $this->organiserName),
+            from: new Address('noreply@nidlp.gov.sa', $this->organiserName),
             subject: $this->title
         );
     }

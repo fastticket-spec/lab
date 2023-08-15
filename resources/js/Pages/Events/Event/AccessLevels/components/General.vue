@@ -223,7 +223,7 @@ const onSubmit = handleSubmit(values => {
 
                                 <b-col sm="12">
                                     <div class="form-group">
-                                        <label for="approvalMessage">{{ $t('input.approval_message') }}</label>
+                                        <label for="approvalMessage">{{ $t('input.approval_message') }}</label> <span><small>&nbsp;Use <strong>%qrcode%</strong> to insert QrCode:</small></span>
                                         <quill-editor toolbar="full" theme="snow" v-model:content="approval_message"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="approval_message" class="text-danger"/>
