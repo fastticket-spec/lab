@@ -26,6 +26,7 @@
         "modifyPersonalDetails": "Modify your personal details.",
         "accountSettings": "Account Setting",
         "manageAccount": "Manage your account parameters.",
+        "organiserPreferences": "Organiser Preferences",
         "logout": "Logout"
     },
     "sidebar": {
@@ -269,5 +270,8 @@
     "sort": {
         "title": "Sort by:",
         "creation_date": "Creation Date"
+    },
+    "preferences": {
+        "email": "Email"
     }
 }

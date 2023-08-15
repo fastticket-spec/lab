@@ -171,3 +171,10 @@ export const createManagerSchema = yup.object({
     email: yup.string().email().required(),
 })
 
+export const emailPreferenceSchema = yup.object({
+    bg_color: yup.string().required(),
+    font_color: yup.string().required(),
+    qr_color: yup.string().required(),
+    logo: yup.string().required()
+})
+

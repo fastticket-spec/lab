@@ -14,6 +14,7 @@ use App\Http\Controllers\Events\DashboardController as EventDashboardController;
 use App\Http\Controllers\EventSurveyController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrganiserController;
+use App\Http\Controllers\PreferencesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ZonesController;
 use Illuminate\Support\Facades\Route;
@@ -205,6 +206,12 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/{user_id}/edit', [UserController::class, 'edit']);
         Route::patch('/{user_id}', [UserController::class, 'update']);
         Route::delete('/{user_id}', [UserController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'organiser-preferences'], function () {
+        Route::get('/', [PreferencesController::class, 'index']);
+        Route::post('/logo', [PreferencesController::class, 'uploadLogo']);
+        Route::post('/', [PreferencesController::class, 'store']);
     });
 });
 
