@@ -68,6 +68,8 @@ const onSubmit = () => {
                                                   id="qr-color" placeholder=""></b-form-input>
                                 </b-form-group>
 
+                                <b-img thumbnail v-if="state.logo" :src="state.logo" />
+
                                 <b-form-group label="Logo" label-for="logo-file">
                                     <b-form-file type="file" size="sm" id="logo-file"
                                                  accept="image/*" multiple @change="uploadLogo"/>
@@ -76,11 +78,6 @@ const onSubmit = () => {
                                 <b-button type="button" @click="onSubmit" variant="primary">
                                     {{ $t(`button.update`) }}
                                 </b-button>
-                            </b-col>
-
-                            <b-col md="6">
-                                <h5 class="mb-3">Email Preview</h5>
-                                <!--                                <page-preview :data="state" :event="event" :access-level="accessLevel"/>-->
                             </b-col>
                         </b-row>
 
