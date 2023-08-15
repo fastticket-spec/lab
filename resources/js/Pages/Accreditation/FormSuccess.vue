@@ -53,7 +53,7 @@ export default {
                 }" class="mx-auto vag d-flex align-items-center">
         <div class="row no-gutters accreditation-form w-100" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
-                <div class="bg-div bg-white" :style="{backgroundColor: accessLevel?.page_design?.form_bg_color}">
+                <div class="bg-div bg-white" :style="{backgroundColor: accessLevel?.page_design?.form_bg_color + ' !important'}">
                     <div class="text-center">
                         <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                     </div>
