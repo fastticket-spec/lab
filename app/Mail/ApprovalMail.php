@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class ApprovalMail extends Mailable
 {
@@ -19,11 +20,12 @@ class ApprovalMail extends Mailable
     public string $content;
     public ?string $organiserName;
     public $preferences;
+//    public ?string $firstName;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($settings, $organiser, $attendeeRef)
+    public function __construct($settings, $organiser, $attendeeRef, $firstName)
     {
         $this->organiserName = $organiser->name ?? null;
         $organiserLogo = $organiser->logo_url ?? null;
@@ -36,6 +38,7 @@ class ApprovalMail extends Mailable
         ];
 
         $qr = QRCodeHelper::getQRCode($attendeeRef);
+        Log::info($qr);
 
         $this->content = $settings->approval_message ?? '<p></p>';
         $this->content = str_replace(
@@ -43,6 +46,13 @@ class ApprovalMail extends Mailable
             "<img src='$qr' alt='' width='150px'>",
             $this->content
         );
+
+        $this->content = str_replace(
+            '%first_name%',
+            $firstName,
+            $this->content
+        );
+
         $this->title = $settings->approval_message_title ?? 'Approval Mail';
     }
 
@@ -52,7 +62,7 @@ class ApprovalMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('register@accreditation.achieveone.sa', $this->organiserName),
+            from: new Address('noreply@nidlp.gov.sa', $this->organiserName),
             subject: $this->title
         );
     }

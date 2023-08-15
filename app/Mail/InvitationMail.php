@@ -99,7 +99,7 @@ class InvitationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('register@accreditation.achieveone.sa', $this->organiserName),
+            from: new Address('noreply@nidlp.gov.sa', $this->organiserName),
             subject: $this->title,
         );
     }
