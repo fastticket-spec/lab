@@ -77,11 +77,6 @@ const onSubmit = () => {
                                     {{ $t(`button.update`) }}
                                 </b-button>
                             </b-col>
-
-                            <b-col md="6">
-                                <h5 class="mb-3">Email Preview</h5>
-                                <!--                                <page-preview :data="state" :event="event" :access-level="accessLevel"/>-->
-                            </b-col>
                         </b-row>
 
                     </div>
