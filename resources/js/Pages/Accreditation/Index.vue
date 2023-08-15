@@ -12,7 +12,7 @@ const props = defineProps({
     reference: String
 })
 
-const lang = ref('arabic');
+const lang = ref('english');
 
 onMounted(() => {
     document.querySelector('title').textContent = `${props.accessLevel.title} - ${props.accessLevel?.event?.organiser?.name}`
@@ -169,13 +169,13 @@ label {
                             </b-btn>
                         </div>
                     </template>
-
+<!--
                     <div class="lang-container">
                         <select v-model="lang">
                             <option value="english">English</option>
                             <option value="arabic">Arabic</option>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

@@ -69,4 +69,9 @@ class Organiser extends Model
     {
         return $this->banner_arabic ? Storage::disk(config('filesystems.default'))->url($this->banner_arabic) : null;
     }
+
+    public function preferences(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Preference::class);
+    }
 }

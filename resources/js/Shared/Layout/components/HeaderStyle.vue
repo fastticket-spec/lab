@@ -86,18 +86,18 @@
                                             </div>
                                         </div>
                                     </a>
-                                    <a href="#"
+                                    <Link href="/organiser-preferences" v-if="isOrganiser"
                                        class="iq-sub-card iq-bg-primary-hover">
                                         <div class="media align-items-center">
                                             <div class="rounded iq-card-icon iq-bg-primary">
                                                 <i class="ri-account-box-line"></i>
                                             </div>
                                             <div class="media-body ml-3">
-                                                <h6 class="mb-0 ">{{ $t('header.accountSettings') }}</h6>
+                                                <h6 class="mb-0 ">{{ $t('header.organiserPreferences') }}</h6>
                                                 <p class="mb-0 font-size-12">{{ $t('header.manageAccount') }}</p>
                                             </div>
                                         </div>
-                                    </a>
+                                    </Link>
                                     <div class="d-inline-block w-100 text-center p-3">
                                         <Link href="/logout" method="post" as="button"
                                               class="btn btn-primary dark-btn-primary">{{ $t('header.logout') }}<i

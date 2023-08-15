@@ -9,6 +9,7 @@
         "chillerlan/php-qrcode": "^4.3",
         "ext-dom": "*",
         "ext-libxml": "*",
+        "chillerlan/php-qrcode": "^4.3",
         "endroid/qr-code": "^3.8",
         "guzzlehttp/guzzle": "^7.2",
         "inertiajs/inertia-laravel": "^0.6.9",

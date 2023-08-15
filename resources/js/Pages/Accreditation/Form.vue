@@ -175,11 +175,13 @@ form-control:disabled, .form-control[readonly] {
     border-bottom-right-radius: 0px;
 }
 
-
-
-label {
-    /* color: accessLevel?.page_design?.font_color ; */
+select {
+    height: 48px;
+    height: 46px !important;
+    border-radius: 3px !important;
 }
+
+
 
 @media screen and (max-width: 600px) {
     .vag {
