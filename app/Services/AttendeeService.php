@@ -263,7 +263,7 @@ class AttendeeService extends BaseRepository
             $settings = optional($attendee->accessLevel)->generalSettings;
 
             Mail::to($attendee->email)
-                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $attendee->ref));
+                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $attendee->ref, $attendee->first_name));
         }
     }
 
