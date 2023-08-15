@@ -1,9 +1,9 @@
-<x-mail::layout>
+<x-mail::layout bodyBg="{{$preferences['email_bg_color']}}" fontColor="{{$preferences['email_font_color']}}">
 {{-- Header --}}
 <x-slot:header>
 <x-mail::header :url="config('app.url')">
-    @if($headerLogo)
-    <img src="{{$headerLogo}}" style="width: 100px; height: auto;" alt="">
+    @if($preferences['email_logo_url'])
+    <img src="{{$preferences['email_logo_url']}}" style="width: 100px; height: auto;" alt="">
     @else
     {{$headerTitle ?? config('app.name')}}
     @endif

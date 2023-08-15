@@ -17,8 +17,8 @@ class AttendeeMail extends Mailable
     public string $content;
     public string $title;
     public ?string $organiserName;
-    public ?string $organiserLogo;
     public ?string $firstName;
+    public $preferences;
 
     /**
      * Create a new message instance.
@@ -26,7 +26,14 @@ class AttendeeMail extends Mailable
     public function __construct($settings, $lang, $organiser, $firstName)
     {
         $this->organiserName = $organiser->name ?? null;
-        $this->organiserLogo = $organiser->logo_url ?? null;
+        $organiserLogo = $organiser->logo_url ?? null;
+
+        $this->preferences = $organiser->preferences ?: [
+            'email_bg_color' => 'transparent',
+            'email_font_color' => '#000000',
+            'email_qr_color' => '#000000',
+            'email_logo_url' => $organiserLogo
+        ];
 
         $this->content = $lang == 'arabic' ? ($settings->email_message_arabic ?? '<p></p>') : ($settings->email_message ?? '<p></p>');
         $this->title = $settings->email_message_title ?? 'Attendee Mail';

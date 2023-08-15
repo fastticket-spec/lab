@@ -15,7 +15,7 @@ class NewOrganiserUser extends Mailable
     use Queueable, SerializesModels;
 
     public ?string $organiserName;
-    public ?string $organiserLogo;
+    public $preferences;
 
     /**
      * Create a new message instance.
@@ -23,7 +23,14 @@ class NewOrganiserUser extends Mailable
     public function __construct(public $name, public $role, public $email, public $password, $organiser)
     {
         $this->organiserName = $organiser->name ?? null;
-        $this->organiserLogo = $organiser->logo_url ?? null;
+        $organiserLogo = $organiser->logo_url ?? null;
+
+        $this->preferences = $organiser->preferences ?: [
+            'email_bg_color' => 'transparent',
+            'email_font_color' => '#000000',
+            'email_qr_color' => '#000000',
+            'email_logo_url' => $organiserLogo
+        ];
     }
 
     /**
