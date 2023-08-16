@@ -10,7 +10,9 @@ const state = reactive({
     bg_color: props.data?.email_bg_color || '#ffffff',
     font_color: props.data?.email_font_color || '#000000',
     qr_color: props.data?.email_qr_color || '#000000',
-    logo: props.data?.email_logo_url || ''
+    logo: props.data?.email_logo_url || '',
+    logo_width: props.data?.email_logo_width || 200,
+    logo_height: props.data?.email_logo_height || 100,
 })
 
 onUpdated(() => {
@@ -31,7 +33,9 @@ const onSubmit = () => {
         email_bg_color: state.bg_color,
         email_font_color: state.font_color,
         email_qr_color: state.qr_color,
-        email_logo_url: state.logo
+        email_logo_url: state.logo,
+        email_logo_width: state.logo_width,
+        email_logo_height: state.logo_height,
     }, {
         preserveScroll: true,
         preserveState: true
@@ -73,6 +77,16 @@ const onSubmit = () => {
                                 <b-form-group label="Logo" label-for="logo-file">
                                     <b-form-file type="file" size="sm" id="logo-file"
                                                  accept="image/*" multiple @change="uploadLogo"/>
+                                </b-form-group>
+
+                                <b-form-group label="Logo Width" label-for="logo-width">
+                                    <b-form-input v-model="state.logo_width" type="number" size="sm"
+                                                  id="logo-width" placeholder=""></b-form-input>
+                                </b-form-group>
+
+                                <b-form-group label="Logo Height" label-for="logo-height">
+                                    <b-form-input v-model="state.logo_height" type="number" size="sm"
+                                                  id="logo-height" placeholder=""></b-form-input>
                                 </b-form-group>
 
                                 <b-button type="button" @click="onSubmit" variant="primary">

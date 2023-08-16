@@ -16,5 +16,7 @@ class Preference extends Model
         'email_font_color',
         'email_qr_color',
         'email_logo_url',
+        'email_logo_width',
+        'email_logo_height'
     ];
 }

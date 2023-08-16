@@ -38,7 +38,9 @@ class InvitationMail extends Mailable
             'email_bg_color' => 'transparent',
             'email_font_color' => '#000000',
             'email_qr_color' => '#000000',
-            'email_logo_url' => $organiserLogo
+            'email_logo_url' => $organiserLogo,
+            'email_logo_width' => '200',
+            'email_logo_height' => '100'
         ];
 
         $content = $settings->invitation_message ?? '';
