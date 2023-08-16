@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Helpers\QRCodeHelper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -10,7 +9,6 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class ApprovalMail extends Mailable
 {
@@ -20,12 +18,11 @@ class ApprovalMail extends Mailable
     public string $content;
     public ?string $organiserName;
     public $preferences;
-//    public ?string $firstName;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($settings, $organiser, $attendeeRef, $firstName)
+    public function __construct($settings, $organiser, $qrUrl, $firstName)
     {
         $this->organiserName = $organiser->name ?? null;
         $organiserLogo = $organiser->logo_url ?? null;
@@ -34,16 +31,15 @@ class ApprovalMail extends Mailable
             'email_bg_color' => 'transparent',
             'email_font_color' => '#000000',
             'email_qr_color' => '#000000',
-            'email_logo_url' => $organiserLogo
+            'email_logo_url' => $organiserLogo,
+            'email_logo_width' => '200',
+            'email_logo_height' => '100'
         ];
-
-        $qr = QRCodeHelper::getQRCode($attendeeRef);
-        Log::info($qr);
 
         $this->content = $settings->approval_message ?? '<p></p>';
         $this->content = str_replace(
             '%qrcode%',
-            "<img src='$qr' alt='' width='150px'>",
+            "<img src='$qrUrl' alt=$qrUrl style='background-color: white;'>",
             $this->content
         );
 

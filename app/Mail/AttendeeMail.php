@@ -32,7 +32,9 @@ class AttendeeMail extends Mailable
             'email_bg_color' => 'transparent',
             'email_font_color' => '#000000',
             'email_qr_color' => '#000000',
-            'email_logo_url' => $organiserLogo
+            'email_logo_url' => $organiserLogo,
+            'email_logo_width' => '200',
+            'email_logo_height' => '100'
         ];
 
         $this->content = $lang == 'arabic' ? ($settings->email_message_arabic ?? '<p></p>') : ($settings->email_message ?? '<p></p>');
