@@ -3,7 +3,7 @@
 <x-slot:header>
 <x-mail::header :url="config('app.url')">
     @if($preferences['email_logo_url'])
-    <img src="{{$preferences['email_logo_url']}}" style="width: 100px; height: auto;" alt="">
+    <img src="{{$preferences['email_logo_url']}}" style="width: 200px; height: auto;" alt="">
     @else
     {{$headerTitle ?? config('app.name')}}
     @endif
