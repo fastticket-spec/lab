@@ -29,7 +29,9 @@ class NewManager extends Mailable
             'email_bg_color' => 'transparent',
             'email_font_color' => '#000000',
             'email_qr_color' => '#000000',
-            'email_logo_url' => null
+            'email_logo_url' => null,
+            'email_logo_width' => '200',
+            'email_logo_height' => '100'
         ];
     }
 
