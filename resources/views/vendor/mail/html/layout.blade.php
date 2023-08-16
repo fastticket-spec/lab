@@ -1,4 +1,4 @@
-@props(['bodyBg', 'fontColor'])
+@props(['bodyBg', 'fontColor', 'logoUrl', 'logoWidth', 'logoHeight'])
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -40,6 +40,13 @@ width: 100% !important;
 <!-- Body content -->
 <tr>
 <td class="content-cell" style="background-color: {{$bodyBg}}; color: {{$fontColor}}">
+    <div style="text-align: center; margin-bottom: 10px">
+        @if($logoUrl)
+            <img src="{{$logoUrl}}" style="width: {{$logoWidth}}px; height: {{$logoHeight}}px;" alt="">
+        @else
+            {{$headerTitle ?? config('app.name')}}
+        @endif
+    </div>
 {{ Illuminate\Mail\Markdown::parse($slot) }}
 
 {{ $subcopy ?? '' }}
