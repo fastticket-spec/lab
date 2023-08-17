@@ -82,6 +82,7 @@ const {handleSubmit, isSubmitting} = useForm({
 });
 
 const onSubmit = handleSubmit(values => {
+    buttonDisabled.value = true;
     let answers = values.surveys.map(d => {
         if (d.type === '7') {
             d.answer = d.answer.map(x => {
@@ -112,7 +113,6 @@ const onSubmit = handleSubmit(values => {
         answers,
         lang: props.lang,
         reference: props.reference,
-
     };
 
     router.post(`/form/${props.accessLevel.event_id}/${props.accessLevel.id}/submit`, data, {
@@ -169,9 +169,23 @@ form-control:disabled, .form-control[readonly] {
     border-bottom-right-radius: 0px;
 }
 
+select {
+    height: 48px;
+    height: 46px !important;
+    border-radius: 3px !important;
+}
+select option {
+  margin: 40px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 08439614409eb1486c820c4644944986632abeaf
 
 @media screen and (max-width: 600px) {
     .vag {
@@ -279,7 +293,7 @@ form-control:disabled, .form-control[readonly] {
                                                                 v-else-if="field.value.type === '7'"
                                                                 :class="{'text-right': lang === 'arabic'}"
                                                                 class="form-control mb-0"
-                                                                :style="{backgroundColor: accessLevel?.page_design?.field_color}"
+                                                                :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                                 sm="6"
                                                                 :options="field.value.options"
                                                                 :label="lang === 'arabic' ? 'name_arabic' : 'name'"
@@ -294,7 +308,7 @@ form-control:disabled, .form-control[readonly] {
                                                                v-slot="{field: boxField}"
                                                                :class="`checkbox custom-checkbox-color`"
                                                                :validateOnInput="true"
-                                                               :style="{backgroundColor: accessLevel?.page_design?.field_color}"
+                                                               :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                                :value="lang === 'arabic' ? option.name_arabic : option.name">
                                                             <label class="mr-3">
                                                                 <input type="checkbox" :name="`surveys[${idx}].answer`"
@@ -316,6 +330,7 @@ form-control:disabled, .form-control[readonly] {
                                                                v-slot="{field: boxField}"
                                                                :class="`checkbox custom-radio-color`"
                                                                :validateOnInput="true"
+                                                               :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                                :value="lang === 'arabic' ? option.name_arabic : option.name">
                                                             <label class="mr-3">
                                                                 <input type="radio" :name="`surveys[${idx}].answer`"
@@ -336,6 +351,7 @@ form-control:disabled, .form-control[readonly] {
                                                            v-else-if="field.value.type === '11'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
+                                                           :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                            :class="`form-control mb-0`" :validateOnInput="true">
                                                         <option v-for="country in countries"
                                                                 :key="`${field.value.id}-${country.country}`"
@@ -354,7 +370,7 @@ form-control:disabled, .form-control[readonly] {
                             </div>
 
                             <div class="col-12 pb-5 text-center">
-                                <b-btn type="submit" size="lg" class="px-5 py-2" :disabled="isSubmitting" v-if="!isSubmitting"
+                                <b-btn type="submit" size="lg" class="px-5 py-2" :disabled="buttonDisabled" v-if="!isSubmitting"
                                        :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
                                     {{
                                         lang === 'english' ? accessLevel?.page_design?.form_btn_value : accessLevel?.page_design?.form_btn_value_ar

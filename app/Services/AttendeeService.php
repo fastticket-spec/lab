@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\QRCodeHelper;
 use App\Mail\ApprovalMail;
 use App\Mail\AttendeeMail;
 use App\Mail\CustomAttendeeMail;
@@ -262,8 +263,13 @@ class AttendeeService extends BaseRepository
 
             $settings = optional($attendee->accessLevel)->generalSettings;
 
+            $qr = QRCodeHelper::getQRCode($attendee->ref, 'png');
+
+            $path = $this->uploadBase64File(file_get_contents($qr));
+            $qrPath = Storage::disk(config('filesystems.default'))->url($path);
+
             Mail::to($attendee->email)
-                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser));
+                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $qrPath, $attendee->first_name));
         }
     }
 
@@ -768,6 +774,7 @@ class AttendeeService extends BaseRepository
                     surveyLink: "$surveyLink?ref=$inviteId",
                     organiser: $organiser,
                     firstName: $first_name,
+                    lastName: $last_name,
                     registration: $accessLevel->registration,
                     ref: $ref
                 ));

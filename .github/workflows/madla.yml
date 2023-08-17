@@ -1,0 +1,25 @@
+name: Madla Deploy
+
+on:
+  push:
+    branches: [ madla-prod ]
+  pull_request:
+    branches: [ madla-prod ]
+
+jobs:
+  Madla-Deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to Madla-Prod
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.MADLA_HOST }}
+        username: ${{ secrets.SPL_USERNAME }}
+        key: ${{ secrets.STAGING_KEY }}
+        port: ${{ secrets.STAGING_PORT }}
+        script: |
+          cd /var/www/madla-prod && ./madla_deploy.sh
+          cd /var/www/madla-prod && sudo npm install
+          cd /var/www/madla-prod && sudo npm run build

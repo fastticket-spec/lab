@@ -51,6 +51,7 @@ const {value: approval_message} = useField("approval_message");
 const {value: email_message} = useField("email_message");
 const {value: email_message_arabic} = useField("email_message_arabic");
 const {value: invitation_message} = useField("invitation_message");
+const {value: invitation_message_sms} = useField("invitation_message_sms");
 
 const onSubmit = handleSubmit(values => {
     router.post(`/event/${props.eventId}/access-levels/${props.accessLevel.id}/customize/general`, {...values, arabic_invitation: showArabicInvitation.value});
@@ -222,7 +223,7 @@ const onSubmit = handleSubmit(values => {
 
                                 <b-col sm="12">
                                     <div class="form-group">
-                                        <label for="approvalMessage">{{ $t('input.approval_message') }}</label>
+                                        <label for="approvalMessage">{{ $t('input.approval_message') }}</label> <span><small>&nbsp;Use <strong>%qrcode%</strong> to insert QrCode:</small></span>
                                         <quill-editor toolbar="full" theme="snow" v-model:content="approval_message"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="approval_message" class="text-danger"/>
@@ -277,13 +278,27 @@ const onSubmit = handleSubmit(values => {
                                     </b-checkbox>
                                 </b-col>
 
-                                <b-col sm="12">
+                                <b-col sm="12" id="mail-invite">
                                     <div class="form-group">
                                         <label for="invitation_message">Invitation Link Message</label>
-                                        <span><small>&nbsp; Copy this placeholder to denote the link - <strong>%invitation_link%</strong><template v-if="accessLevel.registration"> and <strong>%registration_number%</strong> denotes the registration number.</template></small></span>
+                                        <span><small>&nbsp;Copy these placeholders: <br>
+                                            <strong>%invitation_link%</strong>
+                                            <template v-if="accessLevel.registration"><br><strong>%registration_number%</strong> denotes the registration number.<br></template>
+                                            <strong>%first_name%</strong> for First Name<br>
+                                            <strong>%last_name%</strong> for Last Name<br>
+                                            <strong>%full_name%</strong> for Full Name
+                                        </small></span>
                                         <quill-editor toolbar="full" theme="snow" v-model:content="invitation_message"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="invitation_message" class="text-danger"/>
+                                    </div>
+                                </b-col>
+
+                                <b-col sm="12" id="sms-invite">
+                                    <div class="form-group">
+                                        <label for="invitation_message">Invitation Link Message (SMS)</label>
+                                        <textarea v-model="invitation_message_sms" class="form-control" :class="{'arabic-input': showArabicInvitation}" rows="5"/>
+                                        <ErrorMessage name="invitation_message_sms" class="text-danger"/>
                                     </div>
                                 </b-col>
                             </b-row>

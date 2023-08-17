@@ -1,5 +1,3 @@
-@component('mail::message', ['headerTitle' => $organiserName, 'headerLogo' => $organiserLogo])
-<h3 style="text-align: {{$isArabic ? 'right' : 'left'}}">Dear {{$firstName}},</h3>
-
+@component('mail::message', ['headerTitle' => $organiserName, 'preferences' => $preferences])
 {!! $content !!}
 @endcomponent
