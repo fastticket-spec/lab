@@ -346,7 +346,7 @@ const onSubmit = handleSubmit((values) => {
 
                                                         <b-col sm="5">
                                                             <div class="form-group">
-                                                                <label>Choose Questions</label>
+                                                                <label>Choose Child Question</label>
                                                                 <Field as="select"
                                                                        :name="`surveys[${idx}].options[${optionIdx}].child_question`"
                                                                        :id="`child_question-${idx}-${optionIdx}`"
@@ -358,10 +358,6 @@ const onSubmit = handleSubmit((values) => {
                                                                     </option>
                                                                 </Field>
                                                             </div>
-                                                        </b-col>
-
-                                                        <b-col sm="6">
-                                                            <a href="#"><i class="ri-add-line"></i>Add Questions</a>
                                                         </b-col>
                                                     </b-row>
                                                 </b-col>
