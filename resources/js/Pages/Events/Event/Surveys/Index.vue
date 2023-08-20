@@ -3,6 +3,8 @@ import {ErrorMessage, Field, FieldArray, useField, useForm} from 'vee-validate';
 import {createSurveySchema} from '../../../../Shared/components/helpers/Validators';
 import {router, usePage} from "@inertiajs/vue3";
 import {computed, onMounted, ref} from "vue";
+import VueSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 
 const props = defineProps({
     code: Number,
@@ -154,15 +156,29 @@ const onSubmit = handleSubmit((values) => {
     const childQuestions = [];
     values.surveys.forEach((survey, i) => {
         survey.options.forEach(option => {
-            if(option.child_question) {
-                const childQuestionArray = option.child_question.split('-')
-                let parentAnswer = '';
-                if (childQuestionArray[2] !== 'null') {
-                    parentAnswer = `${childQuestionArray[1]}, ${childQuestionArray[2]}`;
+            if(option.child_question && (option.child_question.length > 0)) {
+                if (!Array.isArray(option.child_question)) {
+                    const childQuestionArray = option.child_question.split('-')
+                    let parentAnswer = '';
+                    if (childQuestionArray[2] !== 'null') {
+                        parentAnswer = `${childQuestionArray[1]}, ${childQuestionArray[2]}`;
+                    } else {
+                        parentAnswer = childQuestionArray[1];
+                    }
+                    childQuestions.push({parentIndex: i, child: childQuestionArray[0], parentAnswer});
                 } else {
-                    parentAnswer = childQuestionArray[1];
+                    option.child_question.forEach(q => {
+                        const childQuestionArray = q.split('-')
+                        let parentAnswer = '';
+                        if (childQuestionArray[2] !== 'null') {
+                            parentAnswer = `${childQuestionArray[1]}, ${childQuestionArray[2]}`;
+                        } else {
+                            parentAnswer = childQuestionArray[1];
+                        }
+                        childQuestions.push({parentIndex: i, child: childQuestionArray[0], parentAnswer});
+                    })
                 }
-                childQuestions.push({parentIndex: i, child: childQuestionArray[0], parentAnswer});
+
             }
         })
     })
@@ -347,16 +363,10 @@ const onSubmit = handleSubmit((values) => {
                                                         <b-col sm="5">
                                                             <div class="form-group">
                                                                 <label>Choose Child Question</label>
-                                                                <Field as="select"
-                                                                       :name="`surveys[${idx}].options[${optionIdx}].child_question`"
-                                                                       :id="`child_question-${idx}-${optionIdx}`"
-                                                                       :class="`question-type form-control mb-0`"
-                                                                       :validateOnInput="true">
-                                                                    <option v-for="(survey, k, i) in mappedSurveys(idx)"
-                                                                            :key="`child-question-surveys-option-${optionIdx}-${k}`"
-                                                                            :value="`${survey.survey_index}-${surveys[idx].options[optionIdx]?.name}-${surveys[idx].options[optionIdx]?.name_arabic}`">{{ survey.title }} ({{ survey.title_arabic }})
-                                                                    </option>
-                                                                </Field>
+                                                                <vue-select class="question-type form-control mb-0" v-model="surveys[idx].options[optionIdx].child_question"
+                                                                            :options="mappedSurveys(idx)" label="title"
+                                                                            :reduce="survey => `${survey.survey_index}-${surveys[idx].options[optionIdx]?.name}-${surveys[idx].options[optionIdx]?.name_arabic}`"
+                                                                            multiple/>
                                                             </div>
                                                         </b-col>
                                                     </b-row>
