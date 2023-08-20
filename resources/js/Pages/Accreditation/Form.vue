@@ -182,10 +182,6 @@ select option {
 }
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 08439614409eb1486c820c4644944986632abeaf
 
 @media screen and (max-width: 600px) {
     .vag {
