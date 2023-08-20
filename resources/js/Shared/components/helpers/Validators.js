@@ -137,19 +137,19 @@ export const accreditationFormSchema = lang => yup.object({
                     is: (required, type, is_private) => {
                         return required === 1 && type !== '10' && !is_private;
                     },
-                    then: () => yup.string().required(lang === 'english' ? 'This field is required' : 'هذه الخانة مطلوبه')
+                    then: () => yup.string().required(lang === 'english' ? 'This field is required1' : 'هذه الخانة مطلوبه')
                 })
                 .when('type', {
                     is: '5',
-                    then: () => yup.string().matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, {message: lang === 'english' ? 'Please supply a valid email address.' : 'يرجى تقديم عنوان بريد إلكتروني صالح'}).required(lang === 'english' ? 'This field is required' : 'هذه الخانة مطلوبه')
+                    then: () => yup.string().matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, {message: lang === 'english' ? 'Please supply a valid email address.' : 'يرجى تقديم عنوان بريد إلكتروني صالح'}).required(lang === 'english' ? 'This field is required2' : 'هذه الخانة مطلوبه')
                 })
                 .when('type', {
                     is: '8',
-                    then: () => yup.array().required(lang === 'english' ? 'This field is required' : 'هذه الخانة مطلوبه')
+                    then: () => yup.array().required(lang === 'english' ? 'This field is required3' : 'هذه الخانة مطلوبه')
                 })
                 .when('type', {
                     is: '7',
-                    then: () => yup.array().required(lang === 'english' ? 'This field is required' : 'هذه الخانة مطلوبه')
+                    then: () => yup.array().required(lang === 'english' ? 'This field is required4' : 'هذه الخانة مطلوبه')
                 })
                 .nullable()
         })
@@ -169,5 +169,12 @@ export const createManagerSchema = yup.object({
     first_name: yup.string().required(),
     last_name: yup.string().required(),
     email: yup.string().email().required(),
+})
+
+export const emailPreferenceSchema = yup.object({
+    bg_color: yup.string().required(),
+    font_color: yup.string().required(),
+    qr_color: yup.string().required(),
+    logo: yup.string().required()
 })
 
