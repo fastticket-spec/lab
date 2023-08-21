@@ -185,7 +185,7 @@ select {
 select {
     height: 48px;
     height: 46px !important;
-    border-radius: 3px !important;
+    border-radius: 6px !important;
 }
 select option {
   margin: 40px;
