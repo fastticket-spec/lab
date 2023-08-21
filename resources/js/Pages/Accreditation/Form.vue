@@ -371,7 +371,7 @@ select option {
                                                 </div>
                                             </b-col>
 
-                                            <b-col :sm="field.value.type !== '10' ? '6' : '12'" class="pb-2" v-else-if="field.value.parent_index && (surveysFields[field.value.parent_index]?.answer?.includes(field.value.parent_answer?.split(', ')[lang === 'english' ? 0 : 1]))">
+                                            <!-- <b-col :sm="field.value.type !== '10' ? '6' : '12'" class="pb-2" v-else-if="field.value.parent_index && (surveysFields[field.value.parent_index]?.answer?.includes(field.value.parent_answer?.split(', ')[lang === 'english' ? 0 : 1]))">
                                                 <div class="form-group mb-0">
                                                     <label :for="`surveys-${idx}`" v-if="field.value.type !== '10'" :style="{ color: accessLevel?.page_design?.font_color}">{{
                                                             lang === 'arabic' ? field.value.title_arabic : field.value.title
@@ -506,7 +506,7 @@ select option {
 
                                                     <ErrorMessage :name="`surveys[${idx}].answer`" class="text-danger"/>
                                                 </div>
-                                            </b-col>
+                                            </b-col> -->
                                         </template>
                                     </FieldArray>
                                 </div>
