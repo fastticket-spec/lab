@@ -362,7 +362,7 @@ const onSubmit = handleSubmit((values) => {
 
                                                         <b-col sm="5">
                                                             <div class="form-group">
-                                                                <label>Choose Child Question</label>
+                                                                <label>Choose Child Question(s)</label>
                                                                 <vue-select class="question-type form-control mb-0" v-model="surveys[idx].options[optionIdx].child_question"
                                                                             :options="mappedSurveys(idx)" label="title"
                                                                             :reduce="survey => `${survey.survey_index}-${surveys[idx].options[optionIdx]?.name}-${surveys[idx].options[optionIdx]?.name_arabic}`"

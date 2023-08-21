@@ -60,7 +60,7 @@ const {handleSubmit, isSubmitting} = useForm({
                     parent_index: x.parent_index,
                     parent_answer: x.parent_answer,
                     options: x.options,
-                    required: x.required,
+                    required: x.parent_index ? 0 : x.required,
                     disabled: x.title === 'Email Address' && props.email,
                     country_code: x.country_code ?  x.country_code  : '+966'
                 }
@@ -78,7 +78,7 @@ const {handleSubmit, isSubmitting} = useForm({
                 parent_index: x.parent_index,
                 parent_answer: x.parent_answer,
                 options: x.options,
-                required: x.required,
+                required: x.parent_index ? 0 : x.required,
                 disabled: x.title === 'Email Address' && props.email,
                 country_code: x.country_code ?  x.country_code  : '+966'
             }))
