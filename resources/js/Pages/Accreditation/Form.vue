@@ -39,6 +39,7 @@ onMounted(() => {
             question: survey.title,
             parent_index: survey.parent_index,
             parent_answer: survey.parent_answer,
+            required: survey.parent_index ? 0 : survey.required,
         }
     })
 });
@@ -51,7 +52,7 @@ const {handleSubmit, isSubmitting} = useForm({
 
                 return {
                     type: x.type,
-                    answer: answer || (x.type === '8' ? [] : ((x.type === '7') ? null : '')),
+                    answer: answer || (x.type === '8' ? [] : ((x.type === '7') ? [] : '')),
                     title: x.title,
                     title_arabic: x.title_arabic,
                     id: x.id,
@@ -69,7 +70,7 @@ const {handleSubmit, isSubmitting} = useForm({
         : {
             surveys: props.surveys.filter(x => !x.private).map(x => ({
                 type: x.type,
-                answer: x.title === 'Email Address' ? props.email : (x.type === '8' ? [] : ((x.type === '7') ? null : '')),
+                answer: x.title === 'Email Address' ? props.email : (x.type === '8' ? [] : ((x.type === '7') ? [] : '')),
                 title: x.title,
                 title_arabic: x.title_arabic,
                 id: x.id,
