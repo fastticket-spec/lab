@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Requests\AccessLevelGeneralRequest;
+use App\Jobs\SendSMSJob;
 use App\Mail\InvitationMail;
 use App\Models\AccessLevel;
 use App\Models\EventSurvey;
@@ -24,7 +25,8 @@ class AccessLevelsService extends BaseRepository
         AccessLevel          $model,
         private FileService  $file,
         private EventService $eventService
-    ) {
+    )
+    {
         parent::__construct($model);
 
         $this->images_path = config('filesystems.directory') . "access_level_images/";
@@ -33,13 +35,14 @@ class AccessLevelsService extends BaseRepository
     public function fetchAccessLevels(Request $request, string $eventId)
     {
         return $this->model->query()
-            ->with(['event', 'surveyAccessLevels.surveys', 'attendees'])
+            ->with(['event', 'surveyAccessLevels.surveys', 'attendees', 'generalSettings'])
             ->whereEventId($eventId)
             ->latest()
             ->paginate($request->per_page ?: 10)
             ->withQueryString()
             ->through(function ($accessLevel) {
                 $quantity = $accessLevel->quantity_available;
+                $generalSettings = $accessLevel->generalSettings;
 
                 return [
                     'id' => $accessLevel->id,
@@ -52,7 +55,9 @@ class AccessLevelsService extends BaseRepository
                     'public_status' => $accessLevel->public_status,
                     'registration' => $accessLevel->registration,
                     'attendees' => $accessLevel->attendees,
-                    'has_surveys' => !!optional($accessLevel->surveyAccessLevels)->surveys
+                    'has_surveys' => !!optional($accessLevel->surveyAccessLevels)->surveys,
+                    'has_sms_invite_content' => $generalSettings && !!$generalSettings->invitation_message_sms,
+                    'has_mail_invite_content' => $generalSettings && !!$generalSettings->invitation_message,
                 ];
             });
     }
@@ -95,7 +100,7 @@ class AccessLevelsService extends BaseRepository
             $badges = array_merge(...$event->badges()
                 ->with('badgeAccessLevels')
                 ->get()
-                ->map(fn ($badge) => $badge->badgeAccessLevels)->toArray());
+                ->map(fn($badge) => $badge->badgeAccessLevels)->toArray());
 
             $excludeIds = collect($badges)->pluck('access_level_id')->toArray();
 
@@ -174,8 +179,6 @@ class AccessLevelsService extends BaseRepository
             return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: "/event/$eventId/access-levels/$accessLevelId/edit", returnType: 'redirect');
         }
     }
-
-
 
 
     public function updateGeneralCustomization(AccessLevelGeneralRequest $request, string $eventId, string $accessLevelId)
@@ -344,8 +347,9 @@ class AccessLevelsService extends BaseRepository
         }
     }
 
-    public function sendLink(array $emails, string $eventId, string $accessLevelId)
+    public function sendLink(Request $request, string $eventId, string $accessLevelId)
     {
+        $invitations = $request->invitations;
         $route = "/event/$eventId/access-levels";
 
         $accessLevel = $this->find($accessLevelId);
@@ -356,19 +360,81 @@ class AccessLevelsService extends BaseRepository
 
         $organiser = $accessLevel->event->organiser;
 
-        foreach ($emails as $email) {
-            $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
-            Mail::to($email)
-                ->later(now()->addSeconds(5), new InvitationMail(
-                    settings: $settings,
-                    surveyLink: "$surveyLink?ref=$inviteId",
-                    organiser: $organiser,
-                    registration: $accessLevel->registration,
-                    ref: $ref
-                ));
+        $path = '';
+        if ($request->hasFile('attachment')) {
+            $path = $this->uploadFile($request->attachment, 'invitation-', '-attachment-');
         }
 
-        $message = 'Invitation has been sent to the emails supplied';
+        foreach ($invitations as $invitation) {
+            $email = $invitation['email'];
+            $phone = $invitation['phone'];
+            $firstName = $invitation['first_name'];
+            $lastName = $invitation['last_name'];
+            $inviteId = Invite::create([
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'email' => $email,
+                'phone' => $phone,
+                'ref' => $ref,
+                'event_id' => $eventId,
+                'access_level_id' => $accessLevelId,
+                'attachment' => $path ? Storage::disk(config('filesystems.default'))->url($path) : null
+            ])->id;
+
+            if ($request->invitation_type == 'mail') {
+                Mail::to($email)
+                    ->later(now()->addSeconds(5), new InvitationMail(
+                        settings: $settings,
+                        surveyLink: "$surveyLink?ref=$inviteId",
+                        organiser: $organiser,
+                        firstName: $invitation['first_name'],
+                        lastName: $invitation['last_name'],
+                        registration: $accessLevel->registration,
+                        ref: $ref,
+                        attachment: $path
+                    ));
+            } else {
+                $smsContent = $settings->invitation_message_sms;
+                $smsContent = str_replace(
+                    '%invitation_link%',
+                    "$surveyLink?ref=$inviteId",
+                    $smsContent
+                );
+
+                $smsContent = str_replace(
+                    '%first_name%',
+                    $firstName,
+                    $smsContent
+                );
+
+                $smsContent = str_replace(
+                    '%last_name%',
+                    $lastName,
+                    $smsContent
+                );
+
+                $smsContent = str_replace(
+                    '%full_name%',
+                    "$firstName $lastName",
+                    $smsContent
+                );
+
+                if ($accessLevel->registration) {
+                    $smsContent = str_replace(
+                        '%registration_number%',
+                        $ref,
+                        $smsContent
+                    );
+                }
+
+                SendSMSJob::dispatch(
+                    phone: $phone,
+                    message: $smsContent
+                )->delay(now()->addSeconds(3));
+            }
+        }
+
+        $message = 'Invitation has been sent to the ' . ($request->invitation_type == 'mail' ? 'emails' : 'phone numbers') . ' supplied';
 
         return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
     }
@@ -388,8 +454,12 @@ class AccessLevelsService extends BaseRepository
 
         $invites = $accessLevel->invites()->latest()->get()->map(function ($invite) {
             return [
+                'first_name' => $invite->first_name,
+                'last_name' => $invite->last_name,
                 'email' => $invite->email,
-                'date_sent' => $invite->created_at->format('jS M, Y h:i a')
+                'phone' => $invite->phone,
+                'date_sent' => $invite->created_at->format('jS M, Y h:i a'),
+                'attachment' => $invite->attachment
             ];
         });
 

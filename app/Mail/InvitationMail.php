@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -15,23 +16,35 @@ class InvitationMail extends Mailable
     use Queueable, SerializesModels;
 
     public string $content;
-    public string  $title;
+    public string $title;
     public ?string $organiserName;
-    public ?string $organiserLogo;
-    public ?string $firstName;
     private bool $registration;
+    public bool $isArabic;
+    public mixed $attachment;
+    public $preferences;
+
 
     /**
      * Create a new message instance.
      */
-    public function __construct($settings, $surveyLink, $organiser, $firstName = 'Applicant', $registration = false, $ref = null)
+    public function __construct($settings, $surveyLink, $organiser, $firstName, $lastName, $registration = false, $ref = null, $attachment = null)
     {
         $this->organiserName = $organiser->name ?? null;
-        $this->organiserLogo = $organiser->logo_url ?? null;
+        $this->attachment = $attachment;
+        $organiserLogo = $organiser->logo_url ?? null;
+        $this->isArabic = !!optional($settings)->arabic_invitation;
+
+        $this->preferences = $organiser->preferences ?: [
+            'email_bg_color' => 'transparent',
+            'email_font_color' => '#000000',
+            'email_qr_color' => '#000000',
+            'email_logo_url' => $organiserLogo,
+            'email_logo_width' => '200',
+            'email_logo_height' => '100'
+        ];
 
         $content = $settings->invitation_message ?? '';
         $this->title = $settings->invitation_title ?? 'Invitation Link';
-        $this->firstName = $firstName;
         if ($content) {
             $this->content = str_replace(
                 '%invitation_link%',
@@ -39,9 +52,34 @@ class InvitationMail extends Mailable
                 $content
             );
 
+            $this->content = str_replace(
+                '%first_name%',
+                $firstName,
+                $this->content
+            );
+
+            $this->content = str_replace(
+                '%last_name%',
+                $lastName,
+                $this->content
+            );
+
+            $this->content = str_replace(
+                '%full_name%',
+                "$firstName $lastName",
+                $this->content
+            );
+
+
             if ($registration) {
                 $this->content = str_replace(
                     '%registration_number%',
+                    $ref,
+                    $this->content
+                );
+
+                $this->content = str_replace(
+                    '٪registration_number٪',
                     $ref,
                     $this->content
                 );
@@ -63,7 +101,7 @@ class InvitationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('register@accreditation.achieveone.sa', $this->organiserName),
+            from: new Address('noreply@nidlp.gov.sa', $this->organiserName),
             subject: $this->title,
         );
     }
@@ -85,6 +123,16 @@ class InvitationMail extends Mailable
      */
     public function attachments(): array
     {
+        if ($this->attachment) {
+            \Log::debug('in here');
+            \Log::debug($this->attachment);
+
+
+            return [
+                Attachment::fromStorageDisk('spaces', $this->attachment)
+            ];
+        }
+
         return [];
     }
 }

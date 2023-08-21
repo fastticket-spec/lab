@@ -12,7 +12,7 @@ class Survey extends Model
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'id', 'event_id', 'title', 'title_arabic', 'type', 'options', 'required', 'private'
+        'id', 'event_id', 'title', 'title_arabic', 'type', 'options', 'required', 'private', 'parent_index', 'parent_answer'
     ];
 
     protected $casts = [

@@ -1,4 +1,4 @@
-@component('mail::message', ['headerTitle' => $organiserName, 'headerLogo' => $organiserLogo])
+@component('mail::message', ['headerTitle' => $organiserName, 'preferences' => $preferences])
 ### Hello {{$name}},
 
 You've been invited to Easy Accredite Dashboard as {{$role}}. Your login details are as follows:
