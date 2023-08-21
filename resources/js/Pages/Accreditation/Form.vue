@@ -222,7 +222,7 @@ select option {
                     </div>
 
                     <template v-else>
-                        <div class="text-center">
+                        <div class="text-center" style="display: none">
                             <img class="my-3 text-center img-fluid logo"
                                  :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                         </div>
@@ -511,7 +511,7 @@ select option {
                                 </div>
                             </div>
 
-                            <div class="col-12 pb-5 text-center">
+                            <div class="col-12 pb-5 text-center" style="margin-top: 20px;">
                                 <b-btn type="submit" size="lg" class="px-5 py-2" :disabled="buttonDisabled" v-if="!isSubmitting"
                                        :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
                                     {{
