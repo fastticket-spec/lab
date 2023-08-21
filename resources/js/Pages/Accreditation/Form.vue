@@ -511,7 +511,7 @@ select option {
                                 </div>
                             </div>
 
-                            <div class="col-12 pb-5 text-center" style="margin-top: 20px;">
+                            <div class="col-12 pb-5 text-center" style="margin-top: 40px;">
                                 <b-btn type="submit" size="lg" class="px-5 py-2" :disabled="buttonDisabled" v-if="!isSubmitting"
                                        :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
                                     {{
