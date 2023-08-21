@@ -90,6 +90,7 @@ const {handleSubmit, isSubmitting} = useForm({
 const {value: surveysFields} = useField('surveys');
 
 const onSubmit = handleSubmit(values => {
+    console.log(values)
     buttonDisabled.value = true;
     let answers = values.surveys.map(d => {
         if (d.type === '7') {
