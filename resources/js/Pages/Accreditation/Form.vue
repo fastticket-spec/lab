@@ -39,6 +39,7 @@ onMounted(() => {
             question: survey.title,
             parent_index: survey.parent_index,
             parent_answer: survey.parent_answer,
+            required: survey.parent_index ? 0 : survey.required,
         }
     })
 });
