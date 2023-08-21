@@ -288,3 +288,7 @@ img {
 .break-all {
     word-break: break-all;
 }
+
+.ql-align-right.ql-direction-rtl {
+    text-align: end!important;
+}

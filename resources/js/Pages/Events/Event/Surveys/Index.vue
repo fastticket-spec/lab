@@ -3,6 +3,8 @@ import {ErrorMessage, Field, FieldArray, useField, useForm} from 'vee-validate';
 import {createSurveySchema} from '../../../../Shared/components/helpers/Validators';
 import {router, usePage} from "@inertiajs/vue3";
 import {computed, onMounted, ref} from "vue";
+import VueSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 
 const props = defineProps({
     code: Number,
@@ -122,7 +124,6 @@ const initialValues = props.event_survey ? {
 onMounted(() => {
     if (props.event_survey) {
         selectedAccessLevels.value = props.survey_access_levels;
-        console.log(selectedAccessLevels.value)
         if (props.event_survey.surveys.length > 0 && props.event_survey.surveys[0].title_arabic) {
             fillArabic.value = true
         }
@@ -135,6 +136,8 @@ const {handleSubmit, isSubmitting, setFieldValue} = useForm({
 });
 
 const {value: surveys} = useField('surveys');
+
+const mappedSurveys = computed(() => idx => surveys.value.map((x, i) => ({...x, survey_index: i})).filter((x, i) => !!x.title && i !== idx));
 
 const closeSurvey = surveyId => {
     setFieldValue(`surveys[${surveyId}].open`, false)
@@ -150,7 +153,40 @@ const onSubmit = handleSubmit((values) => {
     values.access_levels = [...new Set(selectedAccessLevels.value.filter(x => !!x))];
     values.event_id = props.event_id;
 
-    values.surveys = values.surveys.map(survey => {
+    const childQuestions = [];
+    values.surveys.forEach((survey, i) => {
+        survey.options.forEach(option => {
+            if(option.child_question && (option.child_question.length > 0)) {
+                if (!Array.isArray(option.child_question)) {
+                    const childQuestionArray = option.child_question.split('-')
+                    let parentAnswer = '';
+                    if (childQuestionArray[2] !== 'null') {
+                        parentAnswer = `${childQuestionArray[1]}, ${childQuestionArray[2]}`;
+                    } else {
+                        parentAnswer = childQuestionArray[1];
+                    }
+                    childQuestions.push({parentIndex: i, child: childQuestionArray[0], parentAnswer});
+                } else {
+                    option.child_question.forEach(q => {
+                        const childQuestionArray = q.split('-')
+                        let parentAnswer = '';
+                        if (childQuestionArray[2] !== 'null') {
+                            parentAnswer = `${childQuestionArray[1]}, ${childQuestionArray[2]}`;
+                        } else {
+                            parentAnswer = childQuestionArray[1];
+                        }
+                        childQuestions.push({parentIndex: i, child: childQuestionArray[0], parentAnswer});
+                    })
+                }
+
+            }
+        })
+    })
+
+    values.surveys = values.surveys.map((survey, i) => {
+        const surveyParent = childQuestions.find(x => +x.child === i);
+        survey.parent_index = surveyParent?.parentIndex;
+        survey.parent_answer = surveyParent?.parentAnswer;
         survey.options = survey.options.filter(option => (option.name || option.name_arabic));
         return survey;
     });
@@ -306,7 +342,7 @@ const onSubmit = handleSubmit((values) => {
                                                             </div>
                                                         </b-col>
 
-                                                        <b-col>
+                                                        <b-col sm="2">
                                                             <div class="form-group">
                                                                 <label>&nbsp;</label>
                                                                 <div class="form-control no-border">
@@ -323,6 +359,16 @@ const onSubmit = handleSubmit((values) => {
                                                                 </div>
                                                             </div>
                                                         </b-col>
+
+                                                        <b-col sm="5">
+                                                            <div class="form-group">
+                                                                <label>Choose Child Question(s)</label>
+                                                                <vue-select class="question-type form-control mb-0" v-model="surveys[idx].options[optionIdx].child_question"
+                                                                            :options="mappedSurveys(idx)" label="title"
+                                                                            :reduce="survey => `${survey.survey_index}-${surveys[idx].options[optionIdx]?.name}-${surveys[idx].options[optionIdx]?.name_arabic}`"
+                                                                            multiple/>
+                                                            </div>
+                                                        </b-col>
                                                     </b-row>
                                                 </b-col>
                                             </b-row>
@@ -336,7 +382,8 @@ const onSubmit = handleSubmit((values) => {
                                                    @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, private: false, options: [{name: '', name_arabic: ''}], open: true})">
                                                 <i class="ri-add-line"/> Add Field
                                             </b-btn>
-                                            <b-btn variant="danger" :disabled="['Email Address', 'First Name', 'Last Name'].includes(field?.value?.title)"
+                                            <b-btn variant="danger"
+                                                   :disabled="['Email Address', 'First Name', 'Last Name'].includes(field?.value?.title)"
                                                    class="mr-2" v-show="surveys.length > 1"
                                                    @click="remove(idx)"><i class="ri-subtract-line"></i> Remove
                                                 Field
@@ -366,9 +413,11 @@ const onSubmit = handleSubmit((values) => {
                                                    @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, private: false, options: [{name: '', name_arabic: ''}], open: true})">
                                                 <i class="ri-add-line p-0"/>
                                             </b-btn>
-                                            <b-btn :disabled="['Email Address', 'First Name', 'Last Name'].includes(field?.value?.title)" variant="danger"
-                                                   class="mr-2" v-show="surveys.length > 1"
-                                                   @click="remove(idx)"><i class="ri-subtract-line p-0"></i>
+                                            <b-btn
+                                                :disabled="['Email Address', 'First Name', 'Last Name'].includes(field?.value?.title)"
+                                                variant="danger"
+                                                class="mr-2" v-show="surveys.length > 1"
+                                                @click="remove(idx)"><i class="ri-subtract-line p-0"></i>
                                             </b-btn>
                                             <b-btn variant="secondary" class="mr-2"
                                                    @click="surveys[idx].open = 1">

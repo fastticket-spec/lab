@@ -36,8 +36,10 @@ class EventService extends BaseRepository
 
     public function fetchEvents(Request $request): LengthAwarePaginator
     {
-        $account = auth()->user()->account;
+        $user = auth()->user();
+        $account = $user->parentAccount ?: $user->account;
         $roleId = $account->role_id;
+        $activeOrganiser = $user->activeOrganiser();
 
         $eventsAccessID = null;
         if ($roleId) {
@@ -46,8 +48,8 @@ class EventService extends BaseRepository
 
         return $this->model->query()
             ->with(['organiser', 'attendees'])
-            ->when($account->active_organiser, function ($query) use ($account) {
-                $query->where('organiser_id', $account->active_organiser);
+            ->when($activeOrganiser, function ($query) use ($activeOrganiser) {
+                $query->where('organiser_id', $activeOrganiser);
             })
             ->when($request->input('organiser_id'), function (Builder $query) use ($request) {
                 $query->where('organiser_id', $request->organiser_id);
@@ -100,7 +102,7 @@ class EventService extends BaseRepository
 
     public function createEvent(array $data, UploadedFile $eventImage = null, UploadedFile $eventBanner = null)
     {
-        $organiser = $this->organiserService->find(auth()->user()->account->active_organiser);
+        $organiser = $this->organiserService->find(auth()->user()->activeOrganiser());
 
         if ($eventImage) {
             $eventImage = $this->uploadFile($eventImage, $data['title'], '-event-image-');
@@ -178,8 +180,8 @@ class EventService extends BaseRepository
         if ($all) return $this->model->query()->count();
 
         $user = auth()->user();
-        $account = $user->account;
-        $activeOrganiser = $account->active_organiser;
+        $account = $user->parentAccount ?: $user->account;
+        $activeOrganiser = $user->account->active_organiser;
 
         return $this->model->query()
             ->when(!$activeOrganiser, function ($query) use ($user) {

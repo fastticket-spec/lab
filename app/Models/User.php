@@ -20,6 +20,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone',
         'email',
         'password',
+        'parent_account_id'
     ];
 
     protected $hidden = [
@@ -45,7 +46,18 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function organiserIds()
     {
-        $account = $this->account;
+        $account = $this->parentAccount ?: $this->account;
+
         return $account ? optional($account->organiser)->pluck('id') : [];
+    }
+
+    public function parentAccount(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Account::class, 'parent_account_id', 'id');
+    }
+
+    public function activeOrganiser()
+    {
+        return optional($this->account)->active_organiser;
     }
 }

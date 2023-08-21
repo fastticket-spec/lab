@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\QRCodeHelper;
 use App\Mail\ApprovalMail;
 use App\Mail\AttendeeMail;
 use App\Mail\CustomAttendeeMail;
@@ -146,6 +147,8 @@ class AttendeeService extends BaseRepository
                 if ($answer['type'] == '4' && ($file = $answer['answer'])) {
                     $fileUrl = $this->uploadFile($file, $answer['question'], '-accreditation-file-');
                     $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => Storage::disk(config('filesystems.default'))->url($fileUrl)];
+                } elseif ($answer['type'] == '12') {
+                    $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' =>  $answer['country_code'] . '-' . $answer['answer'] ?? ''];
                 } else {
                     $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => $answer['answer'] ?? ''];
                 }
@@ -260,8 +263,13 @@ class AttendeeService extends BaseRepository
 
             $settings = optional($attendee->accessLevel)->generalSettings;
 
+            $qr = QRCodeHelper::getQRCode($attendee->ref, 'png');
+
+            $path = $this->uploadBase64File(file_get_contents($qr));
+            $qrPath = Storage::disk(config('filesystems.default'))->url($path);
+
             Mail::to($attendee->email)
-                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser));
+                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $qrPath, $attendee->first_name));
         }
     }
 
@@ -520,8 +528,7 @@ class AttendeeService extends BaseRepository
             foreach ($survey as $i => $question) {
                 if (in_array(strtolower(str_replace(' ', '_', $question['question'])), ['personal_photo', 'personal_picture', 'bhhgggg']) && $answer = $question['answer']) {
                     $attendee->user_photo = $answer;
-                }
-                if ($answer = $question['answer']) {
+                } elseif ($answer = $question['answer']) {
                     $badgeDatas[] = (object)['column_title' => strtolower(str_replace(' ', '_', $question['question'])), 'column_value' => $answer];
                 }
                 //                if ($question->question_type_id != 8) {
@@ -676,8 +683,7 @@ class AttendeeService extends BaseRepository
         if ($all) return $this->model->query()->count();
 
         $user = auth()->user();
-        $account = $user->account;
-        $activeOrganiser = $account->active_organiser;
+        $activeOrganiser = $user->activeOrganiser();
 
         return $this->model->query()
             ->when(!$activeOrganiser, function ($query) use ($user) {
@@ -704,8 +710,7 @@ class AttendeeService extends BaseRepository
     public function countDownloads(?string $eventId = null, array|Collection|null $allowedEventIds = null): int
     {
         $user = auth()->user();
-        $account = $user->account;
-        $activeOrganiser = $account->active_organiser;
+        $activeOrganiser = $user->activeOrganiser();
 
         return $this->model->query()
             ->when(!$activeOrganiser, function ($query) use ($user) {
@@ -723,9 +728,9 @@ class AttendeeService extends BaseRepository
             ->sum('downloads');
     }
 
-    public function uploadAttendees(string $eventId, array $attendees, string $accessLevelId, bool $approve)
+    public function uploadAttendees(string $eventId, array $attendees, string $accessLevelId, bool $approve, bool $mail)
     {
-        $organiserId = auth()->user()->account->active_organiser;
+        $organiserId = auth()->user()->activeOrganiser();
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
         $surveyLink = config('app.url') . '/a/' . $accessLevelId;
         $settings = $accessLevel->generalSettings;
@@ -763,14 +768,17 @@ class AttendeeService extends BaseRepository
 
             $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
 
-            // Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
-            //     settings: $settings,
-            //     surveyLink: "$surveyLink?ref=$inviteId",
-            //     organiser: $organiser,
-            //     firstName: $first_name,
-            //     registration: $accessLevel->registration,
-            //     ref: $ref
-            // ));
+            if ($mail) {
+                Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
+                    settings: $settings,
+                    surveyLink: "$surveyLink?ref=$inviteId",
+                    organiser: $organiser,
+                    firstName: $first_name,
+                    lastName: $last_name,
+                    registration: $accessLevel->registration,
+                    ref: $ref
+                ));
+            }
         }
 
         $message = 'Attendees uploaded successfully!';
@@ -871,6 +879,16 @@ class AttendeeService extends BaseRepository
         $message = 'Attendee has been moved to access level.';
 
         $route = "/event/$eventId/attendees";
+
+        return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
+    }
+
+    public function deleteAttendee(string $attendeeId, ?string $eventId = null)
+    {
+        $this->delete($attendeeId);
+
+        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $message = 'Attendee deleted successfully!';
 
         return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
     }

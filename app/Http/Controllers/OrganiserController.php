@@ -127,7 +127,9 @@ class OrganiserController extends Controller
     {
         $organiser = $this->organiserService->findOneOrFail($organiserId);
 
-        $setActiveOrganiser = $organiser->account()->update(['active_organiser' => $organiser->id]);
+        $setActiveOrganiser = auth()->user()->account()->update(['active_organiser' => $organiser->id]);
+
+//        $setActiveOrganiser = $organiser->account()->update(['active_organiser' => $organiser->id]);
 
 
         if (!$setActiveOrganiser) {
@@ -150,7 +152,7 @@ class OrganiserController extends Controller
     {
         $organiser = $this->organiserService->findOneOrFail($organiserId);
 
-        $setActiveOrganiser = $organiser->account()->update(['active_organiser' => null]);
+        $setActiveOrganiser = auth()->user()->account()->update(['active_organiser' => null]);
 
         if (!$setActiveOrganiser) {
             return $this->view(
