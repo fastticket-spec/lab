@@ -473,7 +473,7 @@ class AccessLevelsService extends BaseRepository
         return $accessLevel->formEmails()
             ->whereEventId($eventId)
             ->orderBy('severity', 'desc')
-            ->paginate(1)
+            ->paginate(10)
             ->withQueryString()
             ->through(function ($email) {
                 return [
