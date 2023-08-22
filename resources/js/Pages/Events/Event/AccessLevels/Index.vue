@@ -94,6 +94,22 @@ const remove = i => {
 const disableInviteSubmit = computed(() => {
     return !!invitations.value.find(x => inviteType.value === 'mail' ? (!x.email || !x.first_name) : (!x.first_name || !x.phone));
 });
+
+const accessLevelFormEmails = ref({});
+const formEmailsModalShow = ref(false);
+const accessLevelEmailsFields = ['email', 'severity', 'date_created']
+
+const viewEmails = async (page = 1) => {
+    try {
+        const {data} = await axios.get(`/event/${props.event_id}/access-levels/${selectedAccessLevel.value.id}/emails?page=${page}`);
+        accessLevelFormEmails.value = data;
+
+        formEmailsModalShow.value = true
+    } catch (e) {
+        accessLevelFormEmails.value = {};
+        console.log(e);
+    }
+}
 </script>
 
 <template>
@@ -173,6 +189,11 @@ const disableInviteSubmit = computed(() => {
                                :class="access_level.public_status === 0 ? 'text-success' : 'text-danger'"><i
                                 :class="access_level.public_status === 0 ? 'ri-play-line' : 'ri-pause-line'"></i>
                                 {{ access_level.public_status === 0 ? 'Activate(Public)' : 'Deactivate(Public)' }}</a>
+                            <a href="#"
+                               v-if="userRole !== 'Editors' && access_level.has_surveys"
+                               @click.prevent.stop="selectedAccessLevel = access_level; viewEmails(1)"><i
+                                class="ri-mail-line"></i>
+                                View Emails</a>
                         </template>
 
                         <!--<a href="#"
@@ -295,6 +316,30 @@ const disableInviteSubmit = computed(() => {
                         </template>
                     </b-table>
                     <h5 v-else class="text-center mb-3">Invites will appear here</h5>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="formEmailsModalShow" size="lg" id="form-emails-modal" title="Form Emails" scrollable>
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <template v-if="accessLevelFormEmails?.data?.length > 0">
+                        <b-table :items="accessLevelFormEmails?.data" :fields="accessLevelEmailsFields"
+                                 class="table-responsive-sm table-borderless">
+                            <template #cell(email)="data">
+                                <a :href="`mailto:${data.item.email}`">{{ data.item.email }}</a>
+                            </template>
+                        </b-table>
+
+                        <b-pagination v-if="accessLevelFormEmails?.data && accessLevelFormEmails?.data.length > 0" v-model="accessLevelFormEmails.current_page"
+                                      @change="viewEmails"
+                                      :total-rows="accessLevelFormEmails.total" :per-page="accessLevelFormEmails.per_page" align="center"/>
+                    </template>
+
+                    <h5 v-else class="text-center mb-3">Emails will appear here</h5>
                 </b-col>
             </b-row>
 

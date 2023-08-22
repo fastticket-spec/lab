@@ -95,6 +95,7 @@ Route::group(['middleware' => 'auth'], function () {
                     Route::get('/create', [AccessLevelsController::class, 'create']);
                     Route::post('/', [AccessLevelsController::class, 'store']);
                     Route::group(['prefix' => '{access_level_id}'], function () {
+                        Route::get('/emails', [AccessLevelsController::class, 'formEmails']);
                         Route::get('/edit', [AccessLevelsController::class, 'edit']);
                         Route::get('/surveys', [AccessLevelsController::class, 'getSurveys']);
                         Route::get('/invites', [AccessLevelsController::class, 'getInvites']);
