@@ -8,6 +8,7 @@ import {accreditationFormSchema} from "../../Shared/components/helpers/Validator
 import VueCountryCode from "vue-country-code";
 import VuePhoneNumberInput from 'vue-phone-number-input';
 import 'vue-phone-number-input/dist/vue-phone-number-input.css';
+import debounce from "lodash.debounce";
 
 
 const props = defineProps({
@@ -85,15 +86,27 @@ const {handleSubmit, isSubmitting} = useForm({
             }))
         },
     validationSchema: accreditationFormSchema(props.lang),
-
 });
 
 const {value: surveysFields} = useField('surveys');
 
 const emailAddress = computed(() => {
-    console.log(surveysFields);
-    return 'adsfasdf@asdf.com';
+    return surveysFields.value.find(x => x.title === 'Email Address')?.answer;
 });
+
+watch(emailAddress, debounce(async (value) => {
+    try {
+        router.post('/form-emails', {
+            email: value,
+            event_id: props.accessLevel.event_id,
+            access_level_id: props.accessLevel.id,
+            organiser_id: props.accessLevel?.event?.organiser?.id
+        });
+    } catch (e) {
+        console.log(e);
+    }
+}, 3000));
+
 const onSubmit = handleSubmit(values => {
     console.log(values)
     buttonDisabled.value = true;
