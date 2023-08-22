@@ -1,7 +1,7 @@
 <script setup>
 import VueSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import {router} from "@inertiajs/vue3";
 import {ErrorMessage, Field, FieldArray, useField, useForm} from "vee-validate";
 import {accreditationFormSchema} from "../../Shared/components/helpers/Validators.js";
@@ -90,6 +90,10 @@ const {handleSubmit, isSubmitting} = useForm({
 
 const {value: surveysFields} = useField('surveys');
 
+const emailAddress = computed(() => {
+    console.log(surveysFields);
+    return 'adsfasdf@asdf.com';
+});
 const onSubmit = handleSubmit(values => {
     console.log(values)
     buttonDisabled.value = true;
