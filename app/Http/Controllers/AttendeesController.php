@@ -11,6 +11,7 @@ use App\Services\AttendeeService;
 use App\Services\ZoneService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
 use Rap2hpoutre\FastExcel\FastExcel;
 
@@ -325,5 +326,12 @@ class AttendeesController extends Controller
         $response = json_decode($response, true);
         $response = collect($response);
         return (new FastExcel($response))->download($id . '-official.xlsx');
+    }
+
+    public function export(string $eventId): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        $export = $this->attendeeService->export($eventId);
+
+        return Excel::download($export, 'attendees.xlsx');
     }
 }

@@ -130,6 +130,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::prefix('attendees')->group(function () {
                 Route::get('/', [AttendeesController::class, 'eventAttendees']);
                 Route::post('/bulk-approval/{status}', [AttendeesController::class, 'bulkEventApproval']);
+                Route::get('export', [AttendeesController::class, 'export']);
                 Route::post('/mark-as-printed', [AttendeesController::class, 'markAsPrintedEvent']);
                 Route::post('/mark-as-collected', [AttendeesController::class, 'markAsCollectedEvent']);
                 Route::post('/upload-attendees', [AttendeesController::class, 'uploadAttendees']);

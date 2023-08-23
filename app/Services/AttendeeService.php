@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Exports\ExportAttendees;
 use App\Helpers\QRCodeHelper;
+use App\Http\Resources\AttendeeExportResource;
 use App\Mail\ApprovalMail;
 use App\Mail\AttendeeMail;
 use App\Mail\CustomAttendeeMail;
@@ -25,6 +27,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Endroid\QrCode\QrCode;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AttendeeService extends BaseRepository
 {
@@ -891,5 +894,46 @@ class AttendeeService extends BaseRepository
         $message = 'Attendee deleted successfully!';
 
         return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
+    }
+
+    public function export(string $eventId): ExportAttendees
+    {
+        $active_organiser = auth()->user()->account->active_organiser;
+
+
+        $attendees = $this->model->query()
+            ->with('event')
+            ->when($active_organiser, function ($query) use ($active_organiser) {
+                    $query->whereOrganiserId($active_organiser);
+            })
+            ->whereEventId($eventId)
+            ->latest()
+            ->get()
+            ->map(function ($attendee) {
+                $answers = $attendee->answers;
+
+                $questions = collect($answers)->map(function ($answer) {
+                    $question = $answer['question'];
+
+                    $theAnswer = $answer['answer'];
+                    $answer = is_array($theAnswer) ? join(', ', $theAnswer) : $theAnswer;
+                    return "$question: $answer";
+                });
+
+                return [
+                    'event_title' => $attendee->event->title,
+                    'first_name' => $attendee->first_name,
+                    'last_name' => $attendee->last_name,
+                    'email' => $attendee->email,
+                    'reference' => $attendee->ref,
+                    'downloads' => $attendee->downloads ?: 0,
+                    'date_created' => $attendee->created_at->format('Y/M/d h:i A'),
+                    'printed' => $attendee->printed ? 'printed' : 'not printed',
+                    'collected' => $attendee->collected ? 'collected' : 'not collected',
+                    'answers' => join("\n", $questions->toArray()),
+                ];
+            });
+
+       return new ExportAttendees(event_id: $eventId, event_ids: auth()->user()->userEventAccessId(), attendees: $attendees);
     }
 }
