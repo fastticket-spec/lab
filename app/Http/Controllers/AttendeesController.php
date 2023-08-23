@@ -328,9 +328,9 @@ class AttendeesController extends Controller
         return (new FastExcel($response))->download($id . '-official.xlsx');
     }
 
-    public function export(string $eventId): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    public function export(string $eventId, string $accessLevelId): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $export = $this->attendeeService->export($eventId);
+        $export = $this->attendeeService->export($eventId, $accessLevelId);
 
         return Excel::download($export, 'attendees.xlsx');
     }
