@@ -49,7 +49,7 @@ class AttendeeService extends BaseRepository
 
         $eventsAccessID = null;
         if ($roleId) {
-            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn ($access) => $access->event_id);
+            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn($access) => $access->event_id);
         }
 
         return $this->model->query()
@@ -112,8 +112,8 @@ class AttendeeService extends BaseRepository
                     'status' => Attendee::STATUS_READABLE[$attendee->status],
                     'accept_status' => Attendee::ACCEPT_STATUS_READABLE[$attendee->accept_status],
                     'date_submitted' => $attendee->created_at->format('jS M, Y H:i'),
-                    'zones' => $attendee->zones->map(fn ($zone) => $zone->zone_id),
-                    'areas' => $attendee->areas->map(fn ($area) => $area->area_id),
+                    'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id),
+                    'areas' => $attendee->areas->map(fn($area) => $area->area_id),
                     'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge,
                     'printed' => !!$attendee->printed,
                     'collected' => !!$attendee->collected,
@@ -151,7 +151,7 @@ class AttendeeService extends BaseRepository
                     $fileUrl = $this->uploadFile($file, $answer['question'], '-accreditation-file-');
                     $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => Storage::disk(config('filesystems.default'))->url($fileUrl)];
                 } elseif ($answer['type'] == '12') {
-                    $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' =>  $answer['country_code'] . '-' . $answer['answer'] ?? ''];
+                    $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => $answer['country_code'] . '-' . $answer['answer'] ?? ''];
                 } else {
                     $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => $answer['answer'] ?? ''];
                 }
@@ -299,7 +299,7 @@ class AttendeeService extends BaseRepository
 
         $attendee->zones()->delete();
 
-        $zones = collect($zones)->map(fn ($zone) => [
+        $zones = collect($zones)->map(fn($zone) => [
             'id' => Str::uuid(),
             'attendee_id' => $attendeeId,
             'zone_id' => $zone,
@@ -325,7 +325,7 @@ class AttendeeService extends BaseRepository
 
         $attendee->areas()->delete();
 
-        $areas = collect($areas)->map(fn ($area) => [
+        $areas = collect($areas)->map(fn($area) => [
             'id' => Str::uuid(),
             'attendee_id' => $attendeeId,
             'area_id' => $area,
@@ -896,44 +896,60 @@ class AttendeeService extends BaseRepository
         return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
     }
 
-    public function export(string $eventId): ExportAttendees
+    public function export(string $eventId, string $accessLevelId): ExportAttendees
     {
         $active_organiser = auth()->user()->account->active_organiser;
 
+        $accessLevel = $this->accessLevelsService->find($accessLevelId);
+        $surveys = [];
+        $attendees = [];
 
-        $attendees = $this->model->query()
-            ->with('event')
-            ->when($active_organiser, function ($query) use ($active_organiser) {
+        $surveysQuery = optional($accessLevel->surveyAccessLevels)
+            ->surveys();
+
+        if ($surveysQuery) {
+            $surveys = $surveysQuery->whereNot('title', 'Email Address')
+                ->whereNot('title', 'First Name')
+                ->whereNot('title', 'Last Name')
+                ->get()
+                ->map(fn($survey) => $survey->title);
+
+            $attendees = $this->model->query()
+                ->with('event')
+                ->when($active_organiser, function ($query) use ($active_organiser) {
                     $query->whereOrganiserId($active_organiser);
-            })
-            ->whereEventId($eventId)
-            ->latest()
-            ->get()
-            ->map(function ($attendee) {
-                $answers = $attendee->answers;
+                })
+                ->whereEventId($eventId)
+                ->whereAccessLevelId($accessLevelId)
+                ->latest()
+                ->get()
+                ->map(function ($attendee) {
+                    $answers = [];
 
-                $questions = collect($answers)->map(function ($answer) {
-                    $question = $answer['question'];
+                    foreach ($attendee->answers as $answer) {
+                        if ($answer['question'] != 'Email Address' && $answer['question'] != 'First Name' && $answer['question'] != 'Last Name') {
+                            $value = $answer['answer'];
+                            $answers[] = is_array($value) ? join(', ', $value) : $value;
+                        }
+                    }
 
-                    $theAnswer = $answer['answer'];
-                    $answer = is_array($theAnswer) ? join(', ', $theAnswer) : $theAnswer;
-                    return "$question: $answer";
+                    return [
+                        'event_title' => $attendee->event->title,
+                        'first_name' => $attendee->first_name,
+                        'last_name' => $attendee->last_name,
+                        'email' => $attendee->email,
+                        'reference' => $attendee->ref,
+                        'downloads' => $attendee->downloads ?: 0,
+                        'date_created' => $attendee->created_at->format('Y/M/d h:i A'),
+                        'printed' => $attendee->printed ? 'printed' : 'not printed',
+                        'collected' => $attendee->collected ? 'collected' : 'not collected',
+                        ...$answers
+                    ];
                 });
+        }
 
-                return [
-                    'event_title' => $attendee->event->title,
-                    'first_name' => $attendee->first_name,
-                    'last_name' => $attendee->last_name,
-                    'email' => $attendee->email,
-                    'reference' => $attendee->ref,
-                    'downloads' => $attendee->downloads ?: 0,
-                    'date_created' => $attendee->created_at->format('Y/M/d h:i A'),
-                    'printed' => $attendee->printed ? 'printed' : 'not printed',
-                    'collected' => $attendee->collected ? 'collected' : 'not collected',
-                    'answers' => join("\n", $questions->toArray()),
-                ];
-            });
 
-       return new ExportAttendees(event_id: $eventId, event_ids: auth()->user()->userEventAccessId(), attendees: $attendees);
+
+        return new ExportAttendees(event_id: $eventId, event_ids: auth()->user()->userEventAccessId(), attendees: $attendees, questions: count($surveys) > 0 ? $surveys->toArray() : []);
     }
 }
