@@ -465,4 +465,24 @@ class AccessLevelsService extends BaseRepository
 
         return $this->view(['invites' => $invites]);
     }
+
+    public function getFormEmails(string $eventId, string $accessLevelId)
+    {
+        $accessLevel = $this->find($accessLevelId);
+
+        return $accessLevel->formEmails()
+            ->whereEventId($eventId)
+            ->orderBy('severity', 'desc')
+            ->paginate(10)
+            ->withQueryString()
+            ->through(function ($email) {
+                return [
+                    'id' => $email->id,
+                    'organiser_id' => $email->organiser_id,
+                    'email' => $email->email,
+                    'severity' => $email->severity,
+                    'date_created' => $email->created_at->diffForHumans(),
+                ];
+            });
+    }
 }

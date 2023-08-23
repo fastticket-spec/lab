@@ -516,6 +516,8 @@ const deleteAttendee = () => {
                                     class="ri-upload-2-line"></i>Export Template</a>
                                 <Link :href="`/event/${eventId}/attendees/register-applicant`" class="btn btn-outline-primary ml-2"><i
                                     class="ri-user-3-line"></i>Register Applicant</Link>
+                                <a :href="`/event/${eventId}/attendees/export`" class="btn btn-outline-primary ml-2"><i
+                                    class="ri-save-2-line"></i>Export Attendees</a>
                             </b-col>
                         </b-row>
 

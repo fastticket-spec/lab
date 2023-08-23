@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use App\Models\CountryCode;
+use App\Models\FormEmail;
 use App\Models\Invite;
 use App\Services\AccessLevelsService;
 use App\Services\AttendeeService;
@@ -113,5 +114,31 @@ class AccreditationController extends Controller
         $inviteQuery = Invite::whereAccessLevelId($accessLevelId)->whereEmail($request->email)->whereRef($request->registration_number);
 
         return response()->json(['status' => $inviteQuery->exists()]);
+    }
+
+    public function saveFormEmails(Request $request): void
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'event_id' => 'required|exists:events,id',
+            'access_level_id' => 'required|exists:access_levels,id'
+        ]);
+
+        $formEmailQuery = FormEmail::query()->where(['email' => $request->email, 'access_level_id' => $request->access_level_id]);
+
+        if ($formEmailQuery->exists()) {
+            $formEmailQuery->update([
+                'event_id' => $request->event_id,
+                'organiser_id' => $request->organiser_id,
+                'severity' => $formEmailQuery->first()->severity + 1
+            ]);
+        } else {
+            FormEmail::query()->create([
+                'email' => $request->email,
+                'access_level_id' => $request->access_level_id,
+                'event_id' => $request->event_id,
+                'organiser_id' => $request->organiser_id,
+            ]);
+        }
     }
 }

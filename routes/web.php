@@ -38,6 +38,7 @@ Route::get('/form/{access_level_id}', [AccreditationController::class, 'form']);
 Route::post('/form/{event_id}/{access_level_id}/submit', [AccreditationController::class, 'formSubmit']);
 Route::get('/form/{access_level_id}/success', [AccreditationController::class, 'formSuccess']);
 Route::post('/form/{access_level_id}/accreditation-login', [AccreditationController::class, 'login']);
+Route::post('/form-emails', [AccreditationController::class, 'saveFormEmails']);
 Route::get('/spl/data/players/{id}', [AttendeesController::class, 'pullSplDataPlayers']);
 Route::get('/spl/data/officials/{id}', [AttendeesController::class, 'pullSplDataOfficials']);
 
@@ -94,6 +95,7 @@ Route::group(['middleware' => 'auth'], function () {
                     Route::get('/create', [AccessLevelsController::class, 'create']);
                     Route::post('/', [AccessLevelsController::class, 'store']);
                     Route::group(['prefix' => '{access_level_id}'], function () {
+                        Route::get('/emails', [AccessLevelsController::class, 'formEmails']);
                         Route::get('/edit', [AccessLevelsController::class, 'edit']);
                         Route::get('/surveys', [AccessLevelsController::class, 'getSurveys']);
                         Route::get('/invites', [AccessLevelsController::class, 'getInvites']);
@@ -128,6 +130,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::prefix('attendees')->group(function () {
                 Route::get('/', [AttendeesController::class, 'eventAttendees']);
                 Route::post('/bulk-approval/{status}', [AttendeesController::class, 'bulkEventApproval']);
+                Route::get('export', [AttendeesController::class, 'export']);
                 Route::post('/mark-as-printed', [AttendeesController::class, 'markAsPrintedEvent']);
                 Route::post('/mark-as-collected', [AttendeesController::class, 'markAsCollectedEvent']);
                 Route::post('/upload-attendees', [AttendeesController::class, 'uploadAttendees']);
