@@ -61,4 +61,9 @@ class AccessLevel extends Model
     {
         return $this->hasMany(Invite::class);
     }
+
+    public function formEmails(): HasMany
+    {
+        return $this->hasMany(FormEmail::class);
+    }
 }

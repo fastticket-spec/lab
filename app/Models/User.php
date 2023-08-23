@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -59,5 +60,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function activeOrganiser()
     {
         return optional($this->account)->active_organiser;
+    }
+
+    public function userEventAccess()
+    {
+        return $this->account->eventAccess()->get();
+    }
+
+    public function userEventAccessId(): Collection|null
+    {
+        if ($this->userRole()) {
+            $eventIds = $this->account->eventAccess()->get()->map(fn($eventAccess) => $eventAccess->event_id);
+
+            return $eventIds->count() > 0 ? $eventIds : null;
+        }
+
+        return null;
     }
 }

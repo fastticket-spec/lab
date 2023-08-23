@@ -57,7 +57,7 @@ export default {
                     <div class="text-center">
                         <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                     </div>
-                    <p
+                    <p :style="{ color: accessLevel?.page_design?.font_color}"
                         v-html="lang === 'arabic' ? accessLevel?.general_settings?.success_message_arabic : accessLevel?.general_settings?.success_message"
                         class="text-center p-5"/>
                 </div>
