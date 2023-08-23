@@ -14,7 +14,7 @@ class ExportAttendees implements FromCollection, WithHeadings, WithStyles, WithC
     private ?string $event_id;
     private ?Collection $event_ids;
 
-    public function __construct(?string $event_id = null, ?Collection $event_ids = null, private $attendees)
+    public function __construct(?string $event_id = null, ?Collection $event_ids = null, private $attendees, private ?array $questions)
     {
         $this->event_id = $event_id;
         $this->event_ids = $event_ids;
@@ -32,7 +32,7 @@ class ExportAttendees implements FromCollection, WithHeadings, WithStyles, WithC
             "DATE CREATED",
             "PRINTED",
             "COLLECTED",
-            "ANSWERS"
+            ...$this->questions
         ];
 
     }
