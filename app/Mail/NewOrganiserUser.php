@@ -41,7 +41,7 @@ class NewOrganiserUser extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('noreply@nidlp.gov.sa', $this->organiserName),
+            from: new Address('noreply@achieveone.sa', $this->organiserName),
             subject: 'Welcome on-board | ' . config('app.name'),
         );
     }
