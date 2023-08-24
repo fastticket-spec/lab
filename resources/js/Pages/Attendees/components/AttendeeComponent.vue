@@ -169,6 +169,17 @@ const downloadBadge = async (type = 'full') => {
         let source = document.getElementById('badgeContainer')
         source.classList.remove("container");
 
+        let collection = document.getElementsByTagName("p");
+        for (let i = 0; i < collection.length; i++) {
+
+            console.log(collection[i].innerHTML = collection[i].innerHTML.replace('&nbsp;', ' ') );
+            console.log(collection[i].style.wordWrap = 'normal');
+            console.log(collection[i].style.letterSpacing = 'normal');
+            console.log(collection[i].style.wordSpacing = '30px');
+
+
+        }
+
         if (type === 'full') {
             html2canvas(source, {useCORS: true, allowTaint: true, scale: 5}).then(canvas => {
                 const imgWidth = badgeData.value.badge.width;
