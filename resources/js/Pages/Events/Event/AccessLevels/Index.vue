@@ -196,7 +196,7 @@ const viewEmails = async (page = 1) => {
                                 View Emails</a>
                         </template>
 
-                        <!--<a href="#"
+                        <a href="#"
                            v-if="access_level.has_surveys && userRole !== 'Viewers' && userRole !== 'Editors'"
                            @click.prevent.stop="invitationModal = true; selectedAccessLevel = access_level"><i
                             class="ri-settings-2-line"></i>
@@ -206,7 +206,7 @@ const viewEmails = async (page = 1) => {
                            v-if="access_level.has_surveys && userRole !== 'Viewers' && userRole !== 'Editors'"
                            @click.prevent.stop="viewInvitations(access_level.id)"><i
                             class="ri-eye-line"></i>
-                            View Invites</a>-->
+                            View Invites</a>
 
                     </div>
                 </b-card>
