@@ -26,12 +26,14 @@
         "modifyPersonalDetails": "Modify your personal details.",
         "accountSettings": "Account Setting",
         "manageAccount": "Manage your account parameters.",
+        "organiserPreferences": "Organiser Preferences",
         "logout": "Logout"
     },
     "sidebar": {
         "dashboard": "Dashboard",
         "organisers": "Organisers",
         "accountManager": "Account Manager",
+        "accountManagers": "Account Managers",
         "view": "View",
         "create": "Create",
         "orders": "Orders",
@@ -219,7 +221,12 @@
         "all_events": "Access to All Categories",
         "attend_date": "Attend Date",
         "enter_email": "Enter your email address",
-        "enter_reg_no": "Enter your registration number"
+        "enter_reg_no": "Enter your registration number",
+        "approval_message": "Approval Message",
+        "success_message": "Success Message",
+        "success_messageArabic": "Success Message (Arabic)",
+        "email_message": "Email Message",
+        "email_message_arabic": "Email Message (Arabic)"
     },
     "button": {
         "create": "Create",
@@ -263,5 +270,8 @@
     "sort": {
         "title": "Sort by:",
         "creation_date": "Creation Date"
+    },
+    "preferences": {
+        "email": "Email"
     }
 }

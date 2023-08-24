@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Exports\ExportAttendees;
+use App\Helpers\QRCodeHelper;
+use App\Http\Resources\AttendeeExportResource;
 use App\Mail\ApprovalMail;
 use App\Mail\AttendeeMail;
 use App\Mail\CustomAttendeeMail;
@@ -24,6 +27,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Endroid\QrCode\QrCode;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AttendeeService extends BaseRepository
 {
@@ -45,7 +49,7 @@ class AttendeeService extends BaseRepository
 
         $eventsAccessID = null;
         if ($roleId) {
-            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn ($access) => $access->event_id);
+            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn($access) => $access->event_id);
         }
 
         return $this->model->query()
@@ -108,8 +112,8 @@ class AttendeeService extends BaseRepository
                     'status' => Attendee::STATUS_READABLE[$attendee->status],
                     'accept_status' => Attendee::ACCEPT_STATUS_READABLE[$attendee->accept_status],
                     'date_submitted' => $attendee->created_at->format('jS M, Y H:i'),
-                    'zones' => $attendee->zones->map(fn ($zone) => $zone->zone_id),
-                    'areas' => $attendee->areas->map(fn ($area) => $area->area_id),
+                    'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id),
+                    'areas' => $attendee->areas->map(fn($area) => $area->area_id),
                     'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge,
                     'printed' => !!$attendee->printed,
                     'collected' => !!$attendee->collected,
@@ -147,7 +151,7 @@ class AttendeeService extends BaseRepository
                     $fileUrl = $this->uploadFile($file, $answer['question'], '-accreditation-file-');
                     $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => Storage::disk(config('filesystems.default'))->url($fileUrl)];
                 } elseif ($answer['type'] == '12') {
-                    $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' =>  $answer['country_code'] . '-' . $answer['answer'] ?? ''];
+                    $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => $answer['country_code'] . '-' . $answer['answer'] ?? ''];
                 } else {
                     $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => $answer['answer'] ?? ''];
                 }
@@ -262,8 +266,13 @@ class AttendeeService extends BaseRepository
 
             $settings = optional($attendee->accessLevel)->generalSettings;
 
+            $qr = QRCodeHelper::getQRCode($attendee->ref, 'png');
+
+            $path = $this->uploadBase64File(file_get_contents($qr));
+            $qrPath = Storage::disk(config('filesystems.default'))->url($path);
+
             Mail::to($attendee->email)
-                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser));
+                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $qrPath, $attendee->first_name));
         }
     }
 
@@ -290,7 +299,7 @@ class AttendeeService extends BaseRepository
 
         $attendee->zones()->delete();
 
-        $zones = collect($zones)->map(fn ($zone) => [
+        $zones = collect($zones)->map(fn($zone) => [
             'id' => Str::uuid(),
             'attendee_id' => $attendeeId,
             'zone_id' => $zone,
@@ -316,7 +325,7 @@ class AttendeeService extends BaseRepository
 
         $attendee->areas()->delete();
 
-        $areas = collect($areas)->map(fn ($area) => [
+        $areas = collect($areas)->map(fn($area) => [
             'id' => Str::uuid(),
             'attendee_id' => $attendeeId,
             'area_id' => $area,
@@ -678,8 +687,7 @@ class AttendeeService extends BaseRepository
         if ($all) return $this->model->query()->count();
 
         $user = auth()->user();
-        $account = $user->account;
-        $activeOrganiser = $account->active_organiser;
+        $activeOrganiser = $user->activeOrganiser();
 
         return $this->model->query()
             ->when(!$activeOrganiser, function ($query) use ($user) {
@@ -706,8 +714,7 @@ class AttendeeService extends BaseRepository
     public function countDownloads(?string $eventId = null, array|Collection|null $allowedEventIds = null): int
     {
         $user = auth()->user();
-        $account = $user->account;
-        $activeOrganiser = $account->active_organiser;
+        $activeOrganiser = $user->activeOrganiser();
 
         return $this->model->query()
             ->when(!$activeOrganiser, function ($query) use ($user) {
@@ -725,9 +732,9 @@ class AttendeeService extends BaseRepository
             ->sum('downloads');
     }
 
-    public function uploadAttendees(string $eventId, array $attendees, string $accessLevelId, bool $approve)
+    public function uploadAttendees(string $eventId, array $attendees, string $accessLevelId, bool $approve, bool $mail)
     {
-        $organiserId = auth()->user()->account->active_organiser;
+        $organiserId = auth()->user()->activeOrganiser();
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
         $surveyLink = config('app.url') . '/a/' . $accessLevelId;
         $settings = $accessLevel->generalSettings;
@@ -765,14 +772,17 @@ class AttendeeService extends BaseRepository
 
             $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
 
-            // Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
-            //     settings: $settings,
-            //     surveyLink: "$surveyLink?ref=$inviteId",
-            //     organiser: $organiser,
-            //     firstName: $first_name,
-            //     registration: $accessLevel->registration,
-            //     ref: $ref
-            // ));
+            if ($mail) {
+                Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
+                    settings: $settings,
+                    surveyLink: "$surveyLink?ref=$inviteId",
+                    organiser: $organiser,
+                    firstName: $first_name,
+                    lastName: $last_name,
+                    registration: $accessLevel->registration,
+                    ref: $ref
+                ));
+            }
         }
 
         $message = 'Attendees uploaded successfully!';
@@ -885,5 +895,62 @@ class AttendeeService extends BaseRepository
         $message = 'Attendee deleted successfully!';
 
         return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
+    }
+
+    public function export(string $eventId, string $accessLevelId): ExportAttendees
+    {
+        $active_organiser = auth()->user()->account->active_organiser;
+
+        $accessLevel = $this->accessLevelsService->find($accessLevelId);
+        $surveys = [];
+        $attendees = [];
+
+        $surveysQuery = optional($accessLevel->surveyAccessLevels)
+            ->surveys();
+
+        if ($surveysQuery) {
+            $surveys = $surveysQuery->whereNot('title', 'Email Address')
+                ->whereNot('title', 'First Name')
+                ->whereNot('title', 'Last Name')
+                ->get()
+                ->map(fn($survey) => $survey->title);
+
+            $attendees = $this->model->query()
+                ->with('event')
+                ->when($active_organiser, function ($query) use ($active_organiser) {
+                    $query->whereOrganiserId($active_organiser);
+                })
+                ->whereEventId($eventId)
+                ->whereAccessLevelId($accessLevelId)
+                ->latest()
+                ->get()
+                ->map(function ($attendee) {
+                    $answers = [];
+
+                    foreach ($attendee->answers as $answer) {
+                        if ($answer['question'] != 'Email Address' && $answer['question'] != 'First Name' && $answer['question'] != 'Last Name') {
+                            $value = $answer['answer'];
+                            $answers[] = is_array($value) ? join(', ', $value) : $value;
+                        }
+                    }
+
+                    return [
+                        'event_title' => $attendee->event->title,
+                        'first_name' => $attendee->first_name,
+                        'last_name' => $attendee->last_name,
+                        'email' => $attendee->email,
+                        'reference' => $attendee->ref,
+                        'downloads' => $attendee->downloads ?: 0,
+                        'date_created' => $attendee->created_at->format('Y/M/d h:i A'),
+                        'printed' => $attendee->printed ? 'printed' : 'not printed',
+                        'collected' => $attendee->collected ? 'collected' : 'not collected',
+                        ...$answers
+                    ];
+                });
+        }
+
+
+
+        return new ExportAttendees(event_id: $eventId, event_ids: auth()->user()->userEventAccessId(), attendees: $attendees, questions: count($surveys) > 0 ? $surveys->toArray() : []);
     }
 }

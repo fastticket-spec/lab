@@ -1,5 +1,3 @@
-@component('mail::message', ['headerTitle' => $organiserName, 'headerLogo' => $organiserLogo])
-### Dear {{$firstName}},
-
+@component('mail::message', ['headerTitle' => $organiserName, 'preferences' => $preferences])
 {!! $content !!}
 @endcomponent

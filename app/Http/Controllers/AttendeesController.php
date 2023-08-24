@@ -11,6 +11,7 @@ use App\Services\AttendeeService;
 use App\Services\ZoneService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
 use Rap2hpoutre\FastExcel\FastExcel;
 
@@ -184,7 +185,7 @@ class AttendeesController extends Controller
 
     public function uploadAttendees(AttendeeUploadRequest $request, string $eventId)
     {
-        return $this->attendeeService->uploadAttendees($eventId, $request->attendees, $request->access_level_id, $request->approve);
+        return $this->attendeeService->uploadAttendees($eventId, $request->attendees, $request->access_level_id, $request->approve, $request->mail);
     }
 
     /**
@@ -325,5 +326,12 @@ class AttendeesController extends Controller
         $response = json_decode($response, true);
         $response = collect($response);
         return (new FastExcel($response))->download($id . '-official.xlsx');
+    }
+
+    public function export(string $eventId, string $accessLevelId): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        $export = $this->attendeeService->export($eventId, $accessLevelId);
+
+        return Excel::download($export, 'attendees.xlsx');
     }
 }

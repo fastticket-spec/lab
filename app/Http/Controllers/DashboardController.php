@@ -26,8 +26,8 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         $userRole = $user->userRole();
-        $account = $user->account;
-        $active_organiser = $account->active_organiser;
+        $account = $user->parentAccount ?: $user->account;
+        $active_organiser = $user->account->active_organiser;
 
         $roleId = $account->role_id;
 

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -20,6 +21,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone',
         'email',
         'password',
+        'parent_account_id'
     ];
 
     protected $hidden = [
@@ -45,7 +47,34 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function organiserIds()
     {
-        $account = $this->account;
+        $account = $this->parentAccount ?: $this->account;
+
         return $account ? optional($account->organiser)->pluck('id') : [];
+    }
+
+    public function parentAccount(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Account::class, 'parent_account_id', 'id');
+    }
+
+    public function activeOrganiser()
+    {
+        return optional($this->account)->active_organiser;
+    }
+
+    public function userEventAccess()
+    {
+        return $this->account->eventAccess()->get();
+    }
+
+    public function userEventAccessId(): Collection|null
+    {
+        if ($this->userRole()) {
+            $eventIds = $this->account->eventAccess()->get()->map(fn($eventAccess) => $eventAccess->event_id);
+
+            return $eventIds->count() > 0 ? $eventIds : null;
+        }
+
+        return null;
     }
 }

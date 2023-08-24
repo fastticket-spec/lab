@@ -34,23 +34,33 @@ const visit = (link, method = 'get') => {
 const invitationModal = ref(false);
 const invitesModal = ref(false);
 
-const invitation = reactive({
-    emails: []
-});
+const invitations = ref([{email: '', first_name: '', last_name: '', phone: ''}]);
+const inviteAttachment = ref(null);
+const isSubmittingInvite = ref(false);
+
+const inviteType = ref('mail');
 
 onUpdated(() => {
-    invitation.emails = [];
     invitationModal.value = false
+
+    invitations.value = [{email: '', first_name: '', last_name: '', phone: ''}];
+    inviteAttachment.value = null
+    isSubmittingInvite.value = false
 })
 
-const selectedAccessLevel = ref('')
+const selectedAccessLevel = ref({})
 
 const onPaginate = page => {
     router.get(`/event/${props.event_id}/access-levels?sort=${selectedSort.value}&page=${page}`)
 }
 
 const sendInvite = () => {
-    router.post(`/event/${props.event_id}/access-levels/${selectedAccessLevel.value}/send-invitation`, invitation)
+    // isSubmittingInvite.value = true;
+    router.post(`/event/${props.event_id}/access-levels/${selectedAccessLevel.value.id}/send-invitation`, {
+        invitations: invitations.value,
+        invitation_type: inviteType.value,
+        attachment: inviteAttachment.value ? inviteAttachment.value.files[0] : null
+    })
 }
 
 const quantityAvailable = computed(() => (quantityAvailable, quantityFilled) => {
@@ -58,7 +68,7 @@ const quantityAvailable = computed(() => (quantityAvailable, quantityFilled) => 
     return available >= 0 ? available : 0
 })
 
-const inviteFields = ['email', 'date_sent'];
+const inviteFields = ['first_name', 'last_name', 'email', 'phone', 'attachment', 'date_sent'];
 const accessLevelInvites = ref([]);
 
 const viewInvitations = async (accessLevelId) => {
@@ -67,12 +77,39 @@ const viewInvitations = async (accessLevelId) => {
         accessLevelInvites.value = data.invites;
 
         invitesModal.value = true;
-        selectedAccessLevel.value = accessLevelId;
+        selectedAccessLevel.value.id = accessLevelId;
     } catch (e) {
         console.log(e);
     }
 }
 
+const insert = i => {
+    invitations.value.splice(i, 0, {email: '', first_name: '', last_name: '', phone: ''})
+}
+
+const remove = i => {
+    invitations.value.splice(i, 1)
+}
+
+const disableInviteSubmit = computed(() => {
+    return !!invitations.value.find(x => inviteType.value === 'mail' ? (!x.email || !x.first_name) : (!x.first_name || !x.phone));
+});
+
+const accessLevelFormEmails = ref({});
+const formEmailsModalShow = ref(false);
+const accessLevelEmailsFields = ['email', 'severity', 'date_created']
+
+const viewEmails = async (page = 1) => {
+    try {
+        const {data} = await axios.get(`/event/${props.event_id}/access-levels/${selectedAccessLevel.value.id}/emails?page=${page}`);
+        accessLevelFormEmails.value = data;
+
+        formEmailsModalShow.value = true
+    } catch (e) {
+        accessLevelFormEmails.value = {};
+        console.log(e);
+    }
+}
 </script>
 
 <template>
@@ -105,7 +142,9 @@ const viewInvitations = async (accessLevelId) => {
 
         <b-row class="page-cards">
             <b-col sm="6" v-for="access_level in access_levels.data" :key="access_level.id">
-                <b-card :title="locale === 'ar' ? (access_level.title_arabic || access_level.title) : access_level.title" class="iq-mb-3">
+                <b-card
+                    :title="locale === 'ar' ? (access_level.title_arabic || access_level.title) : access_level.title"
+                    class="iq-mb-3">
 
                     <b-card-text class="d-flex w-100 justify-content-around my-5">
                         <div class="text-center">
@@ -150,11 +189,16 @@ const viewInvitations = async (accessLevelId) => {
                                :class="access_level.public_status === 0 ? 'text-success' : 'text-danger'"><i
                                 :class="access_level.public_status === 0 ? 'ri-play-line' : 'ri-pause-line'"></i>
                                 {{ access_level.public_status === 0 ? 'Activate(Public)' : 'Deactivate(Public)' }}</a>
+                            <a href="#"
+                               v-if="userRole !== 'Editors' && access_level.has_surveys"
+                               @click.prevent.stop="selectedAccessLevel = access_level; viewEmails(1)"><i
+                                class="ri-mail-line"></i>
+                                View Emails</a>
                         </template>
 
-                        <a href="#"
+                        <!--<a href="#"
                            v-if="access_level.has_surveys && userRole !== 'Viewers' && userRole !== 'Editors'"
-                           @click.prevent.stop="invitationModal = true; selectedAccessLevel = access_level.id"><i
+                           @click.prevent.stop="invitationModal = true; selectedAccessLevel = access_level"><i
                             class="ri-settings-2-line"></i>
                             Send Invitation</a>
 
@@ -162,7 +206,7 @@ const viewInvitations = async (accessLevelId) => {
                            v-if="access_level.has_surveys && userRole !== 'Viewers' && userRole !== 'Editors'"
                            @click.prevent.stop="viewInvitations(access_level.id)"><i
                             class="ri-eye-line"></i>
-                            View Invites</a>
+                            View Invites</a>-->
 
                     </div>
                 </b-card>
@@ -173,28 +217,81 @@ const viewInvitations = async (accessLevelId) => {
                       @change="onPaginate"
                       :total-rows="access_levels.total" :per-page="access_levels.per_page" align="center"/>
 
-        <b-modal v-model="invitationModal" id="message-modal" title="Send Invitation">
+        <b-modal v-model="invitationModal" id="invitation-modal" title="Send Invitation" size="lg">
             <b-row class="mt-3">
-                <b-col sm="12">
-                    <span>Supply the emails you want to send invite to.</span>
+                <b-col sm="6">
                     <div class="form-group">
-                        <label for="subject">Emails</label>
-                        <vue-select v-model="invitation.emails" class="form-control mb-0"
-                                    :options="[]"
-                                    multiple taggable>
-                            <template v-slot:no-options>Type emails and press enter.</template>
-                        </vue-select>
+                        <label for="type">Type</label>
+                        <select class="form-control" v-model="inviteType">
+                            <option value="mail">Mail</option>
+                            <option value="sms">SMS</option>
+                        </select>
                     </div>
-
                 </b-col>
             </b-row>
+
+            <b-row class="mt-3" v-if="(inviteType === 'mail' && !selectedAccessLevel.has_mail_invite_content) || (inviteType === 'sms' && !selectedAccessLevel.has_sms_invite_content)">
+                <b-col sm="12">
+                    <h5>Invite {{ inviteType }} content is missing. Click <Link :href="`/event/${event_id}/access-levels/${selectedAccessLevel.id}/customize#${inviteType}-invite`">here</Link> to update content.</h5>
+                </b-col>
+            </b-row>
+
+            <template v-if="(inviteType === 'mail' && selectedAccessLevel.has_mail_invite_content) || (inviteType === 'sms' && selectedAccessLevel.has_sms_invite_content)">
+                <b-row class="mt-3" v-for="(invitation, i) in invitations" :key="`invitation-${i}`">
+                    <b-col sm="3">
+                        <div class="form-group">
+                            <label for="subject">First Name</label>
+                            <input type="text" class="form-control" v-model="invitation.first_name">
+                        </div>
+                    </b-col>
+                    <b-col sm="3">
+                        <div class="form-group">
+                            <label for="subject">Last Name</label>
+                            <input type="text" class="form-control" v-model="invitation.last_name">
+                        </div>
+                    </b-col>
+                    <b-col sm="4" v-if="inviteType === 'mail'">
+                        <div class="form-group">
+                            <label for="subject">Email</label>
+                            <input type="email" class="form-control" v-model="invitation.email">
+                        </div>
+                    </b-col>
+                    <b-col sm="4" v-else>
+                        <div class="form-group">
+                            <label for="subject">Phone</label>
+                            <input type="text" class="form-control" placeholder="+9660123456789" v-model="invitation.phone">
+                        </div>
+                    </b-col>
+                    <b-col sm="2" class="mb-3 pt-5">
+                        <b-btn variant="outline-primary"
+                               @click="insert(i + 1)">
+                            <i class="ri-add-line p-0"></i>
+                        </b-btn>
+                        <b-btn v-if="invitations.length > 1"
+                               variant="outline-danger"
+                               @click="remove(i)"
+                               class="ml-2"><i
+                            class="ri-delete-bin-2-line p-0"></i>
+                        </b-btn>
+                    </b-col>
+                </b-row>
+
+                <b-row v-if="inviteType === 'mail'">
+                    <b-col size="12">
+                        <div class="form-group">
+                            <label>Attachment</label><br>
+                            <input type="file" ref="inviteAttachment" accept="application/pdf">
+                        </div>
+                    </b-col>
+                </b-row>
+            </template>
 
             <template #modal-footer>
                 <div class="w-100">
                     <b-button
                         variant="primary"
                         @click="sendInvite"
-                        :disabled="invitation.emails.length === 0"
+                        :disabled="disableInviteSubmit || isSubmittingInvite"
                         class="btn btn-primary float-right ml-2">Send Invite
                     </b-button>
                     <b-button
@@ -209,12 +306,40 @@ const viewInvitations = async (accessLevelId) => {
             </template>
         </b-modal>
 
-        <b-modal v-model="invitesModal" id="message-modal" title="View Invites" scrollable>
+        <b-modal v-model="invitesModal" size="xl" id="message-modal" title="View Invites" scrollable>
             <b-row class="mt-3">
                 <b-col sm="12">
                     <b-table v-if="accessLevelInvites.length > 0" :items="accessLevelInvites" :fields="inviteFields"
-                             class="table-responsive-sm table-borderless" />
+                             class="table-responsive-sm table-borderless">
+                        <template #cell(attachment)="data">
+                            <a v-if="data.item.attachment" :href="data.item.attachment" target="_blank">View</a>
+                        </template>
+                    </b-table>
                     <h5 v-else class="text-center mb-3">Invites will appear here</h5>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="formEmailsModalShow" size="lg" id="form-emails-modal" title="Form Emails" scrollable>
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <template v-if="accessLevelFormEmails?.data?.length > 0">
+                        <b-table :items="accessLevelFormEmails?.data" :fields="accessLevelEmailsFields"
+                                 class="table-responsive-sm table-borderless">
+                            <template #cell(email)="data">
+                                <a :href="`mailto:${data.item.email}`">{{ data.item.email }}</a>
+                            </template>
+                        </b-table>
+
+                        <b-pagination v-if="accessLevelFormEmails?.data && accessLevelFormEmails?.data.length > 0" v-model="accessLevelFormEmails.current_page"
+                                      @change="viewEmails"
+                                      :total-rows="accessLevelFormEmails.total" :per-page="accessLevelFormEmails.per_page" align="center"/>
+                    </template>
+
+                    <h5 v-else class="text-center mb-3">Emails will appear here</h5>
                 </b-col>
             </b-row>
 

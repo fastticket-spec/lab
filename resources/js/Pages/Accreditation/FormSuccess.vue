@@ -34,12 +34,7 @@ export default {
     border-radius: 0.25rem;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
-.bg-white {
-    background-color: #7d4f4c61 !important;
-}
-label {
-    color: #ffffff;
-}
+
 </style>
 
 
@@ -58,11 +53,11 @@ label {
                 }" class="mx-auto vag d-flex align-items-center">
         <div class="row no-gutters accreditation-form w-100" :class="{'rtl text-right': lang === 'arabic'}">
             <div class="col-12 align-self-center">
-                <div class="bg-div bg-white">
+                <div class="bg-div bg-white" :style="{backgroundColor: accessLevel?.page_design?.form_bg_color + ' !important'}">
                     <div class="text-center">
                         <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                     </div>
-                    <p
+                    <p :style="{ color: accessLevel?.page_design?.font_color}"
                         v-html="lang === 'arabic' ? accessLevel?.general_settings?.success_message_arabic : accessLevel?.general_settings?.success_message"
                         class="text-center p-5"/>
                 </div>

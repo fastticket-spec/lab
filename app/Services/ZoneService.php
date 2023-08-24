@@ -96,8 +96,7 @@ class ZoneService extends BaseRepository
     public function count(?string $eventId = null): int
     {
         $user = auth()->user();
-        $account = $user->account;
-        $activeOrganiser = $account->active_organiser;
+        $activeOrganiser = $user->activeOrganiser();
         if ($eventId) {
             $eventIds = [$eventId];
         } else {

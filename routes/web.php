@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountManagerController;
 use App\Http\Controllers\AccreditationController;
 use App\Http\Controllers\AreasController;
 use App\Http\Controllers\AttendeesController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Events\DashboardController as EventDashboardController;
 use App\Http\Controllers\EventSurveyController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrganiserController;
+use App\Http\Controllers\PreferencesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ZonesController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +38,7 @@ Route::get('/form/{access_level_id}', [AccreditationController::class, 'form']);
 Route::post('/form/{event_id}/{access_level_id}/submit', [AccreditationController::class, 'formSubmit']);
 Route::get('/form/{access_level_id}/success', [AccreditationController::class, 'formSuccess']);
 Route::post('/form/{access_level_id}/accreditation-login', [AccreditationController::class, 'login']);
+Route::post('/form-emails', [AccreditationController::class, 'saveFormEmails']);
 Route::get('/spl/data/players/{id}', [AttendeesController::class, 'pullSplDataPlayers']);
 Route::get('/spl/data/officials/{id}', [AttendeesController::class, 'pullSplDataOfficials']);
 
@@ -57,6 +60,13 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::post('/{id}/set-organiser', [OrganiserController::class, 'loginOrganiser']);
         Route::post('/{id}/unset-organiser', [OrganiserController::class, 'logoutOrganiser']);
+    });
+
+    Route::group(['prefix' => 'account-managers'], function () {
+        Route::get('/', [AccountManagerController::class, 'index']);
+        Route::get('/create', [AccountManagerController::class, 'create']);
+        Route::post('/', [AccountManagerController::class, 'store']);
+        Route::delete('/{accountManagerId}', [AccountManagerController::class, 'destroy']);
     });
 
     Route::group(['middleware' => 'active-organiser'], function () {
@@ -85,6 +95,7 @@ Route::group(['middleware' => 'auth'], function () {
                     Route::get('/create', [AccessLevelsController::class, 'create']);
                     Route::post('/', [AccessLevelsController::class, 'store']);
                     Route::group(['prefix' => '{access_level_id}'], function () {
+                        Route::get('/emails', [AccessLevelsController::class, 'formEmails']);
                         Route::get('/edit', [AccessLevelsController::class, 'edit']);
                         Route::get('/surveys', [AccessLevelsController::class, 'getSurveys']);
                         Route::get('/invites', [AccessLevelsController::class, 'getInvites']);
@@ -119,6 +130,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::prefix('attendees')->group(function () {
                 Route::get('/', [AttendeesController::class, 'eventAttendees']);
                 Route::post('/bulk-approval/{status}', [AttendeesController::class, 'bulkEventApproval']);
+                Route::get('export/{access_level_id}', [AttendeesController::class, 'export']);
                 Route::post('/mark-as-printed', [AttendeesController::class, 'markAsPrintedEvent']);
                 Route::post('/mark-as-collected', [AttendeesController::class, 'markAsCollectedEvent']);
                 Route::post('/upload-attendees', [AttendeesController::class, 'uploadAttendees']);
@@ -197,6 +209,12 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/{user_id}/edit', [UserController::class, 'edit']);
         Route::patch('/{user_id}', [UserController::class, 'update']);
         Route::delete('/{user_id}', [UserController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'organiser-preferences'], function () {
+        Route::get('/', [PreferencesController::class, 'index']);
+        Route::post('/logo', [PreferencesController::class, 'uploadLogo']);
+        Route::post('/', [PreferencesController::class, 'store']);
     });
 });
 

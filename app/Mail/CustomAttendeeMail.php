@@ -15,7 +15,7 @@ class CustomAttendeeMail extends Mailable
     use Queueable, SerializesModels;
 
     public ?string $organiserName;
-    public ?string $organiserLogo;
+    public $preferences;
 
     /**
      * Create a new message instance.
@@ -23,7 +23,16 @@ class CustomAttendeeMail extends Mailable
     public function __construct(public array $data, $organiser)
     {
         $this->organiserName = $organiser->name ?? null;
-        $this->organiserLogo = $organiser->logo_url ?? null;
+        $organiserLogo = $organiser->logo_url ?? null;
+
+        $this->preferences = $organiser->preferences ?: [
+            'email_bg_color' => 'transparent',
+            'email_font_color' => '#000000',
+            'email_qr_color' => '#000000',
+            'email_logo_url' => $organiserLogo,
+            'email_logo_width' => '200',
+            'email_logo_height' => '100'
+        ];
     }
 
     /**
@@ -32,7 +41,7 @@ class CustomAttendeeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('register@accreditation.achieveone.sa', $this->organiserName),
+            from: new Address('noreply@achieveone.sa', $this->organiserName),
             subject: $this->data['subject'],
         );
     }

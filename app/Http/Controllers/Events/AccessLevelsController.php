@@ -148,7 +148,14 @@ class AccessLevelsController extends Controller
 
     public function sendInvitationLink(Request $request, string $eventId, string $accessLevelId)
     {
-        return $this->accessLevelsService->sendLink($request->emails, $eventId, $accessLevelId);
+        $request->validate([
+            'invitations' => 'array|required',
+            'invitation_type' => 'required|in:mail,sms',
+            'invitations.*.email' => 'required_if:invitation_type,mail|email|nullable',
+            'invitations.*.phone' => 'required_if:invitation_type,sms',
+        ]);
+
+        return $this->accessLevelsService->sendLink($request, $eventId, $accessLevelId);
     }
 
     public function getSurveys(string $eventId, string $accessLevelId)
@@ -159,5 +166,10 @@ class AccessLevelsController extends Controller
     public function getInvites(string $eventId, string $accessLevelId)
     {
         return $this->accessLevelsService->getInvites($accessLevelId);
+    }
+
+    public function formEmails(string $eventId, string $accessLevelId)
+    {
+        return $this->accessLevelsService->getFormEmails($eventId, $accessLevelId);
     }
 }
