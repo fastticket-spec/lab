@@ -563,7 +563,7 @@ class AttendeeService extends BaseRepository
         $badgeDatas[] = (object)['column_title' => 'first_name', 'column_value' => $attendee->first_name];
         $badgeDatas[] = (object)['column_title' => 'last_name', 'column_value' => $attendee->last_name];
         $badgeDatas[] = (object)['column_title' => 'email', 'column_value' => $attendee->email];
-        $badgeDatas[] = (object)['column_title' => 'full_name', 'column_value' => $attendee->first_name . str_repeat('&nbsp;', 1) . $attendee->last_name];
+        $badgeDatas[] = (object)['column_title' => 'full_name', 'column_value' => ($attendee->first_name . ' ' . $attendee->last_name)];
 
 
         //        if (!$attendee) {
@@ -970,7 +970,7 @@ class AttendeeService extends BaseRepository
             "parts": [
               {
                 "html": "index.html",
-                "pages": {"pageCount": 0},
+                "pages": {"pageCount": 1},
                 "layout": {
                     "size": {
                       "width": 85,

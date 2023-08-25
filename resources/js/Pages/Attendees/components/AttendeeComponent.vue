@@ -169,49 +169,95 @@ const downloadBadge = async (type = 'full') => {
         let source = document.getElementById('badgeContainer')
         source.classList.remove("container");
 
+
+
+
         if (type === 'full') {
-            html2canvas(source, {useCORS: true, allowTaint: true, scale: 5}).then(canvas => {
+            // html2canvas(source, {useCORS: true, allowTaint: true, scale: 5}).then(canvas => {
+            //     const imgWidth = badgeData.value.badge.width;
+            //     const imgHeight = badgeData.value.badge.height;
+            //     const contentDataURL = canvas.toDataURL('image/jpeg')
+
+
+            //     document.body.appendChild(canvas);
+            //     const {jsPDF} = window.jspdf;
+
+            //     let pdf = new jsPDF('p', 'cm', [imgWidth, imgHeight]); // A4 size page of PDF
+            //     pdf.addImage(contentDataURL, 'JPEG', 0, 0, imgWidth, imgHeight)
+
+            //     pdf.save('MYPdf.pdf');
+            // });
+
+            domtoimage.toPng(source)
+            .then(function (dataUrl) {
+                var img = new Image();
+                img.src = dataUrl;
+                document.body.appendChild(img);
                 const imgWidth = badgeData.value.badge.width;
                 const imgHeight = badgeData.value.badge.height;
-                const contentDataURL = canvas.toDataURL('image/jpeg')
+                // const contentDataURL = img.toDataURL('image/jpeg')
 
-
-                document.body.appendChild(canvas);
                 const {jsPDF} = window.jspdf;
 
                 let pdf = new jsPDF('p', 'cm', [imgWidth, imgHeight]); // A4 size page of PDF
-                pdf.addImage(contentDataURL, 'JPEG', 0, 0, imgWidth, imgHeight)
+                pdf.addImage(img, 'JPEG', 0, 0, imgWidth, imgHeight)
 
                 pdf.save('MYPdf.pdf');
+            })
+            .catch(function (error) {
+                console.error('oops, something went wrong!', error);
             });
+
         } else if (type === 'split') {
-            const rect = source.getBoundingClientRect();
-            setTimeout(gpdf, 5000);
-
             window.scrollTo(0,0)
-            html2canvas(source, {
-                useCORS: true,
-                allowTaint: false,
-                x: rect.left,
-                y: rect.top,
-                width: source.clientWidth,
-                height: (source.clientHeight / 2),
-                scale: 35
-            }).then(canvas => {
-                document.querySelector("#hold1").src = canvas.toDataURL('image/jpeg')
+
+            const rect = source.getBoundingClientRect();
+            // setTimeout(gpdf, 5000);
+
+            domtoimage.toJpeg(source, {quality: 1})
+            .then(function (dataUrl) {
+                var img = new Image();
+                img.src = dataUrl;
+                document.body.appendChild(img);
+
+
+
+                const width = img.width;
+                const height = img.height;
+
+                // Calculate the dimensions for each half
+                const halfHeight = Math.floor(height / 2);
+
+                // Create canvases for the top and bottom halves
+                const topCanvas = document.getElementById('topCanvas');
+                const bottomCanvas = document.getElementById('bottomCanvas');
+
+                // Set canvas dimensions
+                topCanvas.width = width;
+                topCanvas.height = halfHeight;
+                bottomCanvas.width = width;
+                bottomCanvas.height = halfHeight;
+
+                // Get canvas contexts
+                const topCtx = topCanvas.getContext('2d');
+                const bottomCtx = bottomCanvas.getContext('2d');
+
+                // Draw the top half of the image
+                topCtx.drawImage(img, 0, 0, width, halfHeight, 0, 0, width, halfHeight);
+
+                // Draw the bottom half of the image
+                bottomCtx.drawImage(img, 0, halfHeight, width, halfHeight, 0, 0, width, halfHeight);
+                generatePDF(width, halfHeight)
+
+
+
+            })
+            .catch(function (error) {
+                console.error('oops, something went wrong!', error);
             });
 
-            html2canvas(source, {
-                useCORS: true,
-                allowTaint: false,
-                x: rect.left,
-                y: rect.top + 238,
-                width: source.clientWidth,
-                height: source.clientHeight / 2,
-                scale: 35
-            }).then(canvas => {
-                document.querySelector("#hold2").src = canvas.toDataURL('image/jpeg')
-            });
+
+
 
             function gpdf() {
                 const {jsPDF} = window.jspdf;
@@ -230,6 +276,36 @@ const downloadBadge = async (type = 'full') => {
 
                 document.querySelector("#hold1").src = '';
                 document.querySelector("#hold2").src = '';
+            }
+
+
+            function generatePDF(w, h) {
+                // Initialize jsPDF
+                const {jsPDF} = window.jspdf;
+
+                let pdf = new jsPDF('L', 'px', [w, h]); // A4 size page of PDF
+
+                // Get canvases
+                const topCanvas = document.getElementById('topCanvas');
+                const bottomCanvas = document.getElementById('bottomCanvas');
+
+                console.log(topCanvas.toDataURL())
+
+                // Convert canvas to image data
+                const topImageData = topCanvas.toDataURL();
+                const bottomImageData = bottomCanvas.toDataURL();
+
+                // Add top half to the first page
+                pdf.addImage(topImageData, 'JPEG', 0, 0, w, h);
+
+                // Add a new page
+                pdf.addPage();
+
+                // Add bottom half to the second page
+                pdf.addImage(bottomImageData, 'JPEG', 0, 0, w, h);
+
+                // Save the PDF
+                pdf.save('split-image.pdf');
             }
         }
 
@@ -951,6 +1027,10 @@ const onExportAttendee = () => {
 
             <img id="hold1" src="">
             <img id="hold2" src="">
+            <canvas id="topCanvas"></canvas>
+
+  <!-- Canvas for Bottom Half -->
+  <canvas id="bottomCanvas"></canvas>
 
             <template #modal-footer>
                 <div class="w-100" v-if="badgeData.status === 'approved'">
