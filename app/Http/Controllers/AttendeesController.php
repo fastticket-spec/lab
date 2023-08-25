@@ -334,4 +334,9 @@ class AttendeesController extends Controller
 
         return Excel::download($export, 'attendees.xlsx');
     }
+
+    public function PSPDFKit()
+    {
+        return $this->attendeeService->PSPDFKit();
+    }
 }
