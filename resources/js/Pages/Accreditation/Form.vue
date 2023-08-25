@@ -1,13 +1,14 @@
 <script setup>
 import VueSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import {router} from "@inertiajs/vue3";
 import {ErrorMessage, Field, FieldArray, useField, useForm} from "vee-validate";
 import {accreditationFormSchema} from "../../Shared/components/helpers/Validators.js";
 import VueCountryCode from "vue-country-code";
 import VuePhoneNumberInput from 'vue-phone-number-input';
 import 'vue-phone-number-input/dist/vue-phone-number-input.css';
+import debounce from "lodash.debounce";
 
 
 const props = defineProps({
@@ -39,6 +40,7 @@ onMounted(() => {
             question: survey.title,
             parent_index: survey.parent_index,
             parent_answer: survey.parent_answer,
+            required: survey.parent_index ? 0 : survey.required,
         }
     })
 });
@@ -51,7 +53,7 @@ const {handleSubmit, isSubmitting} = useForm({
 
                 return {
                     type: x.type,
-                    answer: answer || (x.type === '8' ? [] : ((x.type === '7') ? null : '')),
+                    answer: answer || (x.type === '8' ? [] : ((x.type === '7') ? [] : '')),
                     title: x.title,
                     title_arabic: x.title_arabic,
                     id: x.id,
@@ -60,7 +62,7 @@ const {handleSubmit, isSubmitting} = useForm({
                     parent_index: x.parent_index,
                     parent_answer: x.parent_answer,
                     options: x.options,
-                    required: x.required,
+                    required: x.parent_index ? 0 : x.required,
                     disabled: x.title === 'Email Address' && props.email,
                     country_code: x.country_code ?  x.country_code  : '+966'
                 }
@@ -69,7 +71,7 @@ const {handleSubmit, isSubmitting} = useForm({
         : {
             surveys: props.surveys.filter(x => !x.private).map(x => ({
                 type: x.type,
-                answer: x.title === 'Email Address' ? props.email : (x.type === '8' ? [] : ((x.type === '7') ? null : '')),
+                answer: x.title === 'Email Address' ? props.email : (x.type === '8' ? [] : ((x.type === '7') ? [] : '')),
                 title: x.title,
                 title_arabic: x.title_arabic,
                 id: x.id,
@@ -78,18 +80,35 @@ const {handleSubmit, isSubmitting} = useForm({
                 parent_index: x.parent_index,
                 parent_answer: x.parent_answer,
                 options: x.options,
-                required: x.required,
+                required: x.parent_index ? 0 : x.required,
                 disabled: x.title === 'Email Address' && props.email,
                 country_code: x.country_code ?  x.country_code  : '+966'
             }))
         },
     validationSchema: accreditationFormSchema(props.lang),
-
 });
 
 const {value: surveysFields} = useField('surveys');
 
+const emailAddress = computed(() => {
+    return surveysFields.value.find(x => x.title === 'Email Address')?.answer;
+});
+
+watch(emailAddress, debounce(async (value) => {
+    try {
+        router.post('/form-emails', {
+            email: value,
+            event_id: props.accessLevel.event_id,
+            access_level_id: props.accessLevel.id,
+            organiser_id: props.accessLevel?.event?.organiser?.id
+        });
+    } catch (e) {
+        console.log(e);
+    }
+}, 3000));
+
 const onSubmit = handleSubmit(values => {
+    console.log(values)
     buttonDisabled.value = true;
     let answers = values.surveys.map(d => {
         if (d.type === '7') {
@@ -147,6 +166,9 @@ input.form-control, .form-control {
 form-control:disabled, .form-control[readonly] {
     opacity: 1;
 }
+select {
+    height: 46px !important;
+}
 
 .form-control {
     display: block;
@@ -180,7 +202,7 @@ form-control:disabled, .form-control[readonly] {
 select {
     height: 48px;
     height: 46px !important;
-    border-radius: 3px !important;
+    border-radius: 6px !important;
 }
 select option {
   margin: 40px;
@@ -219,7 +241,7 @@ select option {
                     </div>
 
                     <template v-else>
-                        <div class="text-center">
+                        <div class="text-center" style="display: none">
                             <img class="my-3 text-center img-fluid logo"
                                  :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                         </div>
@@ -508,7 +530,7 @@ select option {
                                 </div>
                             </div>
 
-                            <div class="col-12 pb-5 text-center">
+                            <div class="col-12 pb-5 text-center" style="margin-top: 40px;">
                                 <b-btn type="submit" size="lg" class="px-5 py-2" :disabled="buttonDisabled" v-if="!isSubmitting"
                                        :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
                                     {{
