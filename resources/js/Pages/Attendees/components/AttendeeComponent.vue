@@ -195,7 +195,8 @@ const downloadBadge = async (type = 'full') => {
                 height: source.clientHeight * scale,
                 style: {
                     transform: 'scale('+scale+')',
-                    transformOrigin: 'top left'
+                    transformOrigin: 'top left',
+                    bgcolor: 'transparent',
                 }
             }).then(function (dataUrl) {
                 var img = new Image();
