@@ -1037,7 +1037,7 @@ const onExportAttendee = () => {
         </b-modal>
 
         <b-modal v-model="badgeModalShow" id="badge-modal" size="xl" title="Badge" :scrollable="true">
-            <b-row class="badge-view" v-if="badgeData" style="margin-top: -13px;">
+            <b-row class="badge-view" v-if="badgeData" style="margin-top: -15px;">
                 <div  v-html="badgeData.html_data" :style="{height: `${badgeData.badge.height * 38}px`}" />
             </b-row>
 
