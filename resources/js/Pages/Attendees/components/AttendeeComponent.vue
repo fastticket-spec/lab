@@ -4,6 +4,8 @@ import {computed, onUpdated, reactive, ref, watch} from "vue";
 import SearchBox from '../../../Shared/components/core/SearchBox/Index.vue';
 import axios from "axios";
 import * as XLSX from "xlsx";
+import { changeDpiDataUrl } from 'changedpi';
+
 
 const props = defineProps({
     attendees: Object,
@@ -187,15 +189,22 @@ const downloadBadge = async (type = 'full') => {
 
             //     pdf.save('MYPdf.pdf');
             // });
-
-            domtoimage.toPng(source)
-            .then(function (dataUrl) {
+            var scale = 2;
+            domtoimage.toPng(source, {
+                width: source.clientWidth * scale,
+                height: source.clientHeight * scale,
+                style: {
+                    transform: 'scale('+scale+')',
+                    transformOrigin: 'top left'
+                }
+            }).then(function (dataUrl) {
                 var img = new Image();
                 img.src = dataUrl;
                 document.body.appendChild(img);
                 const imgWidth = badgeData.value.badge.width;
                 const imgHeight = badgeData.value.badge.height;
                 // const contentDataURL = img.toDataURL('image/jpeg')
+                console.log(img)
 
                 const {jsPDF} = window.jspdf;
 
@@ -210,11 +219,19 @@ const downloadBadge = async (type = 'full') => {
 
         } else if (type === 'split') {
             window.scrollTo(0,0)
+            var scale = 2;
 
             const rect = source.getBoundingClientRect();
             // setTimeout(gpdf, 5000);
 
-            domtoimage.toJpeg(source, {quality: 1})
+            domtoimage.toJpeg(source,{
+                width: source.clientWidth * scale,
+                height: source.clientHeight * scale,
+                style: {
+                    transform: 'scale('+scale+')',
+                    transformOrigin: 'top left'
+                }
+            })
             .then(function (dataUrl) {
                 var img = new Image();
                 img.src = dataUrl;
