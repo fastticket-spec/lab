@@ -196,7 +196,6 @@ const downloadBadge = async (type = 'full') => {
                 style: {
                     transform: 'scale('+scale+')',
                     transformOrigin: 'top left',
-                    bgcolor: 'transparent',
                 }
             }).then(function (dataUrl) {
                 var img = new Image();
@@ -231,7 +230,6 @@ const downloadBadge = async (type = 'full') => {
                 style: {
                     transform: 'scale('+scale+')',
                     transformOrigin: 'top left',
-                    bgcolor: 'transparent',
                 }
             })
             .then(function (dataUrl) {
@@ -1039,8 +1037,8 @@ const onExportAttendee = () => {
         </b-modal>
 
         <b-modal v-model="badgeModalShow" id="badge-modal" size="xl" title="Badge" :scrollable="true">
-            <b-row class="mt-3 badge-view" v-if="badgeData">
-                <b-col sm="12" v-html="badgeData.html_data" :style="{height: `${badgeData.badge.height * 38}px`}" />
+            <b-row class="badge-view" v-if="badgeData" style="margin-top: -13px;">
+                <div  v-html="badgeData.html_data" :style="{height: `${badgeData.badge.height * 38}px`}" />
             </b-row>
 
 
