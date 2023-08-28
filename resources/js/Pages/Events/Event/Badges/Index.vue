@@ -9,7 +9,7 @@ const props = defineProps({
 
 const userRole = computed(() => usePage().props.user_role);
 
-const fields = ['title', {event: 'category'}, 'description', 'width', 'height', 'status', 'access_levels', 'date_created', ((!userRole.value || userRole.value === 'Admin Users' || userRole.value === 'Editors') && 'action')]
+const fields = ['title', {event: 'category'}, 'description', 'width', 'height', 'status', 'access_levels', 'date_created', ((!userRole.value || userRole.value === 'Admin Users') && 'action')]
 
 const visit = (link, method = 'get', useInertia = true) => {
     if (method === 'get') {
@@ -63,7 +63,7 @@ const onPaginate = page => {
                                     </template>
 
                                     <template #cell(action)="data">
-                                      <span>
+                                      <span v-if="(!userRole || userRole === 'Admin Users')">
                                           <b-dropdown id="dropdown-right" right text="Actions" size="sm"
                                                       variant="primary">
                                             <b-dropdown-item

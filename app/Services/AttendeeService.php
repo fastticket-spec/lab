@@ -49,7 +49,7 @@ class AttendeeService extends BaseRepository
 
         $eventsAccessID = null;
         if ($roleId) {
-            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn($access) => $access->event_id);
+            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn ($access) => $access->event_id);
         }
 
         return $this->model->query()
@@ -112,8 +112,8 @@ class AttendeeService extends BaseRepository
                     'status' => Attendee::STATUS_READABLE[$attendee->status],
                     'accept_status' => Attendee::ACCEPT_STATUS_READABLE[$attendee->accept_status],
                     'date_submitted' => $attendee->created_at->format('jS M, Y H:i'),
-                    'zones' => $attendee->zones->map(fn($zone) => $zone->zone_id),
-                    'areas' => $attendee->areas->map(fn($area) => $area->area_id),
+                    'zones' => $attendee->zones->map(fn ($zone) => $zone->zone_id),
+                    'areas' => $attendee->areas->map(fn ($area) => $area->area_id),
                     'badge' => optional($attendee->accessLevel->accessLevelBadge)->badge,
                     'printed' => !!$attendee->printed,
                     'collected' => !!$attendee->collected,
@@ -299,7 +299,7 @@ class AttendeeService extends BaseRepository
 
         $attendee->zones()->delete();
 
-        $zones = collect($zones)->map(fn($zone) => [
+        $zones = collect($zones)->map(fn ($zone) => [
             'id' => Str::uuid(),
             'attendee_id' => $attendeeId,
             'zone_id' => $zone,
@@ -325,7 +325,7 @@ class AttendeeService extends BaseRepository
 
         $attendee->areas()->delete();
 
-        $areas = collect($areas)->map(fn($area) => [
+        $areas = collect($areas)->map(fn ($area) => [
             'id' => Str::uuid(),
             'attendee_id' => $attendeeId,
             'area_id' => $area,
@@ -563,7 +563,7 @@ class AttendeeService extends BaseRepository
         $badgeDatas[] = (object)['column_title' => 'first_name', 'column_value' => $attendee->first_name];
         $badgeDatas[] = (object)['column_title' => 'last_name', 'column_value' => $attendee->last_name];
         $badgeDatas[] = (object)['column_title' => 'email', 'column_value' => $attendee->email];
-        $badgeDatas[] = (object)['column_title' => 'full_name', 'column_value' => $attendee->first_name . str_repeat('&nbsp;', 1) . $attendee->last_name];
+        $badgeDatas[] = (object)['column_title' => 'full_name', 'column_value' => ($attendee->first_name . ' ' . $attendee->last_name)];
 
 
         //        if (!$attendee) {
@@ -608,8 +608,14 @@ class AttendeeService extends BaseRepository
         $tags = $doc->getElementsByTagName("img");
         foreach ($tags as $tag) {
             if ($tag->getAttribute('class') === 'barcode') {
+
+                $filelink = config('app.url') . '/storage/badge_qrs/' . $filename;
                 $old_src = $tag->getAttribute('src');
-                $tag->setAttribute('src', config('app.url') . '/storage/badge_qrs/' . $filename);
+                $type = pathinfo($filelink, PATHINFO_EXTENSION);
+                $data = file_get_contents($filelink);
+                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+                $tag->setAttribute('src', $base64);
                 $tag->setAttribute('data-src', $old_src);
             }
             if ($tag->getAttribute('class') === 'user_photo' && !is_null($attendee->user_photo)) {
@@ -912,7 +918,7 @@ class AttendeeService extends BaseRepository
                 ->whereNot('title', 'First Name')
                 ->whereNot('title', 'Last Name')
                 ->get()
-                ->map(fn($survey) => $survey->title);
+                ->map(fn ($survey) => $survey->title);
 
             $attendees = $this->model->query()
                 ->with('event')
@@ -951,5 +957,49 @@ class AttendeeService extends BaseRepository
 
 
         return new ExportAttendees(event_id: $eventId, event_ids: auth()->user()->userEventAccessId(), attendees: $attendees, questions: count($surveys) > 0 ? $surveys->toArray() : []);
+    }
+
+    public function PSPDFKit()
+    {
+
+        $FileHandle = fopen('result.pdf', 'w+');
+
+        $curl = curl_init();
+
+        $instructions = '{
+            "parts": [
+              {
+                "html": "index.html",
+                "pages": {"pageCount": 1},
+                "layout": {
+                    "size": {
+                      "width": 85,
+                      "height": 120
+                    }
+                  }
+              }
+            ]
+          }';
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.pspdfkit.com/build',
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_POSTFIELDS => array(
+                'instructions' => $instructions,
+                'index.html' => new \CURLFILE('/Users/avatechng/sa/easyticket/Accreditation-v3_renew/public/user_content/badges/testBadge.html')
+            ),
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer pdf_live_BdFCjuj91grYWmMr0utk9iJpT2Tna5IOpEE67T1GDjM'
+            ),
+            CURLOPT_FILE => $FileHandle,
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+
+        fclose($FileHandle);
     }
 }

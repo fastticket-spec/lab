@@ -86,7 +86,7 @@ class DashboardController extends Controller
                 'iI8' => 'sidebar.badges',
                 'icon' => 'ri-calendar-2-line',
                 'count' => $this->badgeService->count(allowedEventIds: $eventsAccessID),
-                'disabled_for' => ['Operations']
+                'disabled_for' => []
             ]
         ];
 

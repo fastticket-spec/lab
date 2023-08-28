@@ -292,6 +292,7 @@ select option {
                                                            v-else-if="field.value.type === '4'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
+                                                           accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
 
                                                     <Field type="email"
@@ -428,6 +429,7 @@ select option {
                                                     <Field type="file" title=" "
                                                            v-else-if="field.value.type === '4'"
                                                            :name="`surveys[${idx}].answer`"
+                                                           accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
 

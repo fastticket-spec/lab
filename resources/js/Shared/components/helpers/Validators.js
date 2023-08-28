@@ -156,6 +156,20 @@ export const accreditationFormSchema = lang => yup.object({
     )
 })
 
+export function checkIfFilesAreTooBig(files) {
+    console.log(files.size);
+    let valid = true
+    if (files) {
+        files.map(file => {
+            const size = file.size / 1024 / 1024
+            if (size > 10) {
+                valid = false
+            }
+        })
+    }
+    return valid
+}
+
 export const createUserSchema = yup.object({
     first_name: yup.string().required(),
     last_name: yup.string().required(),

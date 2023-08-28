@@ -56,7 +56,7 @@
                             class="ri-group-2-line"></i>
                             Attendees</a>
 
-                        <a href="#" v-if="userRole !== 'Operations'" @click.prevent.stop="visit(`/event/${event.id}/badges`)"><i
+                        <a href="#" @click.prevent.stop="visit(`/event/${event.id}/badges`)"><i
                             class="ri-pencil-ruler-line"></i>
                             Badges</a>
                     </template>
