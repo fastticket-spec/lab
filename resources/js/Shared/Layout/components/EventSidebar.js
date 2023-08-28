@@ -50,7 +50,7 @@ export const eventSideBar = eventId => ([
         "is_icon_class": true,
         "component": ["Events/Event/Badges/Index", "Events/Event/Badges/Create"],
         "icon": "ri-pencil-ruler-line",
-        "disabled_for": ["Operations"]
+        "disabled_for": []
     },
 
     {
