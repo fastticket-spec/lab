@@ -17,6 +17,8 @@ class Preference extends Model
         'email_qr_color',
         'email_logo_url',
         'email_logo_width',
-        'email_logo_height'
+        'email_logo_height',
+        'email_header_image_url',
+        'email_footer_image_url'
     ];
 }
