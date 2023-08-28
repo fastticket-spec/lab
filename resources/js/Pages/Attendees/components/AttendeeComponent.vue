@@ -704,7 +704,6 @@ const onExportAttendee = () => {
                                           <b-dropdown id="dropdown-right" right text="Actions" size="sm"
                                                       variant="primary">
                                             <b-dropdown-item
-                                                v-if="userRole !== 'Operations'"
                                                 @click.prevent="selectedAttendee = data.item; answerModalShow = true">Answer</b-dropdown-item>
                                             <b-dropdown-item
                                                 v-if="userRole !== 'Operations'"
