@@ -720,7 +720,7 @@ const onExportAttendee = () => {
                                                 v-if="userRole !== 'Operations'"
                                                 @click.prevent="selectedAttendee = data.item; checkedRows = []; areasModalShow = true; areasForBulk = false; selectedAreas = (data.item.areas || [])">Assign Areas</b-dropdown-item>
                                             <b-dropdown-item
-                                                v-if="data.item.badge && userRole !== 'Editors'"
+
                                                 @click.prevent="viewBadge(data.item.id, data.item.badge.id, data.item.status)">View Badge</b-dropdown-item>
                                             <b-dropdown-item
                                                 v-if="eventId && userRole !== 'Operations'"
