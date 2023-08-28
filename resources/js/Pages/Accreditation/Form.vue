@@ -220,7 +220,7 @@ select option {
 </style>
 
 <template>
-    <b-container fluid class="mx-auto vag" style="width: 80%;" :style="{
+    <b-container fluid class="mx-auto vag" style="width: 80%; margin-top: -77px;" :style="{
                     backgroundColor: accessLevel?.page_design?.bg_type === 'color' && accessLevel?.page_design?.bg_color,
                     backgroundImage: accessLevel?.page_design?.bg_type === 'image'? 'url(' + accessLevel?.page_design?.bg_image + ')' : '',
                     backgroundSize: 'cover',
