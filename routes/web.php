@@ -219,6 +219,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['prefix' => 'organiser-preferences'], function () {
         Route::get('/', [PreferencesController::class, 'index']);
         Route::post('/logo', [PreferencesController::class, 'uploadLogo']);
+        Route::delete('/logo/{type}', [PreferencesController::class, 'deleteLogo']);
         Route::post('/', [PreferencesController::class, 'store']);
     });
 });
