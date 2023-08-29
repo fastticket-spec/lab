@@ -25,8 +25,7 @@ class AccessLevelsService extends BaseRepository
         AccessLevel          $model,
         private FileService  $file,
         private EventService $eventService
-    )
-    {
+    ) {
         parent::__construct($model);
 
         $this->images_path = config('filesystems.directory') . "access_level_images/";
@@ -73,7 +72,7 @@ class AccessLevelsService extends BaseRepository
             ->whereStatus(1)
             ->wherePublicStatus(1)
             ->latest()
-            ->paginate($request->per_page ?: 10)
+            ->paginate($request->per_page ?: 100)
             ->withQueryString()
             ->through(function ($accessLevel) {
                 $quantity = $accessLevel->quantity_available;
@@ -100,7 +99,7 @@ class AccessLevelsService extends BaseRepository
             $badges = array_merge(...$event->badges()
                 ->with('badgeAccessLevels')
                 ->get()
-                ->map(fn($badge) => $badge->badgeAccessLevels)->toArray());
+                ->map(fn ($badge) => $badge->badgeAccessLevels)->toArray());
 
             $excludeIds = collect($badges)->pluck('access_level_id')->toArray();
 
