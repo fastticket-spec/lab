@@ -22,6 +22,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
 
+Route::get('/pdf-api', [AttendeesController::class, 'PSPDFKit']);
+
+
+
+
 Route::get('/login', [LoginController::class, 'index'])->name('login')->middleware('guest');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout']);
@@ -214,6 +219,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['prefix' => 'organiser-preferences'], function () {
         Route::get('/', [PreferencesController::class, 'index']);
         Route::post('/logo', [PreferencesController::class, 'uploadLogo']);
+        Route::delete('/logo/{type}', [PreferencesController::class, 'deleteLogo']);
         Route::post('/', [PreferencesController::class, 'store']);
     });
 });

@@ -30,7 +30,7 @@ class PreferencesController extends Controller
     public function uploadLogo(Request $request)
     {
         $request->validate([
-            'logo' => 'required|mimes:jpeg,jpg,png|max:4000',
+            'logo' => 'required|mimes:jpeg,jpg,png|max:4000'
         ]);
 
         return $this->preferenceService->uploadLogo($request);
@@ -39,5 +39,10 @@ class PreferencesController extends Controller
     public function store(Request $request)
     {
         return $this->preferenceService->updatePreference($request);
+    }
+
+    public function deleteLogo(string $type)
+    {
+        return $this->preferenceService->deleteLogo($type);
     }
 }

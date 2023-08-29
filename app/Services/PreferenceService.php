@@ -35,7 +35,7 @@ class PreferenceService extends BaseRepository
         try {
             $img = $request->file('logo');
 
-            $path = $this->uploadFile($img, 'email-', '-logo-', 1400);
+            $path = $this->uploadFile($img, 'email-', "-$request->image_type-", 1400);
 
             if (!$path) {
                 return false;
@@ -43,8 +43,25 @@ class PreferenceService extends BaseRepository
 
             $activeOrganiser = auth()->user()->activeOrganiser();
 
-            $this->updateOrCreate(['organiser_id' => $activeOrganiser], ['email_logo_url' => Storage::disk(config('filesystems.default'))->url($path)]);
-            $message = 'Logo uploaded successfully';
+            if ($request->image_type == 'logo') {
+                $this->updateOrCreate(
+                    ['organiser_id' => $activeOrganiser],
+                    ['email_logo_url' => Storage::disk(config('filesystems.default'))->url($path)]
+                );
+                $message = 'Logo uploaded successfully';
+            } else if ($request->image_type == 'headerImage') {
+                $this->updateOrCreate(
+                    ['organiser_id' => $activeOrganiser],
+                    ['email_header_image_url' => Storage::disk(config('filesystems.default'))->url($path)]
+                );
+                $message = 'Header image uploaded successfully';
+            } else {
+                $this->updateOrCreate(
+                    ['organiser_id' => $activeOrganiser],
+                    ['email_footer_image_url' => Storage::disk(config('filesystems.default'))->url($path)]
+                );
+                $message = 'Footer image uploaded successfully';
+            }
 
             return $this->view(
                 data: [
@@ -78,5 +95,40 @@ class PreferenceService extends BaseRepository
             component: "/organiser-preferences",
             returnType: 'redirect'
         );
+    }
+
+    public function deleteLogo(string $type)
+    {
+        $activeOrganiser = auth()->user()->activeOrganiser();
+
+        if ($type == 'logo') {
+            $this->updateOrCreate(
+                ['organiser_id' => $activeOrganiser],
+                ['email_logo_url' => null]
+            );
+            $message = 'Logo deleted successfully';
+        } else if ($type == 'headerImage') {
+            $this->updateOrCreate(
+                ['organiser_id' => $activeOrganiser],
+                ['email_header_image_url' => null]
+            );
+            $message = 'Header image deleted successfully';
+        } else {
+            $this->updateOrCreate(
+                ['organiser_id' => $activeOrganiser],
+                ['email_footer_image_url' => null]
+            );
+            $message = 'Footer image deleted successfully';
+        }
+
+        return $this->view(
+            data: [
+                'message' => $message,
+            ],
+            flashMessage: $message,
+            component: "/organiser-preferences",
+            returnType: 'redirect'
+        );
+
     }
 }
