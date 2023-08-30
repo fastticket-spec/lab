@@ -219,7 +219,7 @@ const downloadBadge = async (type = 'full') => {
 
         } else if (type === 'split') {
             window.scrollTo(0,0)
-            var scale = 3;
+            var scale = 2;
 
             const rect = source.getBoundingClientRect();
             // setTimeout(gpdf, 5000);
