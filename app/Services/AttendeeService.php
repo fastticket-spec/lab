@@ -913,7 +913,7 @@ class AttendeeService extends BaseRepository
         $surveysQuery = optional($accessLevel->surveyAccessLevels)
             ->surveys();
 
-        if ($surveysQuery) {
+        if ($surveysQuery->exists()) {
             $surveys = $surveysQuery->whereNot('title', 'Email Address')
                 ->whereNot('title', 'First Name')
                 ->whereNot('title', 'Last Name')

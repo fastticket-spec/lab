@@ -50,4 +50,9 @@ class ExportAttendees implements FromCollection, WithHeadings, WithStyles, WithC
             1    => ['font' => ['bold' => true ]],
         ];
     }
+
+    public function chunkSize(): int
+    {
+       return 1000;
+    }
 }
