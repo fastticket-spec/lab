@@ -931,7 +931,7 @@
         nodes: ["p"],
         name:  "Fullname",
         image: "../../../../../../EasyticketJs-master/libs/builder/icons/heading.svg",
-        html: "<p  class='function' key='function'>Function</p>",
+        html: "<p  class='full_name' key='full_name'>Function</p>",
         properties: [{
             name: "Text align",
             key: "text-align",

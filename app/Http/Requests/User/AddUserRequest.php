@@ -16,7 +16,7 @@ class AddUserRequest extends FormRequest
         return [
             'first_name' => 'string|required',
             'last_name' => 'string|required',
-            'email' => 'email|required|unique:users,email',
+            'email' => 'email|required',
             'phone' => 'string',
             'ext' => 'required_with:phone',
             'role_id' => 'required|exists:roles,id',

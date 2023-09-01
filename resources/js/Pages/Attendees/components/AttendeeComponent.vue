@@ -1043,10 +1043,10 @@ const onExportAttendee = () => {
 
             <img id="hold1" src="">
             <img id="hold2" src="">
-            <canvas id="topCanvas"></canvas>
+            <canvas id="topCanvas" style="margin-left: -13px;" ></canvas>
 
-  <!-- Canvas for Bottom Half -->
-  <canvas id="bottomCanvas"></canvas>
+            <!-- Canvas for Bottom Half -->
+            <canvas id="bottomCanvas" style="margin-left: -13px;" ></canvas>
 
             <template #modal-footer>
                 <div class="w-100" v-if="badgeData.status === 'approved'">
