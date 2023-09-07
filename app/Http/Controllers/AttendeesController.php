@@ -198,6 +198,13 @@ class AttendeesController extends Controller
         return $this->attendeeService->checkAttendee($request->attendee_ref);
     }
 
+    public function checkInAttendee(Request $request)
+    {
+        $request->validate(['attendee_ref' => 'required']);
+
+        return $this->attendeeService->checkinAttendee($request->attendee_ref);
+    }
+
     public function markAsPrinted(Request $request)
     {
         $request->validate(['attendee_ids' => 'required|array']);
