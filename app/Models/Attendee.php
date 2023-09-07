@@ -62,4 +62,14 @@ class Attendee extends Model
     {
         return $this->hasMany(AttendeeArea::class);
     }
+
+    public function attendeeCheckins(): HasMany
+    {
+        return $this->hasMany(AttendeeCheckIn::class);
+    }
+
+    public function checkinAttendee(): void
+    {
+        $this->attendeeCheckins()->create(['checkin' => now()]);
+    }
 }

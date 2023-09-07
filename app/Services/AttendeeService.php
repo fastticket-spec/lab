@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exports\ExportAttendees;
 use App\Helpers\QRCodeHelper;
 use App\Http\Resources\AttendeeExportResource;
+use App\Http\Resources\CheckinAttendeeResource;
 use App\Mail\ApprovalMail;
 use App\Mail\AttendeeMail;
 use App\Mail\CustomAttendeeMail;
@@ -808,9 +809,11 @@ class AttendeeService extends BaseRepository
                 ->with(['accessLevel', 'event'])
                 ->firstOrFail();
 
+            $message = 'Attendee fetched';
+
             return $this->view(
-                data: $attendee,
-                flashMessage: 'Attendee fetched',
+                data: ['data' => new CheckinAttendeeResource($attendee), 'message' => $message],
+                flashMessage: $message,
                 component: '/dashboard',
                 returnType: 'redirect'
             );
@@ -820,6 +823,36 @@ class AttendeeService extends BaseRepository
                     data: ['message' => 'Attendee not found'],
                     statusCode: 400,
                     flashMessage: 'Attendee not found',
+                    component: '/dashboard',
+                    returnType: 'redirect'
+                );
+            }
+            throw $th;
+        }
+    }
+
+    public function checkinAttendee(string $attendeeRef)
+    {
+        try {
+            $attendee = $this->model->query()
+                ->whereRef($attendeeRef)
+                ->with(['accessLevel', 'event'])
+                ->firstOrFail();
+
+            $attendee->checkinAttendee();
+
+            return $this->view(
+                data: ['message' => 'Checked in successfully'],
+                flashMessage: 'Checked in successfully',
+                component: '/dashboard',
+                returnType: 'redirect'
+            );
+        } catch (\Throwable $th) {
+            if ($th instanceof ModelNotFoundException) {
+                return $this->view(
+                    data: ['message' => 'Reference not found'],
+                    statusCode: 400,
+                    flashMessage: 'Reference not found',
                     component: '/dashboard',
                     returnType: 'redirect'
                 );

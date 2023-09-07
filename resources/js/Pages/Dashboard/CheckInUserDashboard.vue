@@ -22,8 +22,7 @@ const onScan = async (decodedText, decodedResult = null) => {
     try {
         attendee.value = '';
         if (decodedText) {
-            const {data} = await axios.post('/checkin-user/verify-attendee', {attendee_ref: decodedText})
-            console.log(data)
+            const {data: {data}} = await axios.post('/checkin-user/verify-attendee', {attendee_ref: decodedText})
             attendee.value = data;
         }
     } catch (e) {
@@ -115,10 +114,10 @@ const checkIn = async type => {
                                     </b-card>
                                     <b-card class="card-bordered mb-2"><b>Reference:</b> {{ attendee.ref }}
                                     </b-card>
-                                    <b-card class="card-bordered mb-2"><b>Category:</b> {{ attendee.event?.title }}
+                                    <b-card class="card-bordered mb-2"><b>Category:</b> {{ attendee.category }}
                                     </b-card>
                                     <b-card class="card-bordered"><b>Access Level:</b> {{
-                                            attendee.access_level?.title
+                                            attendee.access_level
                                         }}
                                     </b-card>
 
