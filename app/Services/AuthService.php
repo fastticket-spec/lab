@@ -17,13 +17,22 @@ class AuthService extends BaseRepository
         parent::__construct($model);
     }
 
-    public function loginUser(array $data): array
+    public function loginUser(array $data, ?string $userType = null): array
     {
         $userData = $this->findOneBy(['email' => $data['email']]);
 
         if (!$userData) {
             return [
                 'message' => 'Email or password is incorrect!',
+                'status' => 401
+            ];
+        }
+
+        $userRole = optional($userData->account)->role;
+
+        if ($userRole && ($userType && $userType !== 'checkin')) {
+            return [
+                'message' => 'You cannot access this dashboard with the supplied credentials!',
                 'status' => 401
             ];
         }
