@@ -17,9 +17,9 @@ class LoginController extends Controller
         return Inertia::render('Auth/Login');
     }
 
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request, ?string $userType = null)
     {
-        $data = $this->authService->loginUser($request->only(['email', 'password']));
+        $data = $this->authService->loginUser($request->only(['email', 'password']), $userType);
 
         if ($data['status'] != 200) {
 
@@ -42,5 +42,10 @@ class LoginController extends Controller
     {
         auth()->logout();
         return redirect('/login');
+    }
+
+    public function scanAppLogin(LoginRequest $request)
+    {
+        return $this->login($request, 'checkin');
     }
 }
