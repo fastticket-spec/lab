@@ -810,7 +810,7 @@ class AttendeeService extends BaseRepository
             $attendee = $this->model->query()
                 ->whereRef($attendeeRef)
                 ->with(['accessLevel', 'event'])
-                ->whereHas('event', function($query) use ($eventAccessIds) {
+                ->whereHas('event', function ($query) use ($eventAccessIds) {
                     $query->whereIn('id', $eventAccessIds);
                 })
                 ->firstOrFail();
@@ -845,7 +845,7 @@ class AttendeeService extends BaseRepository
             $attendee = $this->model->query()
                 ->whereRef($attendeeRef)
                 ->with(['accessLevel', 'event'])
-                ->whereHas('event', function($query) use ($eventAccessIds) {
+                ->whereHas('event', function ($query) use ($eventAccessIds) {
                     $query->whereIn('id', $eventAccessIds);
                 })
                 ->firstOrFail();
@@ -853,7 +853,7 @@ class AttendeeService extends BaseRepository
             $attendee->checkinAttendee();
 
             return $this->view(
-                data: ['message' => 'Checked in successfully'],
+                data: ['message' => 'Checked in successfully', 'attendee' => $attendee->answers],
                 flashMessage: 'Checked in successfully',
                 component: '/dashboard',
                 returnType: 'redirect'
