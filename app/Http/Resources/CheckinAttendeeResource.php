@@ -21,7 +21,8 @@ class CheckinAttendeeResource extends JsonResource
             'last_name' => $this->last_name,
             'ref' => $this->ref,
             'category' => $this->event->title,
-            'access_level' => $this->accessLevel->title
+            'access_level' => $this->accessLevel->title,
+            'answers' => $this->answers
         ];
     }
 }
