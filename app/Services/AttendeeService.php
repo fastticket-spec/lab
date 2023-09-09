@@ -804,9 +804,14 @@ class AttendeeService extends BaseRepository
     public function checkAttendee(string $attendeeRef)
     {
         try {
+            $eventAccessIds = auth()->user()->userEventAccessId();
+
             $attendee = $this->model->query()
                 ->whereRef($attendeeRef)
                 ->with(['accessLevel', 'event'])
+                ->whereHas('event', function($query) use ($eventAccessIds) {
+                    $query->whereIn('id', $eventAccessIds);
+                })
                 ->firstOrFail();
 
             $message = 'Attendee fetched';
@@ -834,9 +839,14 @@ class AttendeeService extends BaseRepository
     public function checkinAttendee(string $attendeeRef)
     {
         try {
+            $eventAccessIds = auth()->user()->userEventAccessId();
+
             $attendee = $this->model->query()
                 ->whereRef($attendeeRef)
                 ->with(['accessLevel', 'event'])
+                ->whereHas('event', function($query) use ($eventAccessIds) {
+                    $query->whereIn('id', $eventAccessIds);
+                })
                 ->firstOrFail();
 
             $attendee->checkinAttendee();
