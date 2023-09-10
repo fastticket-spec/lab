@@ -49,14 +49,14 @@ class AttendeesController extends Controller
         ]);
     }
 
-    public function approveAttendee(string $attendeeId, int $status)
+    public function approveAttendee(Request $request, string $attendeeId, int $status)
     {
-        return $this->attendeeService->approveAttendee($attendeeId, $status);
+        return $this->attendeeService->approveAttendee(attendeeId: $attendeeId, status: $status, page: $request->page);
     }
 
-    public function approveEventAttendee(string $eventId, string $attendeeId, int $status)
+    public function approveEventAttendee(Request $request, string $eventId, string $attendeeId, int $status)
     {
-        return $this->attendeeService->approveAttendee($attendeeId, $status, $eventId);
+        return $this->attendeeService->approveAttendee(attendeeId: $attendeeId, status: $status, eventId: $eventId, page: $request->page);
     }
 
     public function sendAttendeeMessage(AttendeeMessageRequest $request, string $attendeeId)
@@ -73,70 +73,70 @@ class AttendeesController extends Controller
     {
         $request->validate(['zones' => 'required|array', 'zones.*' => 'required|string']);
 
-        return $this->attendeeService->assignZones($request->zones, $attendeeId);
+        return $this->attendeeService->assignZones(zones: $request->zones, attendeeId: $attendeeId, page: $request->page);
     }
 
     public function assignEventZones(Request $request, string $eventId, string $attendeeId)
     {
         $request->validate(['zones' => 'required|array', 'zones.*' => 'required|string']);
 
-        return $this->attendeeService->assignZones($request->zones, $attendeeId, $eventId);
+        return $this->attendeeService->assignZones(zones: $request->zones, attendeeId: $attendeeId, eventId: $eventId, page: $request->page);
     }
 
     public function assignAreas(Request $request, string $attendeeId)
     {
         $request->validate(['areas' => 'required|array', 'areas.*' => 'required|string']);
 
-        return $this->attendeeService->assignAreas($request->areas, $attendeeId);
+        return $this->attendeeService->assignAreas(areas: $request->areas, attendeeId: $attendeeId, page: $request->page);
     }
 
     public function assignEventAreas(Request $request, string $eventId, string $attendeeId)
     {
         $request->validate(['areas' => 'required|array', 'areas.*' => 'required|string']);
 
-        return $this->attendeeService->assignAreas($request->areas, $attendeeId, $eventId);
+        return $this->attendeeService->assignAreas(areas: $request->areas, attendeeId: $attendeeId, eventId: $eventId, page: $request->page);
     }
 
     public function bulkApproval(Request $request, int $status)
     {
         $request->validate(['attendee_ids' => 'array|required']);
 
-        return $this->attendeeService->bulkApproveAttendee($request->attendee_ids, $status);
+        return $this->attendeeService->bulkApproveAttendee(attendeeIds: $request->attendee_ids, status: $status, page: $request->page);
     }
 
     public function bulkEventApproval(Request $request, string $eventId, int $status)
     {
         $request->validate(['attendee_ids' => 'array|required']);
 
-        return $this->attendeeService->bulkApproveAttendee($request->attendee_ids, $status, $eventId);
+        return $this->attendeeService->bulkApproveAttendee(attendeeIds: $request->attendee_ids, status: $status, eventId: $eventId, page: $request->page);
     }
 
     public function bulkAssignZones(Request $request)
     {
         $request->validate(['attendee_ids' => 'array|required', 'zones' => 'required|array', 'zones.*' => 'required|string']);
 
-        return $this->attendeeService->bulkAssignZones($request->attendee_ids, $request->zones);
+        return $this->attendeeService->bulkAssignZones(attendeeIds: $request->attendee_ids, zones:  $request->zones, page: $request->page);
     }
 
     public function bulkAssignEventZones(Request $request, string $eventId)
     {
         $request->validate(['attendee_ids' => 'array|required', 'zones' => 'required|array', 'zones.*' => 'required|string']);
 
-        return $this->attendeeService->bulkAssignZones($request->attendee_ids, $request->zones, $eventId);
+        return $this->attendeeService->bulkAssignZones(attendeeIds: $request->attendee_ids, zones:  $request->zones, eventId:  $eventId, page: $request->page);
     }
 
     public function bulkAssignAreas(Request $request)
     {
         $request->validate(['attendee_ids' => 'array|required', 'areas' => 'required|array', 'areas.*' => 'required|string']);
 
-        return $this->attendeeService->bulkAssignAreas($request->attendee_ids, $request->areas);
+        return $this->attendeeService->bulkAssignAreas(attendeeIds: $request->attendee_ids, areas: $request->areas, page: $request->page);
     }
 
     public function bulkAssignEventAreas(Request $request, string $eventId)
     {
         $request->validate(['attendee_ids' => 'array|required', 'areas' => 'required|array', 'areas.*' => 'required|string']);
 
-        return $this->attendeeService->bulkAssignAreas($request->attendee_ids, $request->areas, $eventId);
+        return $this->attendeeService->bulkAssignAreas(attendeeIds: $request->attendee_ids, areas: $request->areas, eventId: $eventId, page: $request->page);
     }
 
     public function sendInvitation(string $attendeeId)
@@ -211,7 +211,8 @@ class AttendeesController extends Controller
 
         return $this->attendeeService->togglePrinted(
             attendee_ids: $request->attendee_ids,
-            printed: $request->printed
+            printed: $request->printed,
+            page: $request->page
         );
     }
 
@@ -222,7 +223,8 @@ class AttendeesController extends Controller
         return $this->attendeeService->togglePrinted(
             attendee_ids: $request->attendee_ids,
             printed: $request->printed,
-            eventId: $eventId
+            eventId: $eventId,
+            page: $request->page
         );
     }
 
@@ -232,7 +234,8 @@ class AttendeesController extends Controller
 
         return $this->attendeeService->toggleCollected(
             attendee_ids: $request->attendee_ids,
-            collected: $request->collected
+            collected: $request->collected,
+            page: $request->page
         );
     }
 
@@ -243,7 +246,8 @@ class AttendeesController extends Controller
         return $this->attendeeService->toggleCollected(
             attendee_ids: $request->attendee_ids,
             collected: $request->collected,
-            eventId: $eventId
+            eventId: $eventId,
+            page: $request->page
         );
     }
 
@@ -275,17 +279,17 @@ class AttendeesController extends Controller
     {
         $request->validate(['access_level_id' => 'required|exists:access_levels,id']);
 
-        return $this->attendeeService->changeAccessLevel($eventId, $attendeeId, $request->access_level_id);
+        return $this->attendeeService->changeAccessLevel($eventId, $attendeeId, $request->access_level_id, $request->page);
     }
 
     public function destroyAttendee(string $attendeeId)
     {
-        return $this->attendeeService->deleteAttendee($attendeeId);
+        return $this->attendeeService->deleteAttendee(attendeeId: $attendeeId, page: request()->page);
     }
 
     public function destroyEventAttendee(string $eventId, string $attendeeId)
     {
-        return $this->attendeeService->deleteAttendee($attendeeId, $eventId);
+        return $this->attendeeService->deleteAttendee(attendeeId: $attendeeId, eventId: $eventId, page: request()->page);
     }
 
     public function pullSplDataPlayers(Request $request, $id)
