@@ -136,21 +136,27 @@ const onPaginate = page => {
 }
 
 const approveAttendee = () => {
+    const data = {page: props.attendees.current_page};
+
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/approval/1`)
-        : router.post(`/attendees/${selectedAttendee.value.id}/approval/1`)
+        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/approval/1`, data)
+        : router.post(`/attendees/${selectedAttendee.value.id}/approval/1`, data)
 }
 
 const declineAttendee = (attendeeId) => {
+    const data = {page: props.attendees.current_page};
+
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/${attendeeId}/approval/2`)
-        : router.post(`/attendees/${attendeeId}/approval/2`)
+        ? router.post(`/event/${props.eventId}/attendees/${attendeeId}/approval/2`, data)
+        : router.post(`/attendees/${attendeeId}/approval/2`, data)
 }
 
 const reinstateAttendee = (attendeeId) => {
+    const data = {page: props.attendees.current_page};
+
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/${attendeeId}/approval/0`)
-        : router.post(`/attendees/${attendeeId}/approval/0`)
+        ? router.post(`/event/${props.eventId}/attendees/${attendeeId}/approval/0`, data)
+        : router.post(`/attendees/${attendeeId}/approval/0`, data)
 }
 
 const viewBadge = async (attendeeId, badgeId, status) => {
@@ -340,9 +346,11 @@ const downloadBadge = async (type = 'full') => {
 }
 
 const onSubmitMessage = () => {
+    const data = {...message, page: props.attendees.current_page}
+
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/send-message`, message)
-        : router.post(`/attendees/${selectedAttendee.value.id}/send-message`, message)
+        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/send-message`, data)
+        : router.post(`/attendees/${selectedAttendee.value.id}/send-message`, data)
 };
 
 const eventZones = computed(() => {
@@ -370,42 +378,50 @@ const eventAreas = computed(() => {
 });
 
 const onAssignZones = () => {
+    const data = {zones: selectedZones.value, page: props.attendees.current_page};
+
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/assign-zones`, {zones: selectedZones.value})
-        : router.post(`/attendees/${selectedAttendee.value.id}/assign-zones`, {zones: selectedZones.value})
+        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/assign-zones`, data)
+        : router.post(`/attendees/${selectedAttendee.value.id}/assign-zones`, data)
 }
 
 const onAssignAreas = () => {
+    const data = {areas: selectedAreas.value, page: props.attendees.current_page}
+
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/assign-areas`, {areas: selectedAreas.value})
-        : router.post(`/attendees/${selectedAttendee.value.id}/assign-areas`, {areas: selectedAreas.value})
+        ? router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/assign-areas`, data)
+        : router.post(`/attendees/${selectedAttendee.value.id}/assign-areas`, data)
 }
 
 const approveAttendees = () => {
+    const data = {attendee_ids: checkedRows.value, page: props.attendees.current_page};
+
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/bulk-approval/1`, {attendee_ids: checkedRows.value})
-        : router.post(`/attendees/bulk-approval/1`, {attendee_ids: checkedRows.value})
+        ? router.post(`/event/${props.eventId}/attendees/bulk-approval/1`, data)
+        : router.post(`/attendees/bulk-approval/1`, data)
 }
 const declineAttendees = () => {
+    const data = {attendee_ids: checkedRows.value, page: props.attendees.current_page};
+
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/bulk-approval/2`, {attendee_ids: checkedRows.value})
-        : router.post(`/attendees/bulk-approval/2`, {attendee_ids: checkedRows.value})
+        ? router.post(`/event/${props.eventId}/attendees/bulk-approval/2`, data)
+        : router.post(`/attendees/bulk-approval/2`, data)
 }
 const assignZonesToAttendees = () => {
+    const data = {attendee_ids: checkedRows.value, zones: selectedZones.value, page: props.attendees.current_page};
+
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/bulk-assign-zones`, {
-            attendee_ids: checkedRows.value,
-            zones: selectedZones.value
-        })
-        : router.post(`/attendees/bulk-assign-zones`, {attendee_ids: checkedRows.value, zones: selectedZones.value})
+        ? router.post(`/event/${props.eventId}/attendees/bulk-assign-zones`, data)
+        : router.post(`/attendees/bulk-assign-zones`, data)
 }
 const assignAreasToAttendees = () => {
     props.eventId
         ? router.post(`/event/${props.eventId}/attendees/bulk-assign-areas`, {
             attendee_ids: checkedRows.value,
-            areas: selectedAreas.value
+            areas: selectedAreas.value,
+            page: props.attendees.current_page
         })
-        : router.post(`/attendees/bulk-assign-areas`, {attendee_ids: checkedRows.value, areas: selectedAreas.value})
+        : router.post(`/attendees/bulk-assign-areas`, {attendee_ids: checkedRows.value, areas: selectedAreas.value, page: props.attendees.current_page})
 }
 
 const showEdit = answer => {
@@ -445,15 +461,19 @@ const cancelAnswer = (answerIndex) => {
 }
 
 const markAsPrinted = (printed = true) => {
+    const data = {attendee_ids: checkedRows.value, printed, page: props.attendees.current_page}
+
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/mark-as-printed`, {attendee_ids: checkedRows.value, printed})
-        : router.post(`/attendees/mark-as-printed`, {attendee_ids: checkedRows.value, printed})
+        ? router.post(`/event/${props.eventId}/attendees/mark-as-printed`, data)
+        : router.post(`/attendees/mark-as-printed`, data)
 }
 
 const markAsCollected = (collected = true) => {
+    const data = {attendee_ids: checkedRows.value, collected, page: props.attendees.current_page};
+
     props.eventId
-        ? router.post(`/event/${props.eventId}/attendees/mark-as-collected`, {attendee_ids: checkedRows.value, collected})
-        : router.post(`/attendees/mark-as-collected`, {attendee_ids: checkedRows.value, collected})
+        ? router.post(`/event/${props.eventId}/attendees/mark-as-collected`, data)
+        : router.post(`/attendees/mark-as-collected`, data)
 }
 
 const markBadgeAsPrinted = async () => {
@@ -556,9 +576,11 @@ const moveToAccessLevel = () => {
 }
 
 const deleteAttendee = () => {
+    const page = props.attendees.current_page;
+
     props.eventId
-        ? router.delete(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}`)
-        : router.delete(`/attendees/${selectedAttendee.value.id}`)
+        ? router.delete(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}?page=${page}`)
+        : router.delete(`/attendees/${selectedAttendee.value.id}?page=${page}`)
 }
 
 const exportAttendeeData = reactive({

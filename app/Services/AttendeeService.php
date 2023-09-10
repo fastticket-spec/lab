@@ -98,7 +98,7 @@ class AttendeeService extends BaseRepository
                 $query->whereStatus($request->filter);
             })
             ->latest()
-            ->paginate(1000)
+            ->paginate(10)
             ->withQueryString()
             ->through(function ($attendee) {
                 return [
@@ -213,7 +213,7 @@ class AttendeeService extends BaseRepository
         }
     }
 
-    public function approveAttendee(string $attendeeId, int $status, ?string $eventId = null)
+    public function approveAttendee(string $attendeeId, int $status, ?string $eventId = null, ?int $page = 1)
     {
         $attendee = $this->find($attendeeId);
         $attendee->load(['accessLevel.generalSettings', 'event.organiser']);
@@ -227,7 +227,7 @@ class AttendeeService extends BaseRepository
         }
 
         $message = 'Attendee has been ' . ($status === 1 ? 'approved' : ($status === 2 ? 'declined' : 'reinstated'));
-        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
@@ -236,7 +236,7 @@ class AttendeeService extends BaseRepository
         );
     }
 
-    public function bulkApproveAttendee(array $attendeeIds, int $status, ?string $eventId = null)
+    public function bulkApproveAttendee(array $attendeeIds, int $status, ?string $eventId = null, ?int $page = 1)
     {
         $this->model->query()
             ->whereIn('id', $attendeeIds)
@@ -252,7 +252,7 @@ class AttendeeService extends BaseRepository
         }
 
         $message = 'Attendees has been ' . ($status === 1 ? 'approved' : ($status === 2 ? 'declined' : 'reinstated'));
-        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
@@ -285,7 +285,9 @@ class AttendeeService extends BaseRepository
 
         $message = 'Email sent successfully';
 
-        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $page = $data['page'] ?? 1;
+
+        $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
@@ -294,7 +296,7 @@ class AttendeeService extends BaseRepository
         );
     }
 
-    public function assignZones(array $zones, string $attendeeId, ?string $eventId = null)
+    public function assignZones(array $zones, string $attendeeId, ?string $eventId = null, ?int $page = 1)
     {
         $attendee = $this->find($attendeeId);
 
@@ -311,7 +313,7 @@ class AttendeeService extends BaseRepository
         DB::table('attendee_zones')->insert($zones->toArray());
 
         $message = 'Zones has been assigned to attendee';
-        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
@@ -320,7 +322,7 @@ class AttendeeService extends BaseRepository
         );
     }
 
-    public function assignAreas(array $areas, string $attendeeId, ?string $eventId = null)
+    public function assignAreas(array $areas, string $attendeeId, ?string $eventId = null, ?int $page = 1)
     {
         $attendee = $this->find($attendeeId);
 
@@ -337,7 +339,7 @@ class AttendeeService extends BaseRepository
         DB::table('attendee_areas')->insert($areas->toArray());
 
         $message = 'Areas has been assigned to attendee';
-        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
@@ -346,7 +348,7 @@ class AttendeeService extends BaseRepository
         );
     }
 
-    public function bulkAssignZones(array $attendeeIds, array $zones, ?string $eventId = null)
+    public function bulkAssignZones(array $attendeeIds, array $zones, ?string $eventId = null, ?int $page = 1)
     {
         $attendees = $this->model->query()
             ->with('zones')
@@ -365,7 +367,7 @@ class AttendeeService extends BaseRepository
         }
 
         $message = 'Zones has been assigned to attendees';
-        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
@@ -374,7 +376,7 @@ class AttendeeService extends BaseRepository
         );
     }
 
-    public function bulkAssignAreas(array $attendeeIds, array $areas, ?string $eventId = null)
+    public function bulkAssignAreas(array $attendeeIds, array $areas, ?string $eventId = null, ?int $page = 1)
     {
         $attendees = $this->model->query()
             ->with('areas')
@@ -393,7 +395,7 @@ class AttendeeService extends BaseRepository
         }
 
         $message = 'Area has been assigned to attendees';
-        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         return $this->view(
             data: ['message' => $message],
             flashMessage: $message,
@@ -872,7 +874,7 @@ class AttendeeService extends BaseRepository
         }
     }
 
-    public function togglePrinted(array $attendee_ids, bool $printed = true, ?string $eventId = null)
+    public function togglePrinted(array $attendee_ids, bool $printed = true, ?string $eventId = null, ?int $page = 1)
     {
         $this->model->query()
             ->whereIn('id', $attendee_ids)
@@ -880,7 +882,7 @@ class AttendeeService extends BaseRepository
                 'printed' => $printed
             ]);
 
-        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         $message = (count($attendee_ids) > 1 ? "Attendees" : "Attendee") . " print status updated.";
 
         return $this->view(
@@ -891,7 +893,7 @@ class AttendeeService extends BaseRepository
         );
     }
 
-    public function toggleCollected(array $attendee_ids, bool $collected, ?string $eventId = null)
+    public function toggleCollected(array $attendee_ids, bool $collected, ?string $eventId = null, ?int $page = 1)
     {
         $this->model->query()
             ->whereIn('id', $attendee_ids)
@@ -899,7 +901,7 @@ class AttendeeService extends BaseRepository
                 'collected' => $collected
             ]);
 
-        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         $message = (count($attendee_ids) > 1 ? "Attendees" : "Attendee") . " collection status updated.";
 
         return $this->view(
@@ -923,7 +925,7 @@ class AttendeeService extends BaseRepository
         );
     }
 
-    public function changeAccessLevel(string $eventId, string $attendeeId, string $access_level_id)
+    public function changeAccessLevel(string $eventId, string $attendeeId, string $access_level_id, ?int $page = 1)
     {
         $this->update([
             'access_level_id' => $access_level_id
@@ -931,16 +933,16 @@ class AttendeeService extends BaseRepository
 
         $message = 'Attendee has been moved to access level.';
 
-        $route = "/event/$eventId/attendees";
+        $route = "/event/$eventId/attendees?page=$page";
 
         return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
     }
 
-    public function deleteAttendee(string $attendeeId, ?string $eventId = null)
+    public function deleteAttendee(string $attendeeId, ?string $eventId = null, ?int $page = 1)
     {
         $this->delete($attendeeId);
 
-        $route = $eventId ? "/event/$eventId/attendees" : "/attendees";
+        $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         $message = 'Attendee deleted successfully!';
 
         return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
