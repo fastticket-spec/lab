@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exports\ExportAttendees;
+use App\Exports\ExportCheckins;
 use App\Helpers\QRCodeHelper;
 use App\Http\Resources\AttendeeExportResource;
 use App\Http\Resources\CheckinAttendeeResource;
@@ -13,6 +14,7 @@ use App\Mail\InvitationMail;
 use App\Models\Area;
 use App\Models\Attendee;
 use App\Models\AttendeeArea;
+use App\Models\AttendeeCheckIn;
 use App\Models\AttendeeZone;
 use App\Models\BadgesArea;
 use App\Models\BadgesZone;
@@ -1003,6 +1005,33 @@ class AttendeeService extends BaseRepository
 
 
         return new ExportAttendees(event_id: $eventId, event_ids: auth()->user()->userEventAccessId(), attendees: $attendees, questions: count($surveys) > 0 ? $surveys->toArray() : []);
+    }
+
+    public function exportCheckins(string $eventId, string $accessLevelId): ExportCheckins
+    {
+        $active_organiser = auth()->user()->account->active_organiser;
+
+        $attendees = $this->model->query()
+            ->when($active_organiser, function ($query) use ($active_organiser) {
+                $query->whereOrganiserId($active_organiser);
+            })
+            ->whereEventId($eventId)
+            ->whereAccessLevelId($accessLevelId)
+            ->pluck('id');
+
+        $checkins = AttendeeCheckIn::whereIn('attendee_id', $attendees)
+            ->with('attendee')
+            ->latest()
+            ->get()
+            ->groupBy('attendee_id')
+            ->values()
+            ->map(fn ($checkin) => [
+                'first_name' => $checkin[0]->attendee->first_name,
+                'last_name' => $checkin[0]->attendee->last_name,
+                'checkin_time' => $checkin[0]->created_at->format('d-M-Y H:i'),
+            ]);
+
+        return new ExportCheckins($checkins);
     }
 
     public function PSPDFKit()

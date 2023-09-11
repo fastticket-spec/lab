@@ -23,6 +23,7 @@ const selectedAttendee = ref({})
 const uploadModalShow = ref(false)
 const exportModalShow = ref(false)
 const exportAttendeeModalShow = ref(false)
+const exportCheckinModalShow = ref(false)
 const answerModalShow = ref(false)
 const messageModalShow = ref(false)
 const badgeModalShow = ref(false)
@@ -587,8 +588,16 @@ const exportAttendeeData = reactive({
     access_level_id: ''
 })
 
+const exportCheckinsData = reactive({
+    access_level_id: ''
+})
+
 const onExportAttendee = () => {
     location.href = `/event/${props.eventId}/attendees/export/${exportAttendeeData.access_level_id}`
+}
+
+const onExportCheckins = () => {
+    location.href = `/event/${props.eventId}/attendees/export-checkins/${exportCheckinsData.access_level_id}`
 }
 </script>
 
@@ -642,6 +651,8 @@ const onExportAttendee = () => {
                                     class="ri-user-3-line"></i>Register Applicant</Link>
                                 <a href="#" class="btn btn-outline-primary ml-2" @click="exportAttendeeModalShow = true"><i
                                     class="ri-save-2-line"></i>Export Attendees</a>
+                                <a href="#" class="btn btn-outline-primary ml-2" @click="exportCheckinModalShow = true"><i
+                                    class="ri-save-2-line"></i>Export Checkins</a>
                             </b-col>
                         </b-row>
 
@@ -1184,6 +1195,40 @@ const onExportAttendee = () => {
                         variant="danger"
                         class="float-right ml-2"
                         @click="exportAttendeeModalShow = false"
+                    >
+                        Close
+                    </b-button>
+                </div>
+            </template>
+        </b-modal>
+
+        <b-modal v-model="exportCheckinModalShow" id="export-checkins-modal" title="Export Checkins">
+            <b-row class="mt-3">
+                <b-col sm="12">
+                    <div class="form-group">
+                        <label for="access-level">Access Level</label>
+                        <select class="form-control" v-model="exportCheckinsData.access_level_id" id="access-level">
+                            <option value="">Select Access level</option>
+                            <option v-for="level in accessLevels" :key="level.id" :value="level.id">{{ level.title }}
+                            </option>
+                        </select>
+                    </div>
+                </b-col>
+            </b-row>
+
+            <template #modal-footer>
+                <div class="w-100">
+                    <b-button
+                        variant="primary"
+                        @click="onExportCheckins"
+                        :disabled="!exportCheckinsData.access_level_id"
+                        class="btn btn-primary float-right ml-2">Export
+                    </b-button>
+                    <b-button
+                        type="button"
+                        variant="danger"
+                        class="float-right ml-2"
+                        @click="exportCheckinModalShow = false"
                     >
                         Close
                     </b-button>
