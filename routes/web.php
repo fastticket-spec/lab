@@ -136,6 +136,7 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::get('/', [AttendeesController::class, 'eventAttendees']);
                 Route::post('/bulk-approval/{status}', [AttendeesController::class, 'bulkEventApproval']);
                 Route::get('export/{access_level_id}', [AttendeesController::class, 'export']);
+                Route::get('export-checkins/{access_level_id}', [AttendeesController::class, 'exportCheckins']);
                 Route::post('/mark-as-printed', [AttendeesController::class, 'markAsPrintedEvent']);
                 Route::post('/mark-as-collected', [AttendeesController::class, 'markAsCollectedEvent']);
                 Route::post('/upload-attendees', [AttendeesController::class, 'uploadAttendees']);

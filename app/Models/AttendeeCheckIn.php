@@ -13,4 +13,9 @@ class AttendeeCheckIn extends Model
     protected $fillable = [
         'attendee_id', 'checkin'
     ];
+
+    public function attendee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Attendee::class);
+    }
 }

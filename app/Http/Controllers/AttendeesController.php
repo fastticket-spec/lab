@@ -346,6 +346,13 @@ class AttendeesController extends Controller
         return Excel::download($export, 'attendees.xlsx');
     }
 
+    public function exportCheckins(string $eventId, string $accessLevelId): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        $export = $this->attendeeService->exportCheckins($eventId, $accessLevelId);
+
+        return Excel::download($export, 'checkins.xlsx');
+    }
+
     public function PSPDFKit()
     {
         return $this->attendeeService->PSPDFKit();
