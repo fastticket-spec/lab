@@ -814,6 +814,7 @@ class AttendeeService extends BaseRepository
             $attendee = $this->model->query()
                 ->whereRef($attendeeRef)
                 ->with(['accessLevel', 'event'])
+                ->where('status', 1)
                 ->whereHas('event', function ($query) use ($eventAccessIds) {
                     $query->whereIn('id', $eventAccessIds);
                 })
