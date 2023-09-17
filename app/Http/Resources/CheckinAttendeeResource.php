@@ -22,7 +22,7 @@ class CheckinAttendeeResource extends JsonResource
             'ref' => $this->ref,
             'category' => $this->event->title,
             'access_level' => $this->accessLevel->title,
-            'answers' => $this->answers
+            'answers' => optional($this->answers)
         ];
     }
 }
