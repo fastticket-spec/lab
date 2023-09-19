@@ -39,7 +39,7 @@ class AuthService extends BaseRepository
 
         $user = $this->find(auth()->user()->id);
 
-        $accessToken = $user->createToken('authenticate_user')->plainTextToken;
+        $accessToken = $user->createToken('authenticate_user')->accessToken;
 
         return [
             'user' => $user,

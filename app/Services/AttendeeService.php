@@ -272,7 +272,7 @@ class AttendeeService extends BaseRepository
             $qrPath = Storage::disk(config('filesystems.default'))->url($path);
 
             Mail::to($attendee->email)
-                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $qrPath, $attendee->first_name));
+                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $qrPath, $attendee->first_name, $attendee->ref));
         }
     }
 
