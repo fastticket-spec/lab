@@ -30,6 +30,8 @@ class AccessLevelGeneralSetting extends Model
         "invitation_message_sms",
         "start_on",
         "end_on",
-        "arabic_invitation"
+        "arabic_invitation",
+        "decline_text",
+        "decline_invitation"
     ];
 }

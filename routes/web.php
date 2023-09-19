@@ -52,6 +52,8 @@ Route::get('/home/{id}', [EventDashboardController::class, 'public']);
 
 Route::post('/event_badge_image_upload', [BadgeController::class, 'imageUpload']);
 
+Route::get('/decline-invite/{invite_id}', [AccessLevelsController::class, 'declineInvite']);
+
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('home');
 
