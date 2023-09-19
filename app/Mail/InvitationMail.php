@@ -27,7 +27,7 @@ class InvitationMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($settings, $surveyLink, $organiser, $firstName, $lastName, $registration = false, $ref = null, $attachment = null)
+    public function __construct($settings, $surveyLink, $organiser, $firstName, $lastName, $registration = false, $ref = null, $attachment = null, $declineLink = null)
     {
         $this->organiserName = $organiser->name ?? null;
         $this->attachment = $attachment;
@@ -70,6 +70,11 @@ class InvitationMail extends Mailable
                 $this->content
             );
 
+            $this->content = str_replace(
+                '%decline_link%',
+                $declineLink,
+                $this->content
+            );
 
             if ($registration) {
                 $this->content = str_replace(
