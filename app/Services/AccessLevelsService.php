@@ -381,6 +381,12 @@ class AccessLevelsService extends BaseRepository
             ])->id;
 
             if ($request->invitation_type == 'mail') {
+                $declineLink = '';
+                if ($settings->decline_invitation) {
+                    $declineLink = config('app.url') . "/decline-invite/$inviteId";
+                }
+
+
                 Mail::to($email)
                     ->later(now()->addSeconds(5), new InvitationMail(
                         settings: $settings,
@@ -390,7 +396,8 @@ class AccessLevelsService extends BaseRepository
                         lastName: $invitation['last_name'],
                         registration: $accessLevel->registration,
                         ref: $ref,
-                        attachment: $path
+                        attachment: $path,
+                        declineLink: $declineLink
                     ));
             } else {
                 $smsContent = $settings->invitation_message_sms;

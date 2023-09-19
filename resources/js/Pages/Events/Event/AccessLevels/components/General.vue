@@ -15,6 +15,7 @@ const props = defineProps({
 
 const showArabicInputs = ref(true)
 const showArabicInvitation = ref(false)
+const declineInvitation = ref(false)
 
 const initialValues = props.data
     ? {
@@ -40,6 +41,7 @@ const {handleSubmit, isSubmitting} = useForm({
 
 onMounted(() => {
     showArabicInvitation.value = !!props.data?.arabic_invitation
+    declineInvitation.value = !!props.data?.decline_invitation
 })
 
 
@@ -52,9 +54,10 @@ const {value: email_message} = useField("email_message");
 const {value: email_message_arabic} = useField("email_message_arabic");
 const {value: invitation_message} = useField("invitation_message");
 const {value: invitation_message_sms} = useField("invitation_message_sms");
+const {value: decline_text} = useField("decline_text");
 
 const onSubmit = handleSubmit(values => {
-    router.post(`/event/${props.eventId}/access-levels/${props.accessLevel.id}/customize/general`, {...values, arabic_invitation: showArabicInvitation.value});
+    router.post(`/event/${props.eventId}/access-levels/${props.accessLevel.id}/customize/general`, {...values, arabic_invitation: showArabicInvitation.value, decline_invitation: declineInvitation.value});
 })
 </script>
 
@@ -223,7 +226,7 @@ const onSubmit = handleSubmit(values => {
 
                                 <b-col sm="12">
                                     <div class="form-group">
-                                        <label for="approvalMessage">{{ $t('input.approval_message') }}</label> <span><small>&nbsp;Use <strong>%qrcode%</strong> to insert QrCode:</small></span>
+                                        <label for="approvalMessage">{{ $t('input.approval_message') }}</label> <span><small>&nbsp;Use <strong>%qrcode%</strong> to insert QrCode and <strong>%ref%</strong> for attendee reference:</small></span>
                                         <quill-editor toolbar="full" theme="snow" v-model:content="approval_message"
                                                       content-type="html"></quill-editor>
                                         <ErrorMessage name="approval_message" class="text-danger"/>
@@ -286,7 +289,8 @@ const onSubmit = handleSubmit(values => {
                                             <template v-if="accessLevel.registration"><br><strong>%registration_number%</strong> denotes the registration number.<br></template>
                                             <strong>%first_name%</strong> for First Name<br>
                                             <strong>%last_name%</strong> for Last Name<br>
-                                            <strong>%full_name%</strong> for Full Name
+                                            <strong>%full_name%</strong> for Full Name<br>
+                                            <strong>%decline_link%</strong> for Decline Invitation Link
                                         </small></span>
                                         <quill-editor toolbar="full" theme="snow" v-model:content="invitation_message"
                                                       content-type="html"></quill-editor>
