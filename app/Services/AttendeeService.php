@@ -272,7 +272,7 @@ class AttendeeService extends BaseRepository
             $qrPath = Storage::disk(config('filesystems.default'))->url($path);
 
             Mail::to($attendee->email)
-                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $qrPath, $attendee->first_name));
+                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $qrPath, $attendee->first_name, $attendee->ref));
         }
     }
 
@@ -778,6 +778,12 @@ class AttendeeService extends BaseRepository
             $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
 
             if ($mail) {
+                $declineLink = '';
+                if ($settings->decline_invitation) {
+                    $declineLink = config('app.url') . "/decline-invite/$inviteId";
+                }
+
+
                 Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
                     settings: $settings,
                     surveyLink: "$surveyLink?ref=$inviteId",
@@ -785,7 +791,8 @@ class AttendeeService extends BaseRepository
                     firstName: $first_name,
                     lastName: $last_name,
                     registration: $accessLevel->registration,
-                    ref: $ref
+                    ref: $ref,
+                    declineLink: $declineLink
                 ));
             }
         }
