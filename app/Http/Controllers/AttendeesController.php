@@ -185,7 +185,7 @@ class AttendeesController extends Controller
 
     public function uploadAttendees(AttendeeUploadRequest $request, string $eventId)
     {
-        return $this->attendeeService->uploadAttendees($eventId, $request->attendees, $request->access_level_id, $request->approve, $request->mail);
+        return $this->attendeeService->uploadAttendees($eventId, $request->attendees, $request->access_level_id, $request->approve, $request->mail, $request->whatsapp);
     }
 
     /**
