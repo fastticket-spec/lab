@@ -19,6 +19,7 @@ use App\Models\Invite;
 use App\Models\Zone;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
+use AshAllenDesign\ShortURL\Exceptions\ShortURLException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -737,6 +738,9 @@ class AttendeeService extends BaseRepository
             ->sum('downloads');
     }
 
+    /**
+     * @throws ShortURLException
+     */
     public function uploadAttendees(string $eventId, array $attendees, string $accessLevelId, bool $approve, bool $mail, bool $whatsapp)
     {
         DB::beginTransaction();
@@ -809,6 +813,7 @@ class AttendeeService extends BaseRepository
             }
 
             if ($whatsapp && $phone) {
+                $surveyLink = (new URLShortenerService())->shorten($surveyLink);
                 $this->whatsappService->sendMessage($phone, $surveyLink, "$first_name $last_name");
             }
         }
