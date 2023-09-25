@@ -77,7 +77,8 @@ watch(checkAllRows, val => {
 const upload = reactive({
     access_level_id: '',
     approve: false,
-    mail: false
+    mail: false,
+    whatsapp: false
 });
 
 const exportData = reactive({
@@ -512,9 +513,7 @@ const onUploadAttendees = () => {
 
     router.post(`/event/${props.eventId}/attendees/upload-attendees`, {
         attendees: uploadedAttendees.value,
-        access_level_id: upload.access_level_id,
-        approve: upload.approve,
-        mail: upload.mail
+        ...upload
     })
 }
 
@@ -976,6 +975,13 @@ const onExportAttendee = () => {
                         <b-checkbox v-model="upload.mail" class="custom-checkbox-color"
                                     name="mail-check" inline>
                             Send Invitation Mail
+                        </b-checkbox>
+                    </div>
+
+                    <div class="form-group">
+                        <b-checkbox v-model="upload.whatsapp" class="custom-checkbox-color"
+                                    name="whatsapp-check" inline>
+                            Send Invitation Via Whatsapp
                         </b-checkbox>
                     </div>
                 </b-col>
