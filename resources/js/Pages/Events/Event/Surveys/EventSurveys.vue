@@ -16,7 +16,7 @@ const visit = (link, method = 'get') => {
 }
 
 const onPaginate = page => {
-    router.get(`/event_surveys?page=${page}`)
+    router.get(`/event/${props.event_id}/event-surveys?page=${page}`)
 }
 </script>
 
