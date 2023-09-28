@@ -241,7 +241,7 @@ select option {
                     </div>
 
                     <template v-else>
-                        <div class="text-center" style="display: none">
+                        <div class="text-center" style="">
                             <img class="my-3 text-center img-fluid logo"
                                  :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                         </div>
