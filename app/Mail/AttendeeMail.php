@@ -48,7 +48,6 @@ class AttendeeMail extends Mailable
             $firstName,
             $this->content
         );
-
     }
 
     /**
@@ -57,7 +56,7 @@ class AttendeeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('noreply@achieveone.sa', $this->organiserName),
+            from: new Address(env('MAIL_FROM_ADDRESS'), $this->organiserName),
             subject: $this->title,
         );
     }
