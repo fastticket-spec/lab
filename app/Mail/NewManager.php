@@ -41,7 +41,7 @@ class NewManager extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('noreply@achieveone.sa', $this->organiserName),
+            from: new Address(env('MAIL_FROM_ADDRESS'), $this->organiserName),
             subject: 'Welcome on-board | ' . config('app.name'),
         );
     }
