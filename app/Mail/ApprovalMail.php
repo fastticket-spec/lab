@@ -22,7 +22,7 @@ class ApprovalMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($settings, $organiser, $qrUrl, $firstName)
+    public function __construct($settings, $organiser, $qrUrl, $firstName, $attendeeRef)
     {
         $this->organiserName = $organiser->name ?? null;
         $organiserLogo = $organiser->logo_url ?? null;
@@ -49,6 +49,12 @@ class ApprovalMail extends Mailable
             $this->content
         );
 
+        $this->content = str_replace(
+            '%ref%',
+            $attendeeRef,
+            $this->content
+        );
+        
         $this->title = $settings->approval_message_title ?? 'Approval Mail';
     }
 

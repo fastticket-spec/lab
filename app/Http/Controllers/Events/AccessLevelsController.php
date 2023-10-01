@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Events;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AccessLevelGeneralRequest;
+use App\Models\Invite;
 use App\Services\AccessLevelsService;
 use App\Services\EventService;
 use Illuminate\Http\Request;
@@ -171,5 +172,20 @@ class AccessLevelsController extends Controller
     public function formEmails(string $eventId, string $accessLevelId)
     {
         return $this->accessLevelsService->getFormEmails($eventId, $accessLevelId);
+    }
+
+    public function declineInvite(string $invitationId): \Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+    {
+        try {
+            $invite = Invite::query()->findOrFail($invitationId);
+
+            $invite->update(['declined' => 1]);
+
+            return view('invite-declined', ['status' => 'success', 'message' => 'Invitation has been declined successfully!']);
+        } catch (\Throwable $th) {
+            \Log::debug($th);
+
+            return view('invite-declined', ['status' => 'danger', 'message' => 'Invite not found!']);
+        }
     }
 }
