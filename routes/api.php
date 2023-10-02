@@ -19,3 +19,6 @@ Route::prefix('checkin-user')->group(function () {
         Route::post('check-in', [AttendeesController::class, 'checkInAttendee']);
     });
 });
+
+
+Route::post('send-data', [AttendeesController::class, 'createAttendeeViaApi']);

@@ -14,6 +14,7 @@ use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
 use Rap2hpoutre\FastExcel\FastExcel;
+use Log;
 
 
 class AttendeesController extends Controller
@@ -115,14 +116,14 @@ class AttendeesController extends Controller
     {
         $request->validate(['attendee_ids' => 'array|required', 'zones' => 'required|array', 'zones.*' => 'required|string']);
 
-        return $this->attendeeService->bulkAssignZones(attendeeIds: $request->attendee_ids, zones:  $request->zones, page: $request->page);
+        return $this->attendeeService->bulkAssignZones(attendeeIds: $request->attendee_ids, zones: $request->zones, page: $request->page);
     }
 
     public function bulkAssignEventZones(Request $request, string $eventId)
     {
         $request->validate(['attendee_ids' => 'array|required', 'zones' => 'required|array', 'zones.*' => 'required|string']);
 
-        return $this->attendeeService->bulkAssignZones(attendeeIds: $request->attendee_ids, zones:  $request->zones, eventId:  $eventId, page: $request->page);
+        return $this->attendeeService->bulkAssignZones(attendeeIds: $request->attendee_ids, zones: $request->zones, eventId: $eventId, page: $request->page);
     }
 
     public function bulkAssignAreas(Request $request)
@@ -356,5 +357,42 @@ class AttendeesController extends Controller
     public function PSPDFKit()
     {
         return $this->attendeeService->PSPDFKit();
+    }
+
+    public function createAttendeeViaApi(Request $request)
+    {
+        Log::info(json_encode($request->all()));
+        $answers = null;
+
+        if ($phone = $request->phone) {
+            $answers = [
+                ['type' => "1", "answer" => $phone, "question" => "Phone Number"]
+            ];
+        }
+
+        $lang = 'english';
+
+        $event = $this->accessLevelsService->find($request->access_level_id)->event;
+
+        if ($event) {
+            $attendee = $this->attendeeService->create([
+                'access_level_id' => $request->access_level_id,
+                'event_id' => $event->id,
+                'ref' => Str::random('8'),
+                'organiser_id' => $event->organiser_id,
+                'first_name' => $first_name = $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $email = $request->email,
+                'answers' => $answers
+            ]);
+
+            $settings = optional($attendee->accessLevel)->generalSettings;
+
+            // Mail::to($email)->later(now()->addSeconds(5), new AttendeeMail($settings, $lang, $attendee->event->organiser, $first_name));
+
+            return $this->view(['message' => 'Attendee created successfully']);
+        } else {
+            return $this->view(['message' => 'Event not found'], 404);
+        }
     }
 }
