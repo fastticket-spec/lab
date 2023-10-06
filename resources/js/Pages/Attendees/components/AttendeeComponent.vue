@@ -91,7 +91,8 @@ const searchAttendees = searchString => {
 }
 
 const goTo = (page, perPage, q) => {
-    router.get(`/attendees?q=${q || ''}&page=${page}&per_page=${perPage}`, {}, {
+  const baseUrl = props.eventId ? `/event/${props.eventId}/attendees` : '/attendees';
+    router.get(`${baseUrl}?q=${q || ''}&page=${page}&per_page=${perPage}`, {}, {
         replace: true,
         preserveState: true
     })
