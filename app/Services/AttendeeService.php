@@ -72,6 +72,7 @@ class AttendeeService extends BaseRepository
                     ->orWhere('ref', 'like', "%{$searchTerm}%")
                     ->orWhere('first_name', 'like', "%{$searchTerm}%")
                     ->orWhere('last_name', 'like', "%{$searchTerm}%")
+                    ->orWhere('answers', 'like', "%{$searchTerm}%")
                     ->orWhereHas('event', function ($q) use ($searchTerm) {
                         $q->where('title', 'like', "%{$searchTerm}%")
                             ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
