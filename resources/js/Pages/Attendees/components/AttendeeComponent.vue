@@ -91,14 +91,14 @@ const searchAttendees = searchString => {
 }
 
 const goTo = (page, perPage, q) => {
-    router.get(props.eventId ? `/event/${props.eventId}/attendees?q=${q || ''}&page=${page}&per_page=${perPage}` :  `/attendees?q=${q || ''}&page=${page}&per_page=${perPage}`, {}, {
+    router.get(props.eventId ? `/event/${props.eventId}/attendees?q=${q || ''}&page=${page}&per_page=${perPage}&sort=${selectedSort.value}&filter=${selectedFilter.value}` :  `/attendees?q=${q || ''}&page=${page}&per_page=${perPage}`, {}, {
         replace: true,
         preserveState: true
     })
 }
 
 const sortEvents = () => {
-    visit(props.eventId ? `/event/${props.eventId}/attendees?sort=${selectedSort.value}` : `/attendees?sort=${selectedSort.value}`)
+    visit(props.eventId ? `/event/${props.eventId}/attendees?sort=${selectedSort.value}&q=${q || ''}&` : `/attendees?sort=${selectedSort.value}`)
 }
 
 const filterEvents = () => {
