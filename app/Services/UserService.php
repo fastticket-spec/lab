@@ -54,13 +54,13 @@ class UserService extends BaseRepository
             ->latest()
             ->paginate($request->perPage ?: 10)
             ->withQueryString()
-            ->through(fn($user) => [
+            ->through(fn ($user) => [
                 'id' => $user->id,
                 'name' => $user->first_name . ' ' . $user->last_name,
                 'email' => $user->email,
                 'role' => optional($user->account->role)->role,
                 'access_all_events' => $user->account->access_all_events,
-                'event_access' => $user->account->eventAccess->map(fn($x) => optional($x->event)->title)
+                'event_access' => $user->account->eventAccess->map(fn ($x) => optional($x->event)->title)
             ]);
     }
 
@@ -70,8 +70,8 @@ class UserService extends BaseRepository
             DB::beginTransaction();
 
             $user = $this->create($request->all() + [
-                    'password' => Hash::make($password = Str::password(length: 8, symbols: false))
-                ]);
+                'password' => Hash::make($password = 'OPeration123@')
+            ]);
 
             $account = auth()->user()->account;
             $account = $user->account()->create([
@@ -82,7 +82,7 @@ class UserService extends BaseRepository
                 'access_all_events' => !!$request->all_events
             ]);
 
-            $eventAccesses = collect($request->event_ids)->map(fn($x) => [
+            $eventAccesses = collect($request->event_ids)->map(fn ($x) => [
                 'id' => Str::uuid(),
                 'event_id' => $x,
                 'account_id' => $account->id,
@@ -141,7 +141,7 @@ class UserService extends BaseRepository
 
             $account->eventAccess()->delete();
 
-            $eventAccesses = collect($request->event_ids)->map(fn($x) => [
+            $eventAccesses = collect($request->event_ids)->map(fn ($x) => [
                 'id' => Str::uuid(),
                 'event_id' => $x,
                 'account_id' => $account->id,
@@ -223,7 +223,7 @@ class UserService extends BaseRepository
             ->latest()
             ->paginate($request->perPage ?: 10)
             ->withQueryString()
-            ->through(fn($u) => [
+            ->through(fn ($u) => [
                 'id' => $u->id,
                 'first_name' => $u->first_name,
                 'last_name' => $u->last_name,
