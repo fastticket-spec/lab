@@ -637,7 +637,7 @@ const onExportCheckins = () => {
                                     <option value="0">Pending</option>
                                     <option value="2">Declined</option>
                                     <option value="3">Printed</option>
-                                    <option value="4">Not Printed</option>
+                                    <option value="4">Not Printed (Approved)</option>
                                 </select>
                             </div>
                         </div>

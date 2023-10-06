@@ -107,7 +107,7 @@ class AttendeeService extends BaseRepository
                         $query->wherePrinted(1);
                         break;
                     case '4':
-                        $query->wherePrinted(0);
+                        $query->wherePrinted(0)->whereStatus(1);
                         break;
                     default:
                         $query->whereStatus($request->filter);
