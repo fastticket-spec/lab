@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Endroid\QrCode\QrCode;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AttendeeService extends BaseRepository
@@ -55,6 +56,8 @@ class AttendeeService extends BaseRepository
             $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn ($access) => $access->event_id);
         }
 
+        Log::info(json_encode($eventId));
+
         return $this->model->query()
             ->with(['event', 'accessLevel.accessLevelBadge.badge', 'zones.zone'])
             ->when($account->active_organiser, function ($query) use ($account) {
@@ -62,9 +65,6 @@ class AttendeeService extends BaseRepository
             })
             ->when($eventId, function ($query) use ($eventId) {
                 $query->where('event_id', $eventId);
-            })
-            ->when($eventsAccessID, function ($query) use ($eventsAccessID) {
-                $query->whereIn('event_id', $eventsAccessID);
             })
             ->when($request->input('q'), function ($query) use ($request) {
                 $searchTerm = $request->q;
