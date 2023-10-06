@@ -70,18 +70,18 @@ class AttendeeService extends BaseRepository
             ->when($request->input('q'), function ($query) use ($request, $eventId) {
                 $searchTerm = $request->q;
                 $query->where(function ($q) use ($searchTerm) {
-                    $q->where('email', 'ilike', "%{$searchTerm}%")
-                        ->orWhere('ref', 'ilike', "%{$searchTerm}%")
-                        ->orWhere('first_name', 'ilike', "%{$searchTerm}%")
-                        ->orWhere('last_name', 'ilike', "%{$searchTerm}%")
-                        ->orWhere('answers', 'ilike', "%{$searchTerm}%")
+                    $q->where('email', 'like', "%{$searchTerm}%")
+                        ->orWhere('ref', 'like', "%{$searchTerm}%")
+                        ->orWhere('first_name', 'like', "%{$searchTerm}%")
+                        ->orWhere('last_name', 'like', "%{$searchTerm}%")
+                        ->orWhere('answers', 'like', "%{$searchTerm}%")
                         ->orWhereHas('event', function ($q) use ($searchTerm) {
-                            $q->where('title', 'ilike', "%{$searchTerm}%")
-                                ->orWhere('title_arabic', 'ilike', "%{$searchTerm}%");
+                            $q->where('title', 'like', "%{$searchTerm}%")
+                                ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
                         })
                         ->orWhereHas('accessLevel', function ($q) use ($searchTerm) {
-                            $q->where('title', 'ilike', "%{$searchTerm}%")
-                                ->orWhere('title_arabic', 'ilike', "%{$searchTerm}%");
+                            $q->where('title', 'like', "%{$searchTerm}%")
+                                ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
                         });
                 });
             })
