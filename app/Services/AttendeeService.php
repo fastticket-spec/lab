@@ -30,7 +30,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Endroid\QrCode\QrCode;
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AttendeeService extends BaseRepository
@@ -56,7 +55,6 @@ class AttendeeService extends BaseRepository
             $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn ($access) => $access->event_id);
         }
 
-        Log::info(json_encode($eventId));
 
         return $this->model->query()
             ->with(['event', 'accessLevel.accessLevelBadge.badge', 'zones.zone'])
@@ -66,19 +64,24 @@ class AttendeeService extends BaseRepository
             ->when($eventId, function ($query) use ($eventId) {
                 $query->where('event_id', $eventId);
             })
-            ->when($request->input('q'), function ($query) use ($request) {
+            ->when($eventsAccessID, function ($query) use ($eventsAccessID) {
+                $query->whereIn('event_id', $eventsAccessID);
+            })
+            ->when($request->input('q'), function ($query) use ($request, $eventId) {
                 $searchTerm = $request->q;
-                $query->where('email', 'like', "%{$searchTerm}%")
+                $query->where('event_id', $eventId)
+                    ->where('email', 'like', "%{$searchTerm}%")
                     ->orWhere('ref', 'like', "%{$searchTerm}%")
                     ->orWhere('first_name', 'like', "%{$searchTerm}%")
                     ->orWhere('last_name', 'like', "%{$searchTerm}%")
                     ->orWhere('answers', 'like', "%{$searchTerm}%")
-                    ->orWhereHas('event', function ($q) use ($searchTerm) {
-                        $q->where('title', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('event', function ($q) use ($searchTerm, $eventId) {
+                        $q->where('event_id', $eventId)->where('title', 'like', "%{$searchTerm}%")
                             ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
                     })
-                    ->orWhereHas('accessLevel', function ($q) use ($searchTerm) {
-                        $q->where('title', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('accessLevel', function ($q) use ($searchTerm, $eventId) {
+                        $q->where('event_id', $eventId)
+                            ->where('title', 'like', "%{$searchTerm}%")
                             ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
                     });
             })

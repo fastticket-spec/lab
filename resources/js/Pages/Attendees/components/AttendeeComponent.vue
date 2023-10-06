@@ -612,7 +612,7 @@ const onExportCheckins = () => {
                         </div>
                     </template>
 
-                    <template v-if="attendees.total" v-slot:headerAction>
+                    <template  v-slot:headerAction>
                         <div class="d-flex justify-content-center align-items-center" style="width: 670px">
                             <search-box
                                 placeholder="Search by first name, last name, email, ref or event"
