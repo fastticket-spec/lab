@@ -101,7 +101,17 @@ class AttendeeService extends BaseRepository
                 }
             })
             ->when(($request->input('filter') || $request->filter == '0'), function ($query) use ($request) {
-                $request->filter == '3' ?  $query->wherePrinted(1) : $query->whereStatus($request->filter);
+
+                switch ($request->filter) {
+                    case '3':
+                        $query->wherePrinted(1);
+                        break;
+                    case '4':
+                        $query->wherePrinted(0)->whereStatus(1);
+                        break;
+                    default:
+                        $query->whereStatus($request->filter);
+                }
             })
 
             ->latest()
