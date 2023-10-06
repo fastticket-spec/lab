@@ -69,21 +69,21 @@ class AttendeeService extends BaseRepository
             })
             ->when($request->input('q'), function ($query) use ($request, $eventId) {
                 $searchTerm = $request->q;
-                $query->where('event_id', $eventId)
-                    ->where('email', 'like', "%{$searchTerm}%")
-                    ->orWhere('ref', 'like', "%{$searchTerm}%")
-                    ->orWhere('first_name', 'like', "%{$searchTerm}%")
-                    ->orWhere('last_name', 'like', "%{$searchTerm}%")
-                    ->orWhere('answers', 'like', "%{$searchTerm}%")
-                    ->orWhereHas('event', function ($q) use ($searchTerm, $eventId) {
-                        $q->where('event_id', $eventId)->where('title', 'like', "%{$searchTerm}%")
-                            ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
-                    })
-                    ->orWhereHas('accessLevel', function ($q) use ($searchTerm, $eventId) {
-                        $q->where('event_id', $eventId)
-                            ->where('title', 'like', "%{$searchTerm}%")
-                            ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
-                    });
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('email', 'like', "%{$searchTerm}%")
+                        ->orWhere('ref', 'like', "%{$searchTerm}%")
+                        ->orWhere('first_name', 'like', "%{$searchTerm}%")
+                        ->orWhere('last_name', 'like', "%{$searchTerm}%")
+                        ->orWhere('answers', 'like', "%{$searchTerm}%")
+                        ->orWhereHas('event', function ($q) use ($searchTerm) {
+                            $q->where('title', 'like', "%{$searchTerm}%")
+                                ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
+                        })
+                        ->orWhereHas('accessLevel', function ($q) use ($searchTerm) {
+                            $q->where('title', 'like', "%{$searchTerm}%")
+                                ->orWhere('title_arabic', 'like', "%{$searchTerm}%");
+                        });
+                });
             })
             ->when($request->input('sort'), function ($query) use ($request) {
                 switch ($request->sort) {
