@@ -99,7 +99,7 @@ const goTo = (page, perPage, q) => {
 }
 
 const sortEvents = () => {
-    visit(props.eventId ? `/event/${props.eventId}/attendees?sort=${selectedSort.value}&q=${q || ''}&` : `/attendees?sort=${selectedSort.value}`)
+    visit(props.eventId ? `/event/${props.eventId}/attendees?sort=${selectedSort.value}` : `/attendees?sort=${selectedSort.value}`)
 }
 
 const filterEvents = () => {
