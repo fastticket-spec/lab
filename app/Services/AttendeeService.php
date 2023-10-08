@@ -22,6 +22,7 @@ use App\Models\Invite;
 use App\Models\Zone;
 use App\Repositories\BaseRepository;
 use App\Services\traits\HasFile;
+use AshAllenDesign\ShortURL\Exceptions\ShortURLException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -38,7 +39,7 @@ class AttendeeService extends BaseRepository
 
     protected string $images_path;
 
-    public function __construct(Attendee $model, public FileService $file, public EventService $eventService, public AccessLevelsService $accessLevelsService, private AccountEventAccessService $accountEventAccessService)
+    public function __construct(Attendee $model, public FileService $file, public EventService $eventService, public AccessLevelsService $accessLevelsService, private AccountEventAccessService $accountEventAccessService, public WhatsappService $whatsappService)
     {
         parent::__construct($model);
 
@@ -758,8 +759,12 @@ class AttendeeService extends BaseRepository
             ->sum('downloads');
     }
 
-    public function uploadAttendees(string $eventId, array $attendees, string $accessLevelId, bool $approve, bool $mail)
+    /**
+     * @throws ShortURLException
+     */
+    public function uploadAttendees(string $eventId, array $attendees, string $accessLevelId, bool $approve, bool $mail, bool $whatsapp)
     {
+        DB::beginTransaction();
         $organiserId = auth()->user()->activeOrganiser();
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
         $surveyLink = config('app.url') . '/a/' . $accessLevelId;
@@ -771,7 +776,17 @@ class AttendeeService extends BaseRepository
             $email = $attendee['Email Address'];
             $first_name = $attendee['First Name'];
             $last_name = $attendee['Last Name'];
+            $phone = $attendee['Mobile Number'] ?? ($attendee['Phone Number'] ?? '');
             $ref = Str::random('8');
+
+            if ($phone) {
+                $phoneLength = strlen($phone);
+                $phone = str_replace('+', '', $phone);
+
+                if ($phoneLength == 9 || $phoneLength === 10) {
+                    $phone = "966$phone";
+                }
+            }
 
             $answers = [];
 
@@ -798,16 +813,17 @@ class AttendeeService extends BaseRepository
 
             $inviteId = Invite::create(['email' => $email, 'ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
 
+            $surveyLink = "$surveyLink?ref=$inviteId";
+
             if ($mail) {
                 $declineLink = '';
                 if ($settings->decline_invitation) {
                     $declineLink = config('app.url') . "/decline-invite/$inviteId";
                 }
 
-
                 Mail::to($email)->later(now()->addSeconds(3), new InvitationMail(
                     settings: $settings,
-                    surveyLink: "$surveyLink?ref=$inviteId",
+                    surveyLink: $surveyLink,
                     organiser: $organiser,
                     firstName: $first_name,
                     lastName: $last_name,
@@ -816,7 +832,14 @@ class AttendeeService extends BaseRepository
                     declineLink: $declineLink
                 ));
             }
+
+            if ($whatsapp && $phone) {
+                $surveyLink = (new URLShortenerService())->shorten($surveyLink);
+                $this->whatsappService->sendMessage($phone, $surveyLink, "$first_name $last_name");
+            }
         }
+
+        DB::commit();
 
         $message = 'Attendees uploaded successfully!';
 
