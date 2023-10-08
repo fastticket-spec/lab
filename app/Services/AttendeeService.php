@@ -900,6 +900,16 @@ class AttendeeService extends BaseRepository
                 })
                 ->firstOrFail();
 
+            if ($attendee->attendeeCheckins()->exists()) {
+                return $this->view(
+                    data: ['message' => 'Attendee already checked in.'],
+                    statusCode: 400,
+                    flashMessage: 'Attendee already checked in.',
+                    component: '/dashboard',
+                    returnType: 'redirect'
+                );
+            }
+
             $attendee->checkinAttendee();
 
             return $this->view(
