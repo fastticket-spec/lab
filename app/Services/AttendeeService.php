@@ -942,6 +942,45 @@ class AttendeeService extends BaseRepository
         }
     }
 
+    public function checkinAttendeeById(string $attendeeId, int $page, ?string $eventId = null)
+    {
+        $page = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
+        try {
+            $attendee = $this->model->query()
+                ->findOrFail($attendeeId);
+
+            if ($attendee->attendeeCheckins()->exists()) {
+                return $this->view(
+                    data: ['message' => 'Attendee already checked in.'],
+                    statusCode: 400,
+                    flashMessage: 'Attendee already checked in.',
+                    component: $page,
+                    returnType: 'redirect'
+                );
+            }
+
+            $attendee->checkinAttendee();
+
+            return $this->view(
+                data: ['message' => 'Checked in successfully', 'attendee' => $attendee->answers],
+                flashMessage: 'Checked in successfully',
+                component: $page,
+                returnType: 'redirect'
+            );
+        } catch (\Throwable $th) {
+            if ($th instanceof ModelNotFoundException) {
+                return $this->view(
+                    data: ['message' => 'Attendee not found'],
+                    statusCode: 400,
+                    flashMessage: 'Reference not found',
+                    component: $page,
+                    returnType: 'redirect'
+                );
+            }
+            throw $th;
+        }
+    }
+
     public function togglePrinted(array $attendee_ids, bool $printed = true, ?string $eventId = null, ?int $page = 1)
     {
         $this->model->query()

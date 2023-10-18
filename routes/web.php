@@ -148,6 +148,7 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('/bulk-assign-zones', [AttendeesController::class, 'bulkAssignEventZones']);
                 Route::post('/bulk-assign-areas', [AttendeesController::class, 'bulkAssignEventAreas']);
                 Route::post('/send-bulk-invitation', [AttendeesController::class, 'sendBulkEventInvitation']);
+                Route::post('/{attendee_id}/checkin', [AttendeesController::class, 'checkinAttendeesEvent']);
                 Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignEventZones']);
                 Route::post('/{attendee_id}/assign-areas', [AttendeesController::class, 'assignEventAreas']);
                 Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendEventInvitation']);
@@ -200,6 +201,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/bulk-assign-zones', [AttendeesController::class, 'bulkAssignZones']);
             Route::post('/bulk-assign-areas', [AttendeesController::class, 'bulkAssignAreas']);
             Route::post('/send-bulk-invitation', [AttendeesController::class, 'sendBulkInvitation']);
+            Route::post('/{attendee_id}/checkin', [AttendeesController::class, 'checkinAttendees']);
             Route::post('/{attendee_id}/assign-zones', [AttendeesController::class, 'assignZones']);
             Route::post('/{attendee_id}/assign-areas', [AttendeesController::class, 'assignAreas']);
             Route::post('/{attendee_id}/send-invitation', [AttendeesController::class, 'sendInvitation']);

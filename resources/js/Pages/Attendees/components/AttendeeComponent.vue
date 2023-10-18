@@ -599,6 +599,14 @@ const onExportAttendee = () => {
 const onExportCheckins = () => {
     location.href = `/event/${props.eventId}/attendees/export-checkins/${exportCheckinsData.access_level_id}`
 }
+
+const checkInAttendee = attendee => {
+  const page = props.attendees.current_page;
+
+  props.eventId
+      ? router.post(`/event/${props.eventId}/attendees/${attendee.id}/checkin`, {page})
+      : router.post(`/attendees/${attendee.id}/checkin`, {page})
+}
 </script>
 
 <template>
@@ -759,6 +767,8 @@ const onExportCheckins = () => {
                                             <b-dropdown-item
                                                 v-if="eventId && userRole !== 'Operations'"
                                                 @click.prevent="selectedAttendee = data.item; selectedAttendeeAccessLevelId = data.item.access_level.id; moveAttendeeModal = true">Move to Access Level</b-dropdown-item>
+                                            <b-dropdown-item
+                                                @click.prevent="checkInAttendee(data.item)">CheckIn Attendee</b-dropdown-item>
                                             <b-dropdown-item
                                                 v-if="userRole !== 'Operations'"
                                                 variant="danger"

@@ -206,6 +206,22 @@ class AttendeesController extends Controller
         return $this->attendeeService->checkinAttendee($request->attendee_ref);
     }
 
+    /**
+     * @throws Throwable
+     */
+    public function checkInAttendees(string $attendeeId, Request $request)
+    {
+        return $this->attendeeService->checkinAttendeeById($attendeeId, $request->page);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function checkInAttendeesEvent(string $eventId, string $attendeeId, Request $request)
+    {
+        return $this->attendeeService->checkinAttendeeById($attendeeId, $request->page, $eventId);
+    }
+
     public function markAsPrinted(Request $request)
     {
         $request->validate(['attendee_ids' => 'required|array']);
