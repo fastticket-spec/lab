@@ -47,6 +47,12 @@ Route::post('/form-emails', [AccreditationController::class, 'saveFormEmails']);
 Route::get('/spl/data/players/{id}', [AttendeesController::class, 'pullSplDataPlayers']);
 Route::get('/spl/data/officials/{id}', [AttendeesController::class, 'pullSplDataOfficials']);
 
+Route::redirect('/print-badge', '/print-badge/welcome');
+Route::get('/print-badge/welcome', [BadgeController::class, 'welcome']);
+Route::get('/print-badge/choose-language', [BadgeController::class, 'chooseLanguage']);
+Route::get('/print-badge/scan-qr', [BadgeController::class, 'scanQr']);
+Route::get('/print-badge/view-badge', [BadgeController::class, 'viewBadge']);
+
 
 Route::get('/home/{id}', [EventDashboardController::class, 'public']);
 
