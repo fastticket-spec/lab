@@ -1,16 +1,17 @@
 <script setup>
 import {onMounted, ref} from "vue";
 import {router} from "@inertiajs/vue3";
+import Loader from "./Loader.vue";
 
 const props = defineProps({
     language: String
 })
 
-const scanned = ref(false);
+const scanning = ref(false);
 
 const onScanSuccess = (decodedText, decodedResult) => {
-    if (decodedText && !scanned.value) {
-        scanned.value = true
+    if (decodedText && !scanning.value) {
+        scanning.value = true
         router.get(`/print-badge/view-badge?ref=${decodedText}&lang=${props.language}`)
     }
 }
@@ -50,7 +51,10 @@ export default {
     <div class="row mt-3">
         <div class="col-6 offset-3">
             <div class="card card-bordered mb-3 text-center qr-card">
-                <div id="qr-code-div" class="qr-code-div"></div>
+                <div id="qr-code-div" class="qr-code-div" v-if="!scanning"></div>
+                <div v-else>
+                    <Loader />
+                </div>
                 <span class="text-danger">{{ errorMessage }}</span>
             </div>
         </div>
