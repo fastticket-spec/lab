@@ -6,7 +6,7 @@ import AlertHandler from "../components/core/alert/AlertHandler.vue";
   <AlertHandler/>
   <section class="print-section">
     <div class="print-header">
-      <img src="../../../images/logo-dark.jpeg" class="print-header--logo" alt="">
+      <img src="../../../images/proptech.png" class="print-header--logo" alt="">
     </div>
 
     <div class="print-body w-100">
@@ -14,21 +14,21 @@ import AlertHandler from "../components/core/alert/AlertHandler.vue";
     </div>
 
     <div class="print-footer text-center">
-      <img src="../../../images/logo-dark.jpeg" class="print-footer--logo" alt="">
+      <img src="../../../images/proptech.png" class="print-footer--logo" alt="">
     </div>
   </section>
 </template>
 
 <style scoped>
 .print-section {
-  background-color: #1B29D7;
+  background-color: #16B3CF;
   height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 .print-header--logo {
-  width: 100px;
+  width: 150px;
   margin: 15px;
 }
 
