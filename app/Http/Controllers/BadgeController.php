@@ -6,6 +6,7 @@ use App\Models\Badge;
 use App\Models\EventBadge;
 use App\Models\EventSurveyAccessLevel;
 use App\Services\AccessLevelsService;
+use App\Services\AttendeeService;
 use App\Services\BadgeService;
 use App\Services\FileService;
 use App\Services\traits\HasFile;
@@ -19,7 +20,7 @@ class BadgeController extends Controller
 
     protected $images_path;
 
-    public function __construct(public BadgeService $badgeService, public AccessLevelsService $accessLevelsService, private FileService $file)
+    public function __construct(public BadgeService $badgeService, public AccessLevelsService $accessLevelsService, private FileService $file, private AttendeeService $attendeeService)
     {
         $this->images_path = config('filesystems.directory') . "badges/";
     }
@@ -122,5 +123,44 @@ class BadgeController extends Controller
                 'details' => $base64
             ]
         );
+    }
+
+    public function welcome(): \Inertia\Response
+    {
+        return Inertia::render('PrintBadge/Welcome');
+    }
+
+    public function chooseLanguage(): \Inertia\Response
+    {
+        return Inertia::render('PrintBadge/Language');
+    }
+
+    public function scanQr(): \Inertia\Response
+    {
+        $language = request()->lang;
+
+        return Inertia::render('PrintBadge/ScanQR', ['language' => $language]);
+    }
+
+    public function viewBadge(): \Inertia\Response
+    {
+        $language = request()->lang;
+        $ref = request()->ref;
+
+        $attendee = $this->attendeeService->findOneBy(['ref' => $ref]);
+
+        if (!$attendee) {
+            return Inertia::render('PrintBadge/BadgeView', ['language' => $language, 'badge' => null, 'error' => 'Attendee not found!']);
+        }
+
+        $badge = optional($attendee->accessLevel->accessLevelBadge)->badge;
+
+        if (!$badge) {
+            return Inertia::render('PrintBadge/BadgeView', ['language' => $language, 'badge' => null, 'error' => 'Badge not found!']);
+        }
+
+        $badgeData = $this->attendeeService->downloadAttendeeBadge('badge', $attendee->id, $badge->id);
+
+        return Inertia::render('PrintBadge/BadgeView', ['language' => $language, 'badge' => $badgeData]);
     }
 }

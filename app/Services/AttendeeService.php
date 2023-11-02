@@ -529,7 +529,7 @@ class AttendeeService extends BaseRepository
         }
     }
 
-    public function downloadAttendeeBadge(Request $request, string $attendeeId, string $badgeId, ?string $eventId = null)
+    public function downloadAttendeeBadge($type, string $attendeeId, string $badgeId, ?string $eventId = null)
     {
         $attendee = $this->find($attendeeId);
         $event = $attendee->event;
@@ -702,7 +702,7 @@ class AttendeeService extends BaseRepository
 
         $html_data = $doc->saveHTML();
 
-        $data = ['html_data' => $html_data, 'badge' => $badge, 'type' => $request->type, 'downloads' => $attendee->downloads, 'downloaded' => $attendee->printed, 'collected' => $attendee->collected];
+        $data = ['html_data' => $html_data, 'badge' => $badge, 'type' => $type, 'downloads' => $attendee->downloads, 'downloaded' => $attendee->printed, 'collected' => $attendee->collected];
 
         return response()->json($data);
 

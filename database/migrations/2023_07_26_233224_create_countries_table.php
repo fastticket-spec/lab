@@ -11,10 +11,7 @@ return new class extends Migration
         Schema::create('countries', function (Blueprint $table) {
             $table->id();
             $table->string('country');
-            $table->string('iso2')->nullable();
-            $table->string('iso3')->nullable();
-            $table->string('currency')->nullable();
-            $table->string('currency_symbol')->nullable();
+
             $table->timestamps();
         });
     }

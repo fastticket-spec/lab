@@ -176,12 +176,12 @@ class AttendeesController extends Controller
 
     public function downloadBadge(Request $request, string $attendeeId, string $badgeId)
     {
-        return $this->attendeeService->downloadAttendeeBadge($request, $attendeeId, $badgeId);
+        return $this->attendeeService->downloadAttendeeBadge($request->type, $attendeeId, $badgeId);
     }
 
     public function downloadEventBadge(Request $request, string $eventId, string $attendeeId, string $badgeId)
     {
-        return $this->attendeeService->downloadAttendeeBadge($request, $attendeeId, $badgeId, $eventId);
+        return $this->attendeeService->downloadAttendeeBadge($request->type, $attendeeId, $badgeId, $eventId);
     }
 
     public function uploadAttendees(AttendeeUploadRequest $request, string $eventId)
