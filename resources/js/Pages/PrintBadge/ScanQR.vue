@@ -8,6 +8,7 @@ const props = defineProps({
 })
 
 const scanning = ref(false);
+const qrCode = ref('');
 
 const onScanSuccess = (decodedText, decodedResult) => {
     if (decodedText && !scanning.value) {
@@ -17,6 +18,15 @@ const onScanSuccess = (decodedText, decodedResult) => {
 }
 
 const errorMessage = ref('');
+const verifyQR = () => {
+  if (!qrCode.value) {
+    errorMessage.value = 'Please supply a QR Code';
+    return;
+  }
+
+  router.get(`/print-badge/view-badge?ref=${qrCode.value}&lang=${props.language}`)
+}
+
 
 onMounted(() => {
     const config = {
@@ -50,13 +60,29 @@ export default {
 
     <div class="row mt-3">
         <div class="col-6 offset-3">
-            <div class="card card-bordered mb-3 text-center qr-card">
-                <div id="qr-code-div" class="qr-code-div" v-if="!scanning"></div>
-                <div v-else>
-                    <Loader />
-                </div>
+          <form @submit.prevent="verifyQR">
+            <div class="row">
+              <div class="col-8">
+                <div class="form-group">
+                  <label for="qr-code" class="text-white w-100" :class="{'text-right': language === 'arabic'}" :style="{direction: language === 'english' ? 'ltr' : 'rtl'}">{{language === 'english' ? 'Enter QR Code below' : 'أدخل رمز الاستجابة السريعة أدناه'}}</label>
+                  <input v-model="qrCode" type="text" class="form-control" :class="{'text-right': language === 'arabic'}" autofocus>
                 <span class="text-danger">{{ errorMessage }}</span>
+                </div>
+              </div>
+
+              <div class="col-4">
+                <div class="form-group">
+                  <button class="btn mt-5">Validate</button>
+                </div>
+              </div>
             </div>
+          </form>
+<!--            <div class="card card-bordered mb-3 text-center qr-card">-->
+<!--                <div id="qr-code-div" class="qr-code-div" v-if="!scanning"></div>-->
+<!--                <div v-else>-->
+<!--                    <Loader />-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
     </div>
 
@@ -88,6 +114,16 @@ export default {
 
 .qr-code-div {
     border: none !important;
+}
+
+.btn {
+  border: 1px solid #ffffff;
+  color: white;
+}
+
+.btn:hover {
+  color: black;
+  background-color: white;
 }
 </style>
 
