@@ -287,7 +287,7 @@ class AttendeeService extends BaseRepository
 
             $qr = QRCodeHelper::getQRCode($attendee->ref, 'png');
 
-            $path = $this->uploadBase64File(file_get_contents($qr));
+            $path = $this->uploadBase64File(file_get_contents($qr), $attendees->ref);
             $qrPath = Storage::disk(config('filesystems.default'))->url($path);
 
             Mail::to($attendee->email)
