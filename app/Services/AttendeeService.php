@@ -287,15 +287,16 @@ class AttendeeService extends BaseRepository
             $mobileNumberArray = collect($attendee->answers)->firstWhere('question', 'Mobile Number');
             $phone = $mobileNumberArray ? $mobileNumberArray['answer'] : '';
 
-            $qrContent = "BEGIN:VCARD\nVERSION:3.0\nN:$attendee->last_name;$attendee->first_name\nFN:$attendee->first_name $attendee->last_name\nORG:\nTITLE:\nADR:\nTEL;WORK;VOICE:$phone\nTEL;FAX:\nEMAIL;WORK;INTERNET:$attendee->email\nURL:\nNOTE:$attendee->ref\nEND:VCARD";
+            $ref = $attendee->ref;
+            $qrContent = "BEGIN:VCARD\nVERSION:3.0\nN:$attendee->last_name;$attendee->first_name\nFN:$attendee->first_name $attendee->last_name\nORG:\nTITLE:\nADR:\nTEL;WORK;VOICE:$phone\nTEL;FAX:\nEMAIL;WORK;INTERNET:$attendee->email\nURL:\nNOTE:$ref\nEND:VCARD";
 
             $qr = QRCodeHelper::getQRCode($qrContent, 'png');
 
-            $path = $this->uploadBase64File(file_get_contents($qr), $attendee->ref);
+            $path = $this->uploadBase64File(file_get_contents($qr), $ref);
             $qrPath = Storage::disk(config('filesystems.default'))->url($path);
 
             Mail::to($attendee->email)
-                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $qrPath, $attendee->first_name, $attendee->ref));
+                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $qrPath, $attendee->first_name, $ref));
         }
     }
 
