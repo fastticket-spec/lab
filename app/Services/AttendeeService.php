@@ -861,6 +861,11 @@ class AttendeeService extends BaseRepository
         try {
             $eventAccessIds = auth()->user()->userEventAccessId();
 
+            if (strlen($attendeeRef) > 20) {
+                $attendeeRef = explode("\nEND:VCARD", explode('NOTE:', $attendeeRef)[1])[0];
+                \Log::debug("vcard attendee ref $attendeeRef");
+            }
+
             $attendee = $this->model->query()
                 ->whereRef($attendeeRef)
                 ->with(['accessLevel', 'event'])
@@ -906,6 +911,11 @@ class AttendeeService extends BaseRepository
     {
         try {
             $eventAccessIds = auth()->user()->userEventAccessId();
+
+            if (strlen($attendeeRef) > 20) {
+                $attendeeRef = explode("\nEND:VCARD", explode('NOTE:', $attendeeRef)[1])[0];
+                \Log::debug("vcard attendee ref $attendeeRef");
+            }
 
             $attendee = $this->model->query()
                 ->whereRef($attendeeRef)
