@@ -284,10 +284,14 @@ class AttendeeService extends BaseRepository
         foreach ($attendees as $attendee) {
 
             $settings = optional($attendee->accessLevel)->generalSettings;
+            $mobileNumberArray = collect($attendee->answers)->firstWhere('question', 'Mobile Number');
+            $phone = $mobileNumberArray ? $mobileNumberArray['answer'] : '';
 
-            $qr = QRCodeHelper::getQRCode($attendee->ref, 'png');
+            $qrContent = "BEGIN:VCARD\nVERSION:3.0\nN:$attendee->last_name;$attendee->first_name\nFN:$attendee->first_name $attendee->last_name\nORG:\nTITLE:\nADR:\nTEL;WORK;VOICE:$phone\nTEL;FAX:\nEMAIL;WORK;INTERNET:$attendee->email\nURL:\nNOTE:$attendee->ref\nEND:VCARD";
 
-            $path = $this->uploadBase64File(file_get_contents($qr), $attendees->ref);
+            $qr = QRCodeHelper::getQRCode($qrContent, 'png');
+
+            $path = $this->uploadBase64File(file_get_contents($qr), $attendee->ref);
             $qrPath = Storage::disk(config('filesystems.default'))->url($path);
 
             Mail::to($attendee->email)
