@@ -21,7 +21,7 @@ class QRCodeHelper
             [
                 'eccLevel' => QRCode::ECC_L,
                 'outputType' => $type,
-                'version' => 5
+                'version' => 20
             ]
         );
 

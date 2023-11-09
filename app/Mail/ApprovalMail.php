@@ -54,7 +54,7 @@ class ApprovalMail extends Mailable
             $attendeeRef,
             $this->content
         );
-        
+
         $this->title = $settings->approval_message_title ?? 'Approval Mail';
     }
 
