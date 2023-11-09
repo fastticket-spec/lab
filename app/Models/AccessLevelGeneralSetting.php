@@ -32,6 +32,7 @@ class AccessLevelGeneralSetting extends Model
         "end_on",
         "arabic_invitation",
         "decline_text",
-        "decline_invitation"
+        "decline_invitation",
+        "enable_vcard"
     ];
 }
