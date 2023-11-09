@@ -288,7 +288,10 @@ class AttendeeService extends BaseRepository
             $phone = $mobileNumberArray ? $mobileNumberArray['answer'] : '';
 
             $ref = $attendee->ref;
-            $qrContent = "BEGIN:VCARD\nVERSION:3.0\nN:$attendee->last_name;$attendee->first_name\nFN:$attendee->first_name $attendee->last_name\nORG:\nTITLE:\nADR:\nTEL;WORK;VOICE:$phone\nTEL;FAX:\nEMAIL;WORK;INTERNET:$attendee->email\nURL:\nNOTE:$ref\nEND:VCARD";
+            $qrContent = $ref;
+            if ($settings->enable_vcard) {
+                $qrContent = "BEGIN:VCARD\nVERSION:3.0\nN:$attendee->last_name;$attendee->first_name\nFN:$attendee->first_name $attendee->last_name\nORG:\nTITLE:\nADR:\nTEL;WORK;VOICE:$phone\nTEL;FAX:\nEMAIL;WORK;INTERNET:$attendee->email\nURL:\nNOTE:$ref\nEND:VCARD";
+            }
 
             $qr = QRCodeHelper::getQRCode($qrContent, 'png');
 
@@ -912,7 +915,7 @@ class AttendeeService extends BaseRepository
         try {
             $eventAccessIds = auth()->user()->userEventAccessId();
 
-            if (strlen($attendeeRef) > 20) {
+            if (strlen($attendeeRef) > 20 && Str::contains($attendeeRef, 'VCARD')) {
                 $attendeeRef = explode("\nEND:VCARD", explode('NOTE:', $attendeeRef)[1])[0];
                 \Log::debug("vcard attendee ref $attendeeRef");
             }

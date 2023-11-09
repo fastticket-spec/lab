@@ -16,6 +16,7 @@ const props = defineProps({
 const showArabicInputs = ref(true)
 const showArabicInvitation = ref(false)
 const declineInvitation = ref(false)
+const enableVCard = ref(false)
 
 const initialValues = props.data
     ? {
@@ -42,6 +43,7 @@ const {handleSubmit, isSubmitting} = useForm({
 onMounted(() => {
     showArabicInvitation.value = !!props.data?.arabic_invitation
     declineInvitation.value = !!props.data?.decline_invitation
+    enableVCard.value = !!props.data?.enable_vcard
 })
 
 
@@ -57,7 +59,7 @@ const {value: invitation_message_sms} = useField("invitation_message_sms");
 const {value: decline_text} = useField("decline_text");
 
 const onSubmit = handleSubmit(values => {
-    router.post(`/event/${props.eventId}/access-levels/${props.accessLevel.id}/customize/general`, {...values, arabic_invitation: showArabicInvitation.value, decline_invitation: declineInvitation.value});
+    router.post(`/event/${props.eventId}/access-levels/${props.accessLevel.id}/customize/general`, {...values, arabic_invitation: showArabicInvitation.value, decline_invitation: declineInvitation.value, enable_vcard: enableVCard.value});
 })
 </script>
 
@@ -306,6 +308,15 @@ const onSubmit = handleSubmit(values => {
                                     </div>
                                 </b-col>
                             </b-row>
+
+                          <b-row class="mt-3">
+                            <b-col>
+                              <b-checkbox v-model="enableVCard" class="custom-checkbox-color"
+                                          name="check-button-vcard" inline>
+                                Enable VCard
+                              </b-checkbox>
+                            </b-col>
+                          </b-row>
 
                             <hr>
 
