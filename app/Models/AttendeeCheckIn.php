@@ -11,11 +11,16 @@ class AttendeeCheckIn extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'attendee_id', 'checkin'
+        'attendee_id', 'checkin', 'checkin_user_id'
     ];
 
     public function attendee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Attendee::class);
+    }
+
+    public function checkinUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'checkin_user_id');
     }
 }

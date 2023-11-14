@@ -1148,11 +1148,16 @@ class AttendeeService extends BaseRepository
             ->get()
             ->groupBy('attendee_id')
             ->values()
-            ->map(fn ($checkin) => [
-                'first_name' => $checkin[0]->attendee->first_name,
-                'last_name' => $checkin[0]->attendee->last_name,
-                'checkin_time' => $checkin[0]->created_at->format('d-M-Y H:i'),
-            ]);
+            ->map(function ($checkin) {
+                $checkinUser = $checkin[0]->checkinUser;
+
+                return [
+                    'first_name' => $checkin[0]->attendee->first_name,
+                    'last_name' => $checkin[0]->attendee->last_name,
+                    'checkin_time' => $checkin[0]->created_at->format('d-M-Y H:i'),
+                    'checkin_user' => optional($checkinUser)->first_name . ' ' . optional($checkinUser)->last_name
+                ];
+            });
 
         return new ExportCheckins($checkins);
     }

@@ -70,6 +70,6 @@ class Attendee extends Model
 
     public function checkinAttendee(): void
     {
-        $this->attendeeCheckins()->create(['checkin' => now()]);
+        $this->attendeeCheckins()->create(['checkin' => now(), 'checkin_user_id' => auth()->id()]);
     }
 }
