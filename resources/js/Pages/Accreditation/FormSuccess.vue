@@ -61,6 +61,9 @@ export default {
                         v-html="lang === 'arabic' ? accessLevel?.general_settings?.success_message_arabic : accessLevel?.general_settings?.success_message"
                         class="text-center p-5"/>
                 </div>
+                <div class="text-center">
+                    <a class="btn btn-primary" onclick="history.back()"> Add Another</a>
+                </div>
             </div>
         </div>
     </b-container>
