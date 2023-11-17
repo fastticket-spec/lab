@@ -49,10 +49,10 @@ trait HasFile
         return $relativePath;
     }
 
-    protected function uploadBase64File($file): ?string
+    protected function uploadBase64File($file, $name): ?string
     {
         $filesystem = config('filesystems.default');
-        $filename = strtotime(now()) . '.' . 'png';
+        $filename = $name . '-' . strtotime(now()) . '.' . 'png';
         $relativePath = $this->images_path . $filename;
 
         Storage::disk($filesystem)->put($relativePath, $file, 'public');

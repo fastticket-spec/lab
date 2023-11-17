@@ -284,14 +284,22 @@ class AttendeeService extends BaseRepository
         foreach ($attendees as $attendee) {
 
             $settings = optional($attendee->accessLevel)->generalSettings;
+            $mobileNumberArray = collect($attendee->answers)->firstWhere('question', 'Mobile Number');
+            $phone = $mobileNumberArray ? $mobileNumberArray['answer'] : '';
 
-            $qr = QRCodeHelper::getQRCode($attendee->ref, 'png');
+            $ref = $attendee->ref;
+            $qrContent = $ref;
+            if ($settings->enable_vcard) {
+                $qrContent = "BEGIN:VCARD\nVERSION:3.0\nN:$attendee->last_name;$attendee->first_name\nFN:$attendee->first_name $attendee->last_name\nORG:\nTITLE:\nADR:\nTEL;WORK;VOICE:$phone\nTEL;FAX:\nEMAIL;WORK;INTERNET:$attendee->email\nURL:\nNOTE:$ref\nEND:VCARD";
+            }
 
-            $path = $this->uploadBase64File(file_get_contents($qr));
+            $qr = QRCodeHelper::getQRCode($qrContent, 'png');
+
+            $path = $this->uploadBase64File(file_get_contents($qr), $ref);
             $qrPath = Storage::disk(config('filesystems.default'))->url($path);
 
             Mail::to($attendee->email)
-                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $qrPath, $attendee->first_name, $attendee->ref));
+                ->later(now()->addSeconds(5), new ApprovalMail($settings, $attendee->event->organiser, $qrPath, $attendee->first_name, $ref));
         }
     }
 
@@ -529,7 +537,7 @@ class AttendeeService extends BaseRepository
         }
     }
 
-    public function downloadAttendeeBadge(Request $request, string $attendeeId, string $badgeId, ?string $eventId = null)
+    public function downloadAttendeeBadge($type, string $attendeeId, string $badgeId, ?string $eventId = null)
     {
         $attendee = $this->find($attendeeId);
         $event = $attendee->event;
@@ -702,7 +710,7 @@ class AttendeeService extends BaseRepository
 
         $html_data = $doc->saveHTML();
 
-        $data = ['html_data' => $html_data, 'badge' => $badge, 'type' => $request->type, 'downloads' => $attendee->downloads, 'downloaded' => $attendee->printed, 'collected' => $attendee->collected];
+        $data = ['html_data' => $html_data, 'badge' => $badge, 'type' => $type, 'downloads' => $attendee->downloads, 'downloaded' => $attendee->printed, 'collected' => $attendee->collected];
 
         return response()->json($data);
 
@@ -856,6 +864,11 @@ class AttendeeService extends BaseRepository
         try {
             $eventAccessIds = auth()->user()->userEventAccessId();
 
+            if (strlen($attendeeRef) > 20) {
+                $attendeeRef = explode("\nEND:VCARD", explode('NOTE:', $attendeeRef)[1])[0];
+                \Log::debug("vcard attendee ref $attendeeRef");
+            }
+
             $attendee = $this->model->query()
                 ->whereRef($attendeeRef)
                 ->with(['accessLevel', 'event'])
@@ -902,6 +915,11 @@ class AttendeeService extends BaseRepository
         try {
             $eventAccessIds = auth()->user()->userEventAccessId();
 
+            if (strlen($attendeeRef) > 20 && Str::contains($attendeeRef, 'VCARD')) {
+                $attendeeRef = explode("\nEND:VCARD", explode('NOTE:', $attendeeRef)[1])[0];
+                \Log::debug("vcard attendee ref $attendeeRef");
+            }
+
             $attendee = $this->model->query()
                 ->whereRef($attendeeRef)
                 ->with(['accessLevel', 'event'])
@@ -935,6 +953,45 @@ class AttendeeService extends BaseRepository
                     statusCode: 400,
                     flashMessage: 'Reference not found',
                     component: '/dashboard',
+                    returnType: 'redirect'
+                );
+            }
+            throw $th;
+        }
+    }
+
+    public function checkinAttendeeById(string $attendeeId, int $page, ?string $eventId = null)
+    {
+        $page = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
+        try {
+            $attendee = $this->model->query()
+                ->findOrFail($attendeeId);
+
+            if ($attendee->attendeeCheckins()->exists()) {
+                return $this->view(
+                    data: ['message' => 'Attendee already checked in.'],
+                    statusCode: 400,
+                    flashMessage: 'Attendee already checked in.',
+                    component: $page,
+                    returnType: 'redirect'
+                );
+            }
+
+            $attendee->checkinAttendee();
+
+            return $this->view(
+                data: ['message' => 'Checked in successfully', 'attendee' => $attendee->answers],
+                flashMessage: 'Checked in successfully',
+                component: $page,
+                returnType: 'redirect'
+            );
+        } catch (\Throwable $th) {
+            if ($th instanceof ModelNotFoundException) {
+                return $this->view(
+                    data: ['message' => 'Attendee not found'],
+                    statusCode: 400,
+                    flashMessage: 'Reference not found',
+                    component: $page,
                     returnType: 'redirect'
                 );
             }
@@ -1091,11 +1148,16 @@ class AttendeeService extends BaseRepository
             ->get()
             ->groupBy('attendee_id')
             ->values()
-            ->map(fn ($checkin) => [
-                'first_name' => $checkin[0]->attendee->first_name,
-                'last_name' => $checkin[0]->attendee->last_name,
-                'checkin_time' => $checkin[0]->created_at->format('d-M-Y H:i'),
-            ]);
+            ->map(function ($checkin) {
+                $checkinUser = $checkin[0]->checkinUser;
+
+                return [
+                    'first_name' => $checkin[0]->attendee->first_name,
+                    'last_name' => $checkin[0]->attendee->last_name,
+                    'checkin_time' => $checkin[0]->created_at->format('d-M-Y H:i'),
+                    'checkin_user' => optional($checkinUser)->first_name . ' ' . optional($checkinUser)->last_name
+                ];
+            });
 
         return new ExportCheckins($checkins);
     }

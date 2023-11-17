@@ -20,7 +20,8 @@ class ExportCheckins implements FromCollection, WithHeadings, WithStyles, WithCh
         return [
             "FIRST NAME",
             "LAST NAME",
-            "CHECKIN TIME"
+            "CHECKIN TIME",
+            "CHECKIN USER"
         ];
 
     }
