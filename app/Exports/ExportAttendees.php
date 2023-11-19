@@ -32,6 +32,7 @@ class ExportAttendees implements FromCollection, WithHeadings, WithStyles, WithC
             "DATE CREATED",
             "PRINTED",
             "COLLECTED",
+            "ZONES",
             ...$this->questions
         ];
 

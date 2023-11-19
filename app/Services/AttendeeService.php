@@ -1092,7 +1092,7 @@ class AttendeeService extends BaseRepository
                 ->map(fn ($survey) => $survey->title);
 
             $attendees = $this->model->query()
-                ->with('event')
+                ->with(['event', 'zones.zone'])
                 ->when($active_organiser, function ($query) use ($active_organiser) {
                     $query->whereOrganiserId($active_organiser);
                 })
@@ -1110,6 +1110,8 @@ class AttendeeService extends BaseRepository
                         }
                     }
 
+                    $attendeeZones = $attendee->zones->map(fn ($zone) => $zone->zone->zone)->toArray();
+
                     return [
                         'event_title' => $attendee->event->title,
                         'first_name' => $attendee->first_name,
@@ -1120,6 +1122,7 @@ class AttendeeService extends BaseRepository
                         'date_created' => $attendee->created_at->format('Y/M/d h:i A'),
                         'printed' => $attendee->printed ? 'printed' : 'not printed',
                         'collected' => $attendee->collected ? 'collected' : 'not collected',
+                        'zones' => join(', ', $attendeeZones),
                         ...$answers
                     ];
                 });
