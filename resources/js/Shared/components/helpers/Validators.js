@@ -139,6 +139,34 @@ export const accreditationFormSchema = lang => yup.object({
                     },
                     then: () => yup.string().required(lang === 'english' ? 'This field is required1' : 'هذه الخانة مطلوبه')
                 })
+                .when(['type', 'input_type', 'input_length', 'required'], ([type, input_type, input_length, required], schema) => {
+                    if (['1', '2', '12'].includes(type) && input_type && input_length) {
+                        const inputLengthArray = input_length.split('-');
+
+                        let schemaBuilder;
+                        if (!required) {
+                            schemaBuilder = schema.nullable();
+                        } else {
+                            schemaBuilder = schema.required(lang === 'english' ? 'This field is required1' : 'هذه الخانة مطلوبه');
+                        }
+                        if (inputLengthArray.length === 2) {
+                            schemaBuilder = schemaBuilder
+                                .min(inputLengthArray[0], `Must be at least ${inputLengthArray[0]} characters`).max(inputLengthArray[1], `Must be at most ${inputLengthArray[1]} characters`);
+                        } else {
+                            schemaBuilder = schemaBuilder
+                                .min(input_length, `Must be exactly ${input_length} digits`)
+                                .max(input_length, `Must be exactly ${input_length} digits`)
+                        }
+
+                        if (input_type === 'number') {
+                            schemaBuilder = schemaBuilder.matches(/^[0-9]+$/, lang === 'english' ? 'Must only be numbers' : 'يجب أن تكون أرقامًا فقط');
+                        }
+
+
+                        return schemaBuilder;
+
+                    }
+                })
                 .when('type', {
                     is: '5',
                     then: () => yup.string().matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, {message: lang === 'english' ? 'Please supply a valid email address.' : 'يرجى تقديم عنوان بريد إلكتروني صالح'}).required(lang === 'english' ? 'This field is required2' : 'هذه الخانة مطلوبه')

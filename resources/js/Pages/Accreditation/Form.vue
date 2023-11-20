@@ -45,6 +45,13 @@ onMounted(() => {
     })
 });
 
+const defaultAnswer = (type, inputType) => {
+  if (type === '8' || type === '7') return [];
+  if (['1', '2', '10'].includes(type) && inputType === 'number') return null;
+  return '';
+}
+
+
 const {handleSubmit, isSubmitting} = useForm({
     initialValues: (props.reference && props.answers)
         ? {
@@ -53,7 +60,7 @@ const {handleSubmit, isSubmitting} = useForm({
 
                 return {
                     type: x.type,
-                    answer: answer || (x.type === '8' ? [] : ((x.type === '7') ? [] : '')),
+                    answer: answer || defaultAnswer(x.type, x.input_type),
                     title: x.title,
                     title_arabic: x.title_arabic,
                     id: x.id,
@@ -64,14 +71,16 @@ const {handleSubmit, isSubmitting} = useForm({
                     options: x.options,
                     required: x.parent_index ? 0 : x.required,
                     disabled: x.title === 'Email Address' && props.email,
-                    country_code: x.country_code ?  x.country_code  : '+966'
+                    country_code: x.country_code ?  x.country_code  : '+966',
+                    input_type: x.input_type,
+                    input_length: x.input_length
                 }
             })
         }
         : {
             surveys: props.surveys.filter(x => !x.private).map(x => ({
                 type: x.type,
-                answer: x.title === 'Email Address' ? props.email : (x.type === '8' ? [] : ((x.type === '7') ? [] : '')),
+                answer: x.title === 'Email Address' ? props.email : defaultAnswer(x.type, x.input_type),
                 title: x.title,
                 title_arabic: x.title_arabic,
                 id: x.id,
@@ -82,7 +91,9 @@ const {handleSubmit, isSubmitting} = useForm({
                 options: x.options,
                 required: x.parent_index ? 0 : x.required,
                 disabled: x.title === 'Email Address' && props.email,
-                country_code: x.country_code ?  x.country_code  : '+966'
+                country_code: x.country_code ?  x.country_code  : '+966',
+                input_type: x.input_type,
+                input_length: x.input_length
             }))
         },
     validationSchema: accreditationFormSchema(props.lang),

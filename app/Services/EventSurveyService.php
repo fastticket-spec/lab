@@ -59,6 +59,11 @@ class EventSurveyService extends BaseRepository
                 'type' => $survey['type'],
                 'options' => $survey['options'],
                 'required' => $survey['required'],
+                'private' => $survey['private'] ?? false,
+                'parent_index' => $survey['parent_index'] ?? null,
+                'parent_answer' => $survey['parent_answer'] ?? null,
+                'input_type' => $survey['input_type'] ?? null,
+                'input_length' => $survey['input_length'] ?? null
             ]);
         }
         DB::commit();
@@ -97,7 +102,9 @@ class EventSurveyService extends BaseRepository
                 'required' => $survey['required'] ?? false,
                 'private' => $survey['private'] ?? false,
                 'parent_index' => $survey['parent_index'] ?? null,
-                'parent_answer' => $survey['parent_answer'] ?? null
+                'parent_answer' => $survey['parent_answer'] ?? null,
+                'input_type' => $survey['input_type'] ?? null,
+                'input_length' => $survey['input_length'] ?? null
             ]);
         }
         DB::commit();

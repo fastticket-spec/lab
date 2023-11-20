@@ -43,6 +43,9 @@ const initialValues = props.event_survey ? {
             ...x,
             required: !!x.required,
             private: !!x.private,
+            hasValidation: !!x.input_type,
+            input_type: x.input_type,
+            input_length: x.input_length,
             options: (x.options).length > 0
                 ? x.options
                 : [{name: '', name_arabic: ''}],
@@ -55,6 +58,9 @@ const initialValues = props.event_survey ? {
                 type: textField.value,
                 required: true,
                 private: false,
+                hasValidation: false,
+                input_type: '',
+                input_length: '',
                 options: [
                     {name: '', name_arabic: ''}
                 ],
@@ -66,6 +72,9 @@ const initialValues = props.event_survey ? {
                 type: textField.value,
                 required: true,
                 private: false,
+                hasValidation: false,
+                input_type: '',
+                input_length: '',
                 options: [
                     {name: '', name_arabic: ''}
                 ],
@@ -77,6 +86,9 @@ const initialValues = props.event_survey ? {
                 type: emailField.value,
                 required: true,
                 private: false,
+                hasValidation: false,
+                input_type: '',
+                input_length: '',
                 options: [
                     {name: '', name_arabic: ''}
                 ],
@@ -91,6 +103,9 @@ const initialValues = props.event_survey ? {
             type: textField.value,
             required: true,
             private: false,
+            hasValidation: false,
+            input_type: '',
+            input_length: '',
             options: [
                 {name: '', name_arabic: ''}
             ],
@@ -102,6 +117,9 @@ const initialValues = props.event_survey ? {
             type: textField.value,
             required: true,
             private: false,
+            hasValidation: false,
+            input_type: '',
+            input_length: '',
             options: [
                 {name: '', name_arabic: ''}
             ],
@@ -113,6 +131,9 @@ const initialValues = props.event_survey ? {
             type: emailField.value,
             required: true,
             private: false,
+            hasValidation: false,
+            input_type: '',
+            input_length: '',
             options: [
                 {name: '', name_arabic: ''}
             ],
@@ -202,6 +223,12 @@ const onSubmit = handleSubmit((values) => {
     }
 
 })
+
+const canValidateInput = computed(() => fieldValue => {
+  if (!fieldValue) return false;
+  if (['Email Address', 'First Name', 'Last Name'].includes(fieldValue.title)) return false;
+  return ['1', '2', '12'].includes(fieldValue.type);
+})
 </script>
 
 <template>
@@ -267,7 +294,7 @@ const onSubmit = handleSubmit((values) => {
                                         </div>
                                     </b-col>
 
-                                    <b-col v-show="field?.value?.open" sm="3">
+                                    <b-col v-show="field?.value?.open" sm="2">
                                         <Field
                                             v-slot="{ field }"
                                             :name="`surveys[${idx}].required`"
@@ -283,7 +310,7 @@ const onSubmit = handleSubmit((values) => {
                                         </Field>
                                     </b-col>
 
-                                    <b-col v-show="field?.value?.open" sm="3">
+                                    <b-col v-show="field?.value?.open" sm="2">
                                         <Field
                                             v-slot="{ field }"
                                             :name="`surveys[${idx}].private`"
@@ -297,6 +324,54 @@ const onSubmit = handleSubmit((values) => {
                                                 Private
                                             </label>
                                         </Field>
+                                    </b-col>
+
+                                    <b-col v-show="field?.value?.open && canValidateInput(field?.value)" sm="2">
+                                      <Field
+                                          v-slot="{ field }"
+                                          :name="`surveys[${idx}].hasValidation`"
+                                          type="checkbox"
+                                          :value="true"
+                                      >
+                                        <label class="mt-3">
+                                          <input type="checkbox" :name="`surveys[${idx}].hasValidation`"
+                                                 v-bind="field"
+                                                 :value="true"/>
+                                          Validate Input?
+                                        </label>
+                                      </Field>
+                                    </b-col>
+
+                                    <b-col v-show="field?.value?.open && field?.value?.hasValidation && canValidateInput(field?.value)" sm="6">
+                                      <div class="form-group mb-0">
+                                        <label :for="`input_type-${idx}`">Input Type</label>
+                                        <Field as="select"
+                                               :name="`surveys[${idx}].input_type`"
+                                               :id="`input_type-${idx}`"
+                                               :class="`input-type form-control mb-0`"
+                                               :validateOnInput="true">
+                                          <option value="">Select Input Type</option>
+                                          <option value="number">Number</option>
+                                          <option value="text">Text</option>
+                                        </Field>
+                                        <ErrorMessage :name="`surveys[${idx}].input_type`"
+                                                      class="text-danger"/>
+                                      </div>
+                                    </b-col>
+
+                                    <b-col v-show="field?.value?.open && field?.value?.hasValidation && canValidateInput(field?.value)" sm="6">
+                                      <div class="form-group mb-0">
+                                        <label :for="`input_type-${idx}`">Input Length <small>For only 5 characters, type 5. For 5 to 10 characters, type 5-10.</small></label>
+                                        <Field
+                                            :name="`surveys[${idx}].input_length`"
+                                            :id="`input_length-${idx}`"
+                                            :class="`input-length form-control mb-0`"
+                                            placeholder="Leave empty for unlimited"
+                                            :validateOnInput="true">
+                                        </Field>
+                                        <ErrorMessage :name="`surveys[${idx}].input_length`"
+                                                      class="text-danger"/>
+                                      </div>
                                     </b-col>
 
                                     <b-col v-show="field?.value?.open" sm="12">
@@ -379,7 +454,7 @@ const onSubmit = handleSubmit((values) => {
                                            class="my-3 d-flex justify-content-between">
                                         <div>
                                             <b-btn variant="primary" class="mr-2"
-                                                   @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, private: false, options: [{name: '', name_arabic: ''}], open: true})">
+                                                   @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, private: false, hasValidation: false, input_type: '', input_length: '', options: [{name: '', name_arabic: ''}], open: true})">
                                                 <i class="ri-add-line"/> Add Field
                                             </b-btn>
                                             <b-btn variant="danger"
@@ -410,7 +485,7 @@ const onSubmit = handleSubmit((values) => {
                                         <span>{{ field_types[surveys[idx].type].name }}</span>
                                         <div>
                                             <b-btn variant="primary" class="mr-2"
-                                                   @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, private: false, options: [{name: '', name_arabic: ''}], open: true})">
+                                                   @click="insert(idx + 1, {title: '', title_arabic: '', type: '1', required: false, private: false, hasValidation: false, input_type: '', input_length: '', options: [{name: '', name_arabic: ''}], open: true})">
                                                 <i class="ri-add-line p-0"/>
                                             </b-btn>
                                             <b-btn
