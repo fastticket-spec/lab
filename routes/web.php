@@ -122,6 +122,7 @@ Route::group(['middleware' => 'auth'], function () {
                         Route::post('/customize/logo', [AccessLevelsController::class, 'logo']);
                         Route::post('/customize/request-form', [AccessLevelsController::class, 'requestForm']);
                         Route::post('/customize/socials', [AccessLevelsController::class, 'socials']);
+                        Route::post('/generate-private-link', [AccessLevelsController::class, 'generatePrivateLink']);
                     });
                 });
 

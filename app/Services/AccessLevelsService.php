@@ -491,4 +491,17 @@ class AccessLevelsService extends BaseRepository
                 ];
             });
     }
+
+    public function generatePrivateLink(string $eventId, string $accessLevelId)
+    {
+        $ref = Str::random('8');
+
+        $inviteId = Invite::create(['ref' => $ref, 'event_id' => $eventId, 'access_level_id' => $accessLevelId])->id;
+
+        $surveyLink = config('app.url') . '/a/' . $accessLevelId;
+
+        $privateLink = "$surveyLink?ref=$inviteId";
+
+        return $this->view(['link' => $privateLink, 'message' => 'Link generated.']);
+    }
 }

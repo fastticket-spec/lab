@@ -110,6 +110,33 @@ const viewEmails = async (page = 1) => {
         console.log(e);
     }
 }
+
+const showLinkModal = ref(false);
+const loadingLink = ref(false);
+const privateLink = ref('');
+const linkCopied = ref(false);
+const onGeneratePrivateLink = async (eventId, accessLevelId) => {
+  if (loadingLink.value) return;
+  try {
+    loadingLink.value = true;
+    const {data: {link}} = await axios.post(`/event/${eventId}/access-levels/${accessLevelId}/generate-private-link`);
+    loadingLink.value = false;
+    privateLink.value = link;
+    showLinkModal.value = true;
+  } catch (e) {
+    console.log(e);
+    loadingLink.value = false;
+  }
+}
+const copyText = async text => {
+  try {
+    await navigator.clipboard.writeText(text);
+    linkCopied.value = true;
+    setTimeout(() => {linkCopied.value = false}, 3000)
+  } catch (e) {
+    console.log(e);
+  }
+}
 </script>
 
 <template>
@@ -161,10 +188,16 @@ const viewEmails = async (page = 1) => {
                         </div>
                     </b-card-text>
 
-                    <div v-if="access_level.has_surveys" class="card-date d-flex flex-column text-center"
-                         :class="{'card-date-ar': locale === 'ar'}">
+                    <template v-if="access_level.has_surveys">
+                      <div class="card-date d-flex flex-column text-center"
+                           :class="{'card-date-ar': locale === 'ar'}">
                         <a :href="`/e/${event_id}/a/${access_level.id}`" target="_blank">View Form</a>
-                    </div>
+                      </div>
+                      <div class="card-date card-date-2 d-flex flex-column text-center"
+                           :class="{'card-date-ar': locale === 'ar'}">
+                        <a href="#" @click.prevent="onGeneratePrivateLink(event_id, access_level.id)">Get Private Link</a>
+                      </div>
+                    </template>
 
                     <div class="d-flex justify-content-around">
                         <template v-if="(userRole !== 'Operations' && userRole !== 'Viewers')">
@@ -346,6 +379,18 @@ const viewEmails = async (page = 1) => {
             <template #modal-footer>
             </template>
         </b-modal>
+
+        <b-modal v-model="showLinkModal" size="lg" id="link-modal" title="Private Link">
+          <b-row class="mt-3">
+            <b-col sm="12">
+              <h6 class="mb-2">Click the link to copy</h6>
+              <h6 class="cursor-pointer mb-2" @click="copyText(privateLink)">{{privateLink}}</h6>
+              <span v-if="linkCopied" class="text-primary">Link copied</span>
+            </b-col>
+          </b-row>
+          <template #modal-footer>
+          </template>
+        </b-modal>
     </b-container>
 </template>
 
@@ -371,6 +416,10 @@ const viewEmails = async (page = 1) => {
 .card-date-ar {
     left: 0;
     right: unset;
+}
+
+.card-date-2 {
+  right: 105px;
 }
 
 .vs__dropdown-toggle {

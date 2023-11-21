@@ -174,6 +174,11 @@ class AccessLevelsController extends Controller
         return $this->accessLevelsService->getFormEmails($eventId, $accessLevelId);
     }
 
+    public function generatePrivateLink(string $eventId, string $accessLevelId)
+    {
+        return $this->accessLevelsService->generatePrivateLink($eventId, $accessLevelId);
+    }
+
     public function declineInvite(string $invitationId): \Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
     {
         try {
