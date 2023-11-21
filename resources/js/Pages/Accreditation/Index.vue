@@ -168,6 +168,10 @@ label {
                                 {{ lang === 'english' ? accessLevel?.page_design?.register_btn_value : accessLevel?.page_design?.register_btn_value_ar  }}
                             </b-btn>
                         </div>
+
+                        <div v-if="accessLevel?.page_design?.footer_logo" class="text-center">
+                            <img :src="accessLevel?.page_design?.footer_logo" alt="" class="img-fluid" :style="`height: ${accessLevel?.page_design?.footer_logo_height}px; margin-bottom: 15px; text-align: center`">
+                        </div>
                     </template>
 
                     <div class="lang-container">

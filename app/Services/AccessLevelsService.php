@@ -306,6 +306,45 @@ class AccessLevelsService extends BaseRepository
         }
     }
 
+    public function uploadFooterLogo(Request $request, string $eventId, string $accessLevelId)
+    {
+        try {
+            $event = $this->eventService->find($eventId);
+
+            $img = $request->file('logo');
+
+            $path = $this->uploadFile($img, 'event-', '-footer-logo-', 1400);
+
+            if (!$path) {
+                return false;
+            }
+
+            $accessLevel = $this->find($accessLevelId);
+            $accessLevel->pageDesign()->updateOrCreate(['access_level_id' => $accessLevelId], ['footer_logo' => Storage::disk(config('filesystems.default'))->url($path)]);
+
+            $message = 'Footer Logo uploaded successfully';
+            $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design&logouploaded=true";
+
+            return $this->view(
+                data: [
+                    'message' => $message,
+                    'data' => $event
+                ],
+                flashMessage: $message,
+                component: $route,
+                returnType: 'redirect'
+            );
+        } catch (\Throwable $th) {
+            $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=design";
+
+            \Log::error($th);
+
+            $message = 'An error occurred while uploading logo!';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
+        }
+    }
+
     public function updateRequestForm(Request $request, string $eventId, string $accessLevelId)
     {
         $route = "/event/$eventId/access-levels/$accessLevelId/customize?page=request_form";

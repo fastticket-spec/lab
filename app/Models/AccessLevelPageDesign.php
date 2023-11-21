@@ -24,6 +24,8 @@ class AccessLevelPageDesign extends Model
         'logo',
         'form_bg_color',
         'field_color',
-        'font_color'
+        'font_color',
+        'footer_logo',
+        'footer_logo_height'
     ];
 }

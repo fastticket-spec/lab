@@ -16,6 +16,10 @@
                     {{ data.register.english }}
                 </b-btn>
             </div>
+
+            <div v-if="data.footer_logo" class="text-center">
+                <img :src="data.footer_logo" alt="" class="img-fluid" :style="`height: ${data.footer_logo_height}px; margin-bottom: 15px; text-align: center`">
+            </div>
         </div>
     </div>
 </template>

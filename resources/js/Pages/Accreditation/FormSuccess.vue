@@ -60,6 +60,10 @@ export default {
                     <p :style="{ color: accessLevel?.page_design?.font_color}"
                         v-html="lang === 'arabic' ? accessLevel?.general_settings?.success_message_arabic : accessLevel?.general_settings?.success_message"
                         class="text-center p-5"/>
+
+                    <div v-if="accessLevel?.page_design?.footer_logo" class="text-center">
+                        <img :src="accessLevel?.page_design?.footer_logo" alt="" class="img-fluid" :style="`height: ${accessLevel?.page_design?.footer_logo_height}px; margin-bottom: 15px; text-align: center`">
+                    </div>
                 </div>
                 <div class="text-center">
                     <a class="btn btn-primary" onclick="history.back()"> Add Another</a>

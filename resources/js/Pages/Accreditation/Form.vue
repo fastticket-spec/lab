@@ -552,6 +552,10 @@ select option {
                                 </b-btn>
                             </div>
                         </form>
+
+                        <div v-if="accessLevel?.page_design?.footer_logo" class="text-center">
+                            <img :src="accessLevel?.page_design?.footer_logo" alt="" class="img-fluid" :style="`height: ${accessLevel?.page_design?.footer_logo_height}px; margin-bottom: 15px; text-align: center`">
+                        </div>
                     </template>
                 </div>
             </div>

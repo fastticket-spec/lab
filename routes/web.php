@@ -120,6 +120,7 @@ Route::group(['middleware' => 'auth'], function () {
                         Route::post('/customize/page-design', [AccessLevelsController::class, 'customizePageDesign']);
                         Route::post('/customize/design-images', [AccessLevelsController::class, 'designImages']);
                         Route::post('/customize/logo', [AccessLevelsController::class, 'logo']);
+                        Route::post('/customize/footer-logo', [AccessLevelsController::class, 'footerLogo']);
                         Route::post('/customize/request-form', [AccessLevelsController::class, 'requestForm']);
                         Route::post('/customize/socials', [AccessLevelsController::class, 'socials']);
                         Route::post('/generate-private-link', [AccessLevelsController::class, 'generatePrivateLink']);

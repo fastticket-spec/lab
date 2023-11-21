@@ -84,6 +84,8 @@ const state = reactive({
     },
     field_color: props.data?.field_color || '#000000',
     font_color: props.data?.font_color || '#000000',
+    footer_logo: props.data?.footer_logo || '',
+    footer_logo_height: props.data?.footer_logo_height || 100,
     backgroundImages: [
         {
             full: 'https://img.freepik.com/free-photo/moon-light-shine-through-window-into-islamic-mosque-interior_1217-2597.jpg?w=2000&t=st=1680706788~exp=1680707388~hmac=003db5592c0f6bd411f53337537d46d0d967930748990ce50c0e8f1407c4f068',
@@ -136,6 +138,15 @@ const uploadLogo = async ({target: {files}}) => {
     })
 }
 
+const uploadFooterLogo = async ({target: {files}}) => {
+    await router.post(`/event/${props.event.id}/access-levels/${props.accessLevel.id}/customize/footer-logo`, {
+        logo: files[0]
+    }, {
+        preserveScroll: true,
+        preserveState: true
+    })
+}
+
 const onSubmit = () => {
     const data = {
         btn_color_code: state.btn.color,
@@ -149,7 +160,8 @@ const onSubmit = () => {
         form_btn_value: state.formButton.english,
         form_btn_value_ar: state.formButton.arabic,
         font_color: state.font_color,
-        field_color: state.field_color
+        field_color: state.field_color,
+        footer_logo_height: state.footer_logo_height
     }
 
     router.post(`/event/${props.event.id}/access-levels/${props.accessLevel.id}/customize/page-design`, data);
@@ -206,7 +218,7 @@ const onSubmit = () => {
                                                         format="hex8"
                                                         picker-type="chrome"
                                                     />
-                                                   
+
                                                 </b-form-group>
 
                                                 <b-form-group label="Font Color" label-for="font-color">
@@ -217,7 +229,7 @@ const onSubmit = () => {
                                                         format="hex8"
                                                         picker-type="chrome"
                                                     />
-                                                    
+
                                                 </b-form-group>
                                             </b-card-body>
                                         </b-collapse>
@@ -344,6 +356,27 @@ const onSubmit = () => {
                                                     <b-form-file type="file" size="sm" id="upload-logo"
                                                                  accept="image/*" multiple @change="uploadLogo"/>
                                                 </b-form-group>
+                                            </b-card-body>
+                                        </b-collapse>
+                                    </b-card>
+
+                                    <b-card no-body class="mb-3">
+                                        <b-card-header header-tag="header" class="p-1" role="tab"
+                                                       header-bg-variant="primary">
+                                            <div v-b-toggle.footer-logo class="py-1 px-2">Footer Logo</div>
+                                        </b-card-header>
+                                        <b-collapse id="footer-logo" visible accordion="my-accordion"
+                                                    role="tabpanel">
+                                            <b-card-body>
+                                                <div v-if="state.footer_logo">
+                                                    <img :src="state.footer_logo" alt="" class="img-fluid" style="height: 100px">
+                                                </div>
+                                                <b-form-group :label="`${state.footer_logo ? 'Change' : 'Upload'} Footer Logo`" label-for="upload-footer-logo">
+                                                    <b-form-file type="file" size="sm" id="upload-footer-logo"
+                                                                 accept="image/*" multiple @change="uploadFooterLogo"/>
+                                                </b-form-group>
+                                                <label for="">Logo Height (px)</label>
+                                                <input type="number" class="form-control" placeholder="Logo Height (px)" v-model="state.footer_logo_height">
                                             </b-card-body>
                                         </b-collapse>
                                     </b-card>

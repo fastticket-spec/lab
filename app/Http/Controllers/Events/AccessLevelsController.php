@@ -137,6 +137,15 @@ class AccessLevelsController extends Controller
         return $this->accessLevelsService->uploadLogo($request, $eventId, $accessLevelId);
     }
 
+    public function footerLogo(Request $request, string $eventId, string $accessLevelId)
+    {
+        $request->validate([
+            'logo' => 'required|mimes:jpeg,jpg,png|max:4000',
+        ]);
+
+        return $this->accessLevelsService->uploadFooterLogo($request, $eventId, $accessLevelId);
+    }
+
     public function requestForm(Request $request, string $eventId, string $accessLevelId)
     {
         return $this->accessLevelsService->updateRequestForm($request, $eventId, $accessLevelId);
