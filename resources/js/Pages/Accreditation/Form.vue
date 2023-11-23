@@ -247,8 +247,8 @@ select option {
             <div class="col-12 align-self-center">
                 <div class="bg-div" :style="{backgroundColor: accessLevel?.page_design?.form_bg_color}">
                     <div class="text-center p-5" v-if="!status">
-                        <h3 class="p-5" v-if="lang === 'english'">Link is not active/Quantity Exceeded.</h3>
-                        <h3 class="p-5" v-else>الحدث غير نشط. يرجى الاتصال بالمسؤول</h3>
+                        <h3 style="color: white" class="p-5" v-if="lang === 'english'">Link is not active/Quantity Exceeded.</h3>
+                        <h3 style="color: white" class="p-5" v-else>الحدث غير نشط. يرجى الاتصال بالمسؤول</h3>
                     </div>
 
                     <template v-else>
