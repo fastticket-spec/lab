@@ -65,9 +65,9 @@ export default {
                         <img :src="accessLevel?.page_design?.footer_logo" alt="" class="img-fluid" :style="`height: ${accessLevel?.page_design?.footer_logo_height}px; margin-bottom: 15px; text-align: center`">
                     </div>
                 </div>
-                <div class="text-center">
+                <!-- <div class="text-center">
                     <a class="btn btn-primary" onclick="history.back()"> Add Another</a>
-                </div>
+                </div> -->
             </div>
         </div>
     </b-container>
