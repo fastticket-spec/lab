@@ -65,11 +65,13 @@ class AccreditationController extends Controller
         $email = null;
         $reference = '';
 
+        $attendee = null;
         if (strlen($request->ref) == 36) {
             $invite = Invite::find($request->ref);
             if ($invite) {
                 $reference = $invite->ref;
                 $email = $invite->email;
+                $attendee = $this->attendeeService->findOneBy(['ref' => $reference]);
             } else {
                 $reference = $request->ref;
             }
@@ -89,7 +91,8 @@ class AccreditationController extends Controller
             'answers' => $answers,
             'countries' => $countries,
             'countryCodes' => $countryCodes,
-            'email' => $email
+            'email' => $email,
+            'attendee' => $attendee
         ]);
     }
 
