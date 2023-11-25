@@ -39,7 +39,7 @@ class ApprovalMail extends Mailable
         $this->content = $settings->approval_message ?? '<p></p>';
         $this->content = str_replace(
             '%qrcode%',
-            "<img src='$qrUrl' alt=$qrUrl style='background-color: white;'>",
+            "<img src='$qrUrl' alt=$qrUrl style='background-color: white; width: 200px'>",
             $this->content
         );
 
