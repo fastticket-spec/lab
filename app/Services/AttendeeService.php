@@ -157,13 +157,13 @@ class AttendeeService extends BaseRepository
 
             $answers = [];
             foreach ($request->answers as $answer) {
-                if ($answer['title'] == 'Email Address') {
+                if (!$email && $answer['title'] == 'Email Address') {
                     $email = $answer['answer'];
                 }
-                if ($answer['title'] == 'First Name') {
+                if (!$first_name && $answer['title'] == 'First Name') {
                     $first_name = $answer['answer'];
                 }
-                if ($answer['title'] == 'Last Name') {
+                if (!$last_name && $answer['title'] == 'Last Name') {
                     $last_name = $answer['answer'];
                 }
                 if ($answer['type'] == '4' && ($file = $answer['answer'])) {
