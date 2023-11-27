@@ -1086,8 +1086,6 @@ class AttendeeService extends BaseRepository
 
         if ($surveysQuery->exists()) {
             $surveys = $surveysQuery->whereNot('title', 'Email Address')
-                ->whereNot('title', 'First Name')
-                ->whereNot('title', 'Last Name')
                 ->get()
                 ->map(fn ($survey) => $survey->title);
 
