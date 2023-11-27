@@ -271,7 +271,7 @@ select option {
                                                         }}:</label>
 
                                                     <div class="mobile_number"  v-if="field.value.type === '12'">
-                                                        <Field as="select" :name="`surveys[${idx}].country_code`" :class="`mb-0`">
+                                                        <Field as="select" :name="`surveys[${idx}].country_code`" :class="`mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }">
                                                           <option v-for="code in countryCodes" :key="code.id" :value="'+' + code.code">{{ lang === 'english' ? code.name_en : code.name_ar }}</option>
                                                         </Field>
                                                         <Field type="number"
