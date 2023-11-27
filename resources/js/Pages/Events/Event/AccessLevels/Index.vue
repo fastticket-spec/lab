@@ -419,7 +419,7 @@ const copyText = async text => {
 }
 
 .card-date-2 {
-  right: 105px;
+  right: 105px!important;
 }
 
 .vs__dropdown-toggle {
