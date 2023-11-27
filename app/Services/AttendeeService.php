@@ -1102,8 +1102,19 @@ class AttendeeService extends BaseRepository
                 ->get()
                 ->map(function ($attendee) {
                     $answers = [];
+                    $firstName = '';
+                    $lastName = '';
 
                     foreach ($attendee->answers as $answer) {
+                        if ($answer['question'] == 'First Name') {
+                            $firstName =  $answer['answer'];
+                        }
+
+                        if ($answer['question'] == 'Last Name') {
+                            $lastName =  $answer['answer'];
+                        }
+
+
                         if ($answer['question'] != 'Email Address' && $answer['question'] != 'First Name' && $answer['question'] != 'Last Name') {
                             $value = $answer['answer'];
                             $answers[] = is_array($value) ? join(', ', $value) : $value;
@@ -1114,8 +1125,8 @@ class AttendeeService extends BaseRepository
 
                     return [
                         'event_title' => $attendee->event->title,
-                        'first_name' => $attendee->first_name,
-                        'last_name' => $attendee->last_name,
+                        'first_name' => is_null($attendee->first_name) || empty($attendee->first_name) ?  $firstName : $attendee->first_name,
+                        'last_name' => is_null($attendee->last_name) || empty($attendee->last_name) ?  $lastName : $attendee->last_name,
                         'email' => $attendee->email,
                         'reference' => $attendee->ref,
                         'downloads' => $attendee->downloads ?: 0,
