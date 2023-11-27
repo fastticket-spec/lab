@@ -289,7 +289,7 @@ class AttendeeService extends BaseRepository
 
             $ref = $attendee->ref;
             $qrContent = $ref;
-            if ($settings->enable_vcard) {
+            if ($settings && $settings->enable_vcard) {
                 $qrContent = "BEGIN:VCARD\nVERSION:3.0\nN:$attendee->last_name;$attendee->first_name\nFN:$attendee->first_name $attendee->last_name\nORG:\nTITLE:\nADR:\nTEL;WORK;VOICE:$phone\nTEL;FAX:\nEMAIL;WORK;INTERNET:$attendee->email\nURL:\nNOTE:$ref\nEND:VCARD";
             }
 
