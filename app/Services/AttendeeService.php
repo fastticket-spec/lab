@@ -1106,11 +1106,11 @@ class AttendeeService extends BaseRepository
                     $lastName = '';
 
                     foreach ($attendee->answers as $answer) {
-                        if ($answer['question'] == 'First Name') {
+                        if ($answer['question'] == 'First Name ') {
                             $firstName =  $answer['answer'];
                         }
 
-                        if ($answer['question'] == 'Last Name') {
+                        if ($answer['question'] == 'First Name ') {
                             $lastName =  $answer['answer'];
                         }
 
