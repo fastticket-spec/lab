@@ -1086,8 +1086,6 @@ class AttendeeService extends BaseRepository
 
         if ($surveysQuery->exists()) {
             $surveys = $surveysQuery->whereNot('title', 'Email Address')
-                ->whereNot('title', 'First Name')
-                ->whereNot('title', 'Last Name')
                 ->get()
                 ->map(fn ($survey) => $survey->title);
 
@@ -1102,9 +1100,20 @@ class AttendeeService extends BaseRepository
                 ->get()
                 ->map(function ($attendee) {
                     $answers = [];
+                    $firstName = '';
+                    $lastName = '';
 
                     foreach ($attendee->answers as $answer) {
-                        if ($answer['question'] != 'Email Address' && $answer['question'] != 'First Name' && $answer['question'] != 'Last Name') {
+                        if (str_contains($answer['question'], 'First Name')) {
+                            $firstName =   $firstName == '' ? $answer['answer'] : $firstName;
+                        }
+
+                        if (str_contains($answer['question'], 'Last Name')) {
+                            $lastName =  $lastName == '' ?  $answer['answer'] : $lastName;
+                        }
+
+
+                        if ($answer['question'] != 'Email Address') {
                             $value = $answer['answer'];
                             $answers[] = is_array($value) ? join(', ', $value) : $value;
                         }
@@ -1114,8 +1123,8 @@ class AttendeeService extends BaseRepository
 
                     return [
                         'event_title' => $attendee->event->title,
-                        'first_name' => $attendee->first_name,
-                        'last_name' => $attendee->last_name,
+                        'first_name' => is_null($attendee->first_name) || empty($attendee->first_name) ?  $firstName : $attendee->first_name,
+                        'last_name' => is_null($attendee->last_name) || empty($attendee->last_name) ?  $lastName : $attendee->last_name,
                         'email' => $attendee->email,
                         'reference' => $attendee->ref,
                         'downloads' => $attendee->downloads ?: 0,
