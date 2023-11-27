@@ -1115,7 +1115,7 @@ class AttendeeService extends BaseRepository
                         }
 
 
-                        if ($answer['question'] != 'Email Address' && $answer['question'] != 'First Name' && $answer['question'] != 'Last Name') {
+                        if ($answer['question'] != 'Email Address') {
                             $value = $answer['answer'];
                             $answers[] = is_array($value) ? join(', ', $value) : $value;
                         }
