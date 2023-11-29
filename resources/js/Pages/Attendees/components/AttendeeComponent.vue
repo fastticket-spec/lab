@@ -445,11 +445,15 @@ const showEdit = answer => {
 
 const saveAnswer = async answerIndex => {
     try {
-        await axios.post(`/attendees/${selectedAttendee.value.id}/update-answers`, {
+        const {data} = await axios.post(`/attendees/${selectedAttendee.value.id}/update-answers`, {
             answers: selectedAttendee.value.answers
         })
 
-        selectedAttendee.value.answers[answerIndex].edit = false;
+        selectedAttendee.value.answers = data.attendee.answers.map(x => ({...x, edit: false}));
+        selectedAttendee.value.first_name = data.attendee.first_name;
+        selectedAttendee.value.last_name = data.attendee.last_name;
+        selectedAttendee.value.email = data.attendee.email;
+        // selectedAttendee.value.answers[answerIndex].edit = false;
     } catch (e) {
         console.log(e);
     }
