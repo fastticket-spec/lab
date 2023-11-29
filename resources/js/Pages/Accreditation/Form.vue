@@ -72,7 +72,7 @@ const {handleSubmit, isSubmitting} = useForm({
                     options: x.options,
                     required: x.parent_index ? 0 : x.required,
                     disabled: x.title === 'Email Address' && props.email,
-                    country_code: x.country_code ?  x.country_code  : '+966',
+                    country_code: x.country_code ?  x.country_code  : '',
                     input_type: x.input_type,
                     input_length: x.input_length
                 }
@@ -92,7 +92,7 @@ const {handleSubmit, isSubmitting} = useForm({
                 options: x.options,
                 required: x.parent_index ? 0 : x.required,
                 disabled: x.title === 'Email Address' && props.email,
-                country_code: x.country_code ?  x.country_code  : '+966',
+                country_code: x.country_code ?  x.country_code  : '',
                 input_type: x.input_type,
                 input_length: x.input_length
             }))
@@ -271,9 +271,9 @@ select option {
                                                         }}:</label>
 
                                                     <div class="mobile_number"  v-if="field.value.type === '12'">
-                                                        <b-select :name="`surveys[${idx}].country_code`"  :class="`mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }" >
-                                                            <b-select-option v-for="code in countryCodes" :key="code.id" :value="'+' + code.code"> {{ lang === 'english' ? code.name_en : code.name_ar}}</b-select-option>
-                                                        </b-select>
+                                                        <Field as="select" :name="`surveys[${idx}].country_code`" :class="`mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }">
+                                                          <option v-for="code in countryCodes" :key="code.id" :value="'+' + code.code">{{ lang === 'english' ? code.name_en : code.name_ar }}</option>
+                                                        </Field>
                                                         <Field type="number"
                                                            :name="`surveys[${idx}].answer`"
                                                            :disabled="!!attendee"
