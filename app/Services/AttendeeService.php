@@ -941,7 +941,7 @@ class AttendeeService extends BaseRepository
             $attendee->checkinAttendee();
 
             return $this->view(
-                data: ['message' => 'Checked in successfully', 'attendee' => $attendee->answers],
+                data: ['message' => 'Checked in successfully', 'attendee' => $attendee->answers, 'checked_in_by' => auth()->user()->first_name . ' ' . auth()->user()->last_name],
                 flashMessage: 'Checked in successfully',
                 component: '/dashboard',
                 returnType: 'redirect'
