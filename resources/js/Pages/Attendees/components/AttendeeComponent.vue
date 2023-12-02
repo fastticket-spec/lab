@@ -427,13 +427,13 @@ const assignAreasToAttendees = () => {
         : router.post(`/attendees/bulk-assign-areas`, {attendee_ids: checkedRows.value, areas: selectedAreas.value, page: props.attendees.current_page})
 }
 
-const showEdit = answer => {
+const showEdit = (answer, dataIndex) => {
     selectedAttendee.value.answers = selectedAttendee.value.answers.map(x => ({
         ...x,
         edit: false,
         answer: x.prev_answer || x.answer
     }))
-    const currentAnswerIndex = selectedAttendee.value.answers.findIndex(x => (x.question === answer.question && x.type === answer.type));
+    const currentAnswerIndex = selectedAttendee.value.answers.findIndex((x, i) => (i === dataIndex && x.question === answer.question && x.type === answer.type));
 
     if (currentAnswerIndex !== '-1') {
         let selectedAnswer = selectedAttendee.value.answers[currentAnswerIndex];
@@ -831,7 +831,7 @@ const checkInAttendee = attendee => {
                             </template>
                         </template>
                         <template #cell(⠀)="data">
-                            <b-btn v-if="data.item.type !== '10' && !data.item.edit" @click="showEdit(data.item)"
+                            <b-btn v-if="data.item.type !== '10' && !data.item.edit" @click="showEdit(data.item, data.index)"
                                    size="sm" variant="primary"><i
                                 class="ri-edit-2-line p-0"></i></b-btn>
                         </template>
