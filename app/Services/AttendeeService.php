@@ -917,7 +917,6 @@ class AttendeeService extends BaseRepository
 
             if (strlen($attendeeRef) > 20 && Str::contains($attendeeRef, 'VCARD')) {
                 $attendeeRef = explode("\nEND:VCARD", explode('NOTE:', $attendeeRef)[1])[0];
-                \Log::debug("vcard attendee ref $attendeeRef");
             }
 
             $attendee = $this->model->query()
@@ -1216,5 +1215,54 @@ class AttendeeService extends BaseRepository
         curl_close($curl);
 
         fclose($FileHandle);
+    }
+
+    public function scanAttendee(string $attendeeRef)
+    {
+        try {
+            $eventAccessIds = auth()->user()->userEventAccessId();
+
+            if (strlen($attendeeRef) > 20 && Str::contains($attendeeRef, 'VCARD')) {
+                $attendeeRef = explode("\nEND:VCARD", explode('NOTE:', $attendeeRef)[1])[0];
+            }
+
+            $attendee = $this->model->query()
+                ->whereRef($attendeeRef)
+                ->with(['accessLevel', 'event'])
+                ->whereHas('event', function ($query) use ($eventAccessIds) {
+                    $query->whereIn('id', $eventAccessIds);
+                })
+                ->firstOrFail();
+
+            if ($attendee->attendeeScans()->exists()) {
+                return $this->view(
+                    data: ['message' => 'Attendee already scanned.'],
+                    statusCode: 400,
+                    flashMessage: 'Attendee already scanned in.',
+                    component: '/dashboard',
+                    returnType: 'redirect'
+                );
+            }
+
+            $attendee->scanAttendee();
+
+            return $this->view(
+                data: ['message' => 'Attendee scanned successfully', 'scanned_by' => auth()->user()->first_name . ' ' . auth()->user()->last_name],
+                flashMessage: 'Attendee scanned successfully',
+                component: '/dashboard',
+                returnType: 'redirect'
+            );
+        } catch (\Throwable $th) {
+            if ($th instanceof ModelNotFoundException) {
+                return $this->view(
+                    data: ['message' => 'Reference not found'],
+                    statusCode: 400,
+                    flashMessage: 'Reference not found',
+                    component: '/dashboard',
+                    returnType: 'redirect'
+                );
+            }
+            throw $th;
+        }
     }
 }

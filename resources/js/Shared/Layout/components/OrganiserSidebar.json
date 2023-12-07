@@ -39,7 +39,7 @@
                 "is_icon_class": true,
                 "component": "Events/Index",
                 "icon": "",
-                "disabled_for": ["Checkin Users"]
+                "disabled_for": ["Checkin Users", "Misc"]
             },
             {
                 "title": "Create",
@@ -50,7 +50,7 @@
                 "is_icon_class": true,
                 "component": "Events/Create",
                 "icon": "",
-                "disabled_for": ["Editors", "Operations", "Checkin Users", "Viewers"]
+                "disabled_for": ["Editors", "Operations", "Checkin Users", "Viewers", "Misc"]
             }
         ]
     },

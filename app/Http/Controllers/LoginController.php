@@ -44,8 +44,13 @@ class LoginController extends Controller
         return redirect('/login');
     }
 
-    public function scanAppLogin(LoginRequest $request)
+    public function checkinAppLogin(LoginRequest $request)
     {
         return $this->login($request, 'checkin');
+    }
+
+    public function scanAppLogin(LoginRequest $request)
+    {
+        return $this->login($request, 'misc');
     }
 }

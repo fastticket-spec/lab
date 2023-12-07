@@ -12,11 +12,19 @@ Route::prefix('user')->group(function () {
 });
 
 Route::prefix('checkin-user')->group(function () {
-    Route::post('/login', [LoginController::class, 'scanAppLogin']);
+    Route::post('/login', [LoginController::class, 'checkinAppLogin']);
 
     Route::group(['middleware' => ['auth:api', 'checkin']], function () {
         Route::post('verify-attendee', [AttendeesController::class, 'checkAttendee']);
         Route::post('check-in', [AttendeesController::class, 'checkInAttendee']);
+    });
+});
+
+Route::prefix('misc-user')->group(function () {
+    Route::post('/login', [LoginController::class, 'scanAppLogin']);
+
+    Route::group(['middleware' => ['auth:api']], function () {
+        Route::post('scan-attendee', [AttendeesController::class, 'scanAttendee']);
     });
 });
 

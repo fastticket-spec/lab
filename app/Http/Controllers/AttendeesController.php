@@ -206,6 +206,13 @@ class AttendeesController extends Controller
         return $this->attendeeService->checkinAttendee($request->attendee_ref);
     }
 
+    public function scanAttendee(Request $request)
+    {
+        $request->validate(['attendee_ref' => 'required']);
+
+        return $this->attendeeService->scanAttendee($request->attendee_ref);
+    }
+
     /**
      * @throws Throwable
      */

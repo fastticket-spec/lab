@@ -115,10 +115,10 @@ const menu = computed(() => {
                 "icon": "ri-home-4-line"
             }
         ];
-    } else if (userRole.value === 'Checkin Users') {
+    } else if (userRole.value === 'Checkin Users' || userRole.value === 'Misc') {
         return [
             {
-                "title": "Checkin Attendee",
+                "title": "Scan Attendee",
                 "name": "sidebar.checkin_attendee",
                 "is_heading": false,
                 "is_active": false,

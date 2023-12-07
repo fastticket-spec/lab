@@ -36,7 +36,7 @@ class DashboardController extends Controller
             $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn($access) => $access->event_id);
         }
 
-        if ($userRole === 'Checkin Users') {
+        if ($userRole === 'Checkin Users' || $userRole === 'Misc') {
             return Inertia::render('Dashboard/CheckInUserDashboard');
         }
 

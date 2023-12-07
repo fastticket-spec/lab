@@ -72,4 +72,14 @@ class Attendee extends Model
     {
         $this->attendeeCheckins()->create(['checkin' => now(), 'checkin_user_id' => auth()->id()]);
     }
+
+    public function attendeeScans(): HasMany
+    {
+        return $this->hasMany(AttendeeScan::class);
+    }
+
+    public function scanAttendee(): void
+    {
+        $this->attendeeScans()->create(['scan' => now(), 'scan_user_id' => auth()->id()]);
+    }
 }

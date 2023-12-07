@@ -30,7 +30,7 @@ class AuthService extends BaseRepository
 
         $userRole = optional($userData->account)->role;
 
-        if ($userRole && ($userType && $userType !== 'checkin')) {
+        if ($userRole && ($userType && $userType !== 'checkin' && $userType !== 'misc')) {
             return [
                 'message' => 'You cannot access this dashboard with the supplied credentials!',
                 'status' => 401
