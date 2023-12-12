@@ -1049,17 +1049,26 @@ class AttendeeService extends BaseRepository
         );
     }
 
-    public function changeAccessLevel(string $eventId, string $attendeeId, string $access_level_id, ?int $page = 1)
+    public function changeAccessLevel(string $eventId, string $attendeeId, string $access_level_id, ?int $page = 1, string $new_event_id)
     {
-        $this->update([
-            'access_level_id' => $access_level_id
-        ], $attendeeId);
-
-        $message = 'Attendee has been moved to access level.';
+        $newAccessLevel = $this->accessLevelsService->find($access_level_id);
+        $attendeesCount = $newAccessLevel->attendees()->count();
 
         $route = "/event/$eventId/attendees?page=$page";
 
-        return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
+        if (!$newAccessLevel->quantity_available || ($newAccessLevel->quantity_available > 0 && ($attendeesCount < $newAccessLevel->quantity_available))) {
+            $this->update([
+                'access_level_id' => $access_level_id,
+                'event_id' => $new_event_id
+            ], $attendeeId);
+
+            $message = 'Attendee has been moved to access level.';
+
+            return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
+        }
+
+        $message = 'The access level has been fully occupied!';
+        return $this->view(data: ['message' => $message], statusCode: 400, flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
     }
 
     public function deleteAttendee(string $attendeeId, ?string $eventId = null, ?int $page = 1)

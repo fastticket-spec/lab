@@ -202,4 +202,9 @@ class AccessLevelsController extends Controller
             return view('invite-declined', ['status' => 'danger', 'message' => 'Invite not found!']);
         }
     }
+
+    public function fetchAccessLevelByEvent(string $eventId)
+    {
+        return $this->view(['data' => $this->accessLevelsService->fetchAccessLevelByEventId($eventId)]);
+    }
 }

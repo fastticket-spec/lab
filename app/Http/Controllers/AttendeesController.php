@@ -8,6 +8,7 @@ use App\Models\Country;
 use App\Services\AccessLevelsService;
 use App\Services\AreaService;
 use App\Services\AttendeeService;
+use App\Services\EventService;
 use App\Services\ZoneService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -19,7 +20,7 @@ use Log;
 
 class AttendeesController extends Controller
 {
-    public function __construct(public AttendeeService $attendeeService, private ZoneService $zoneService, private AccessLevelsService $accessLevelsService, private AreaService $areaService)
+    public function __construct(public AttendeeService $attendeeService, private ZoneService $zoneService, private AccessLevelsService $accessLevelsService, private AreaService $areaService, private EventService $eventService)
     {
     }
 
@@ -32,7 +33,7 @@ class AttendeesController extends Controller
             'sort' => $request->sort,
             'filter_by' => $request->filter,
             'q' => $request->q,
-            'accessLevels' => []
+            'categories' => []
         ]);
     }
 
@@ -46,7 +47,7 @@ class AttendeesController extends Controller
             'sort' => $request->sort,
             'filter_by' => $request->filter,
             'q' => $request->q,
-            'accessLevels' => $this->accessLevelsService->allAccessLevels($eventId)
+            'categories' => $this->eventService->currentOrganiserEvents()
         ]);
     }
 
@@ -301,9 +302,9 @@ class AttendeesController extends Controller
 
     public function changeAccessLevel(Request $request, string $eventId, string $attendeeId)
     {
-        $request->validate(['access_level_id' => 'required|exists:access_levels,id']);
+        $request->validate(['event_id' => 'required|exists:events,id', 'access_level_id' => 'required|exists:access_levels,id']);
 
-        return $this->attendeeService->changeAccessLevel($eventId, $attendeeId, $request->access_level_id, $request->page);
+        return $this->attendeeService->changeAccessLevel($eventId, $attendeeId, $request->access_level_id, $request->page, $request->event_id);
     }
 
     public function destroyAttendee(string $attendeeId)

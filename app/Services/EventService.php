@@ -195,4 +195,14 @@ class EventService extends BaseRepository
             })
             ->count();
     }
+
+    public function currentOrganiserEvents()
+    {
+        $organiserId = auth()->user()->activeOrganiser();
+
+        return $this->model->query()
+            ->whereOrganiserId($organiserId)
+            ->whereStatus(Event::EVENT_STATUS['ACTIVE'])
+            ->get();
+    }
 }

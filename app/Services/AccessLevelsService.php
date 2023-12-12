@@ -115,6 +115,14 @@ class AccessLevelsService extends BaseRepository
             ->get();
     }
 
+    public function fetchAccessLevelByEventId(string $eventId)
+    {
+        return $this->model->query()
+            ->whereEventId($eventId)
+            ->latest()
+            ->get();
+    }
+
     public function createAccessLevel(array $data, string $eventId)
     {
         try {

@@ -98,6 +98,8 @@ Route::group(['middleware' => 'auth'], function () {
             });
         });
 
+        Route::get('access-levels/fetch-access-levels/{eventId}', [AccessLevelsController::class, 'fetchAccessLevelByEvent']);
+
         Route::group(['prefix' => 'event/{id}'], function () {
             Route::get('/dashboard', [EventDashboardController::class, 'index']);
 

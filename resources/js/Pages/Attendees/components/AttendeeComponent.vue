@@ -15,8 +15,8 @@ const props = defineProps({
     zones: Array,
     areas: Array,
     q: String,
-    accessLevels: Array,
-    errors: Object
+    errors: Object,
+    categories: Array
 })
 
 const selectedAttendee = ref({})
@@ -114,7 +114,6 @@ onUpdated(() => {
     zonesModalShow.value = false;
     areasModalShow.value = false;
     messageModalShow.value = false;
-    moveAttendeeModal.value = false;
     deleteModalShow.value = false;
     if (props.errors && Object.keys(props.errors).length === 0) {
         uploadModalShow.value = false;
@@ -567,16 +566,34 @@ const onExportTemplate = async () => {
     }
 }
 
+const accessLevels = ref([]);
 const moveToAccessLevelId = ref('');
+const moveToCategoryId = ref('');
 const selectedAttendeeAccessLevelId = ref('');
 
 const otherAccessLevels = computed(() => excludeAccessLevelId => {
-    return props.accessLevels.filter(x => x.id !== excludeAccessLevelId);
+  return accessLevels.value.filter(x => x.id !== excludeAccessLevelId);
+})
+
+watch(moveToCategoryId, async value => {
+  try {
+    const {data: {data}} = await axios.get(`/access-levels/fetch-access-levels/${value}/`);
+    accessLevels.value = data;
+    moveToAccessLevelId.value = '';
+  } catch (e) {
+    console.log(e);
+  }
 })
 
 const moveToAccessLevel = () => {
     router.post(`/event/${props.eventId}/attendees/${selectedAttendee.value.id}/change-access-level`, {
-        access_level_id: moveToAccessLevelId.value
+        access_level_id: moveToAccessLevelId.value,
+        event_id: moveToCategoryId.value
+    }, {
+      onSuccess: () => {
+        moveAttendeeModal.value = false;
+      },
+      onError: () => {}
     });
 }
 
@@ -770,7 +787,7 @@ const checkInAttendee = attendee => {
                                                 @click.prevent="viewBadge(data.item.id, data.item.badge.id, data.item.status)">View Badge</b-dropdown-item>
                                             <b-dropdown-item
                                                 v-if="eventId && userRole !== 'Operations'"
-                                                @click.prevent="selectedAttendee = data.item; selectedAttendeeAccessLevelId = data.item.access_level.id; moveAttendeeModal = true">Move to Access Level</b-dropdown-item>
+                                                @click.prevent="selectedAttendee = data.item; selectedAttendeeAccessLevelId = data.item.access_level.id; moveToCategoryId = data.item.category.id; moveAttendeeModal = true">Move to Access Level</b-dropdown-item>
                                             <b-dropdown-item
                                                 @click.prevent="checkInAttendee(data.item)">CheckIn Attendee</b-dropdown-item>
                                             <b-dropdown-item
@@ -965,7 +982,18 @@ const checkInAttendee = attendee => {
         <b-modal v-model="moveAttendeeModal" id="move-attendee-modal" title="Move Attendee">
             <b-row class="mt-3">
                 <b-col sm="12">
+                  <div class="form-group">
+                    <label for="">Category</label>
+                    <select class="form-control" v-model="moveToCategoryId">
+                      <option value="">Select Category</option>
+                      <option v-for="category in categories" :key="category.id" :value="category.id">{{category.title}}</option>
+                    </select>
+                  </div>
+                </b-col>
+
+                <b-col sm="12" v-if="moveToCategoryId">
                     <div class="form-group">
+                      <label for="">Access Level</label>
                         <select class="form-control" v-model="moveToAccessLevelId">
                             <option value="">Select Access Level</option>
                             <option v-for="accessLevel in otherAccessLevels(selectedAttendeeAccessLevelId)" :key="accessLevel.id" :value="accessLevel.id">{{accessLevel.title}}</option>

@@ -9,11 +9,11 @@ defineProps({
     zones: Array,
     areas: Array,
     q: String,
-    accessLevels: Array,
-    errors: Object
+    errors: Object,
+    categories: Array
 })
 </script>
 
 <template>
-    <attendee-component :attendees="attendees" :event-id="eventId" :access-levels="accessLevels" :zones="zones"  :areas="areas" :sort="sort" :filter_by="filter_by" :q="q" :errors="errors" />
+    <attendee-component :attendees="attendees" :event-id="eventId" :categories="categories" :zones="zones"  :areas="areas" :sort="sort" :filter_by="filter_by" :q="q" :errors="errors" />
 </template>
