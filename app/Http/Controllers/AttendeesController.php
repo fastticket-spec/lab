@@ -33,6 +33,7 @@ class AttendeesController extends Controller
             'sort' => $request->sort,
             'filter_by' => $request->filter,
             'q' => $request->q,
+            'access_levels' => [],
             'categories' => []
         ]);
     }
@@ -47,6 +48,7 @@ class AttendeesController extends Controller
             'sort' => $request->sort,
             'filter_by' => $request->filter,
             'q' => $request->q,
+            'accessLevels' => $this->accessLevelsService->allAccessLevels($eventId),
             'categories' => $this->eventService->currentOrganiserEvents()
         ]);
     }

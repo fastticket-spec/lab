@@ -16,6 +16,7 @@ const props = defineProps({
     areas: Array,
     q: String,
     errors: Object,
+    accessLevels: Array,
     categories: Array
 })
 
@@ -566,7 +567,7 @@ const onExportTemplate = async () => {
     }
 }
 
-const accessLevels = ref([]);
+const accessLevels = ref(props.accessLevels);
 const moveToAccessLevelId = ref('');
 const moveToCategoryId = ref('');
 const selectedAttendeeAccessLevelId = ref('');
