@@ -199,7 +199,7 @@ class AccessLevelsService extends BaseRepository
                 'quantity_available' => $request->quantity_available,
             ]);
 
-            $accessLevel->generalSettings()->updateOrCreate(['access_level_id' => $accessLevelId], $request->all());
+            $accessLevel->generalSettings()->updateOrCreate(['access_level_id' => $accessLevelId], $request->except('selected_socials') + ['selected_socials' => json_encode($request->selected_socials)]);
 
             $message = 'Access level settings updated';
 

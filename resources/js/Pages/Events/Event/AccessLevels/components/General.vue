@@ -4,18 +4,32 @@ import {useForm, Field, ErrorMessage, useField} from "vee-validate";
 import {accessLevelGeneralSchema} from "../../../../../Shared/components/helpers/Validators.js";
 import {QuillEditor} from "@vueup/vue-quill";
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import VueSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+import {ColorPicker} from "vue3-colorpicker";
+import Facebook from "./Facebook.vue";
+import LinkedIn from "./LinkedIn.vue";
+import Twitter from "./Twitter.vue";
+import Whatsapp from "./Whatsapp.vue";
+
 import {onMounted, ref} from "vue";
 import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
     eventId: String,
     accessLevel: Object,
-    data: Object
+    data: Object,
+    socials: Array
 })
 
 const showArabicInputs = ref(true)
 const showArabicInvitation = ref(false)
 const declineInvitation = ref(false)
+const shareLink = ref(false)
+const gradientColor = ref("linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 100%)");
+
+const socialsData = ref(props.socials);
+
 const enableVCard = ref(false)
 
 const initialValues = props.data
@@ -44,6 +58,7 @@ onMounted(() => {
     showArabicInvitation.value = !!props.data?.arabic_invitation
     declineInvitation.value = !!props.data?.decline_invitation
     enableVCard.value = !!props.data?.enable_vcard
+    shareLink.value = !!props.data?.share_link
 })
 
 
@@ -51,6 +66,9 @@ const {value: description} = useField("description");
 const {value: description_arabic} = useField("description_arabic");
 const {value: success_message} = useField("success_message");
 const {value: success_message_arabic} = useField("success_message_arabic");
+const {value: social_share_message} = useField("social_share_message");
+const {value: social_share_message_arabic} = useField("social_share_message_arabic");
+const {value: link_address} = useField("link_address");
 const {value: approval_message} = useField("approval_message");
 const {value: email_message} = useField("email_message");
 const {value: email_message_arabic} = useField("email_message_arabic");
@@ -59,7 +77,14 @@ const {value: invitation_message_sms} = useField("invitation_message_sms");
 const {value: decline_text} = useField("decline_text");
 
 const onSubmit = handleSubmit(values => {
-    router.post(`/event/${props.eventId}/access-levels/${props.accessLevel.id}/customize/general`, {...values, arabic_invitation: showArabicInvitation.value, decline_invitation: declineInvitation.value, enable_vcard: enableVCard.value});
+  router.post(`/event/${props.eventId}/access-levels/${props.accessLevel.id}/customize/general`, {
+    ...values,
+    arabic_invitation: showArabicInvitation.value,
+    decline_invitation: declineInvitation.value,
+    enable_vcard: enableVCard.value,
+    share_link: shareLink.value,
+    selected_socials:socialsData.value
+  });
 })
 </script>
 
@@ -192,26 +217,87 @@ const onSubmit = handleSubmit(values => {
                             <hr>
 
                             <b-row>
-                                <b-col sm="12">
-                                    <div class="form-group">
-                                        <label for="successMessageInput">{{ $t('input.success_message') }}</label>
-                                        <quill-editor toolbar="full" theme="snow" v-model:content="success_message"
-                                                      content-type="html"></quill-editor>
-                                        <ErrorMessage name="success_message" class="text-danger"/>
-                                    </div>
-                                </b-col>
+                              <b-col sm="12">
+                                <div class="form-group">
+                                  <label for="successMessageInput">{{ $t('input.success_message') }}</label> <span v-if="shareLink"><small>&nbsp;Use <strong>%link_buttons%</strong> to insert Social Media Links</small></span>
+                                  <quill-editor toolbar="full" theme="snow" v-model:content="success_message"
+                                                content-type="html"></quill-editor>
+                                  <ErrorMessage name="success_message" class="text-danger"/>
+                                </div>
+                              </b-col>
 
-                                <b-col v-if="showArabicInputs" sm="12">
-                                    <div class="form-group">
-                                        <label for="successMessageArabicInput">{{
-                                                $t('input.success_messageArabic')
-                                            }}</label>
-                                        <quill-editor toolbar="full" theme="snow"
-                                                      v-model:content="success_message_arabic"
-                                                      content-type="html"></quill-editor>
-                                        <ErrorMessage name="success_message_arabic" class="text-danger"/>
+                              <b-col v-if="showArabicInputs" sm="12">
+                                <div class="form-group">
+                                  <label for="successMessageArabicInput">{{
+                                      $t('input.success_messageArabic')
+                                    }}</label> <span v-if="shareLink"><small>&nbsp;Use <strong>%link_buttons%</strong> to insert Social Media Links</small></span>
+                                  <quill-editor toolbar="full" theme="snow"
+                                                v-model:content="success_message_arabic"
+                                                content-type="html"></quill-editor>
+                                  <ErrorMessage name="success_message_arabic" class="text-danger"/>
+                                </div>
+                              </b-col>
+
+                              <b-col sm="12">
+                                <b-checkbox v-model="shareLink" class="custom-checkbox-color"
+                                            name="check-button-share-link" inline>
+                                  Share Link
+                                </b-checkbox>
+                              </b-col>
+                            </b-row>
+
+                            <b-row v-if="shareLink">
+                              <b-col><p>Choose Socials you'd like to integrate.</p></b-col>
+                              <b-col sm="12">
+                                <b-row>
+                                  <b-col sm="3" class="mb-3" v-for="social in socialsData" :key="social.value">
+                                    <div class="d-flex align-items-center">
+                                      <b-checkbox v-model="social.enabled" class="custom-checkbox-color"
+                                                  name="check-button-selected-socials" inline>
+                                        <Facebook v-if="social.value === 'facebook'" :color="social.color"/>
+                                        <LinkedIn v-if="social.value === 'linkedin'" :color="social.color"/>
+                                        <Twitter v-if="social.value === 'twitter'" :color="social.color"/>
+                                        <Whatsapp v-if="social.value === 'whatsapp'" :color="social.color"/>
+                                      </b-checkbox>
+                                      <div class="ml-3 w-100">
+                                        <color-picker
+                                            class="form-control ml-3"
+                                            v-model:pureColor="social.color"
+                                            v-model:gradientColor="gradientColor"
+                                            format="hex6"
+                                            picker-type="chrome"
+                                        />
+                                      </div>
                                     </div>
-                                </b-col>
+                                  </b-col>
+                                </b-row>
+                              </b-col>
+                              <b-col sm="6">
+                                <div class="form-group">
+                                  <label for="shareMessage">
+                                    Share Message
+                                  </label>
+                                  <input class="form-control" type="text" v-model="social_share_message" />
+                                  <ErrorMessage name="social_share_message" class="text-danger"/>
+                                </div>
+                              </b-col>
+                              <b-col v-if="showArabicInputs" sm="6">
+                                <div class="form-group">
+                                  <label for="shareMessageArabic">
+                                    Share Message (Arabic)
+                                  </label>
+                                  <input class="form-control" type="text" v-model="social_share_message_arabic" />
+                                  <ErrorMessage name="social_share_message_arabic" class="text-danger"/>
+                                </div>
+                              </b-col>
+
+                              <b-col sm="6">
+                                <div class="form-group">
+                                  <label for="link_address">Share Link</label>
+                                  <input id="link_address" class="form-control" type="text" v-model="link_address" />
+                                  <ErrorMessage name="link_address" class="text-danger"/>
+                                </div>
+                              </b-col>
                             </b-row>
 
                             <hr>
