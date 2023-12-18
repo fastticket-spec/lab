@@ -97,6 +97,15 @@ class AccessLevelsController extends Controller
             $data = $accessLevel->socials;
         }
 
+        $socials = optional($accessLevel->generalSettings)->selected_socials
+            ? json_decode($accessLevel->generalSettings->selected_socials)
+            : [
+                ['enabled' => false, 'name' => "LinkedIn", 'value' => 'linkedin', 'color' => '#000000'],
+                ['enabled' => false, 'name' => "Facebook", 'value' => 'facebook', 'color' => '#4460A0'],
+                ['enabled' => false, 'name' => "X (Twitter)", 'value' => 'twitter', 'color' => '#000000'],
+                ['enabled' => false, 'name' => "Whatsapp", 'value' => 'whatsapp', 'color' => '#25d366']
+            ];
+
         return Inertia::render('Events/Event/AccessLevels/Customize', [
             'event' => $event,
             'access_level' => $accessLevel,
@@ -104,7 +113,8 @@ class AccessLevelsController extends Controller
             'currentMenu' => $page,
             'data' => $data,
             'design_images' => $designImages,
-            'logoUploaded' => request()->logouploaded
+            'logoUploaded' => request()->logouploaded,
+            'socials' => $socials
         ]);
     }
 
