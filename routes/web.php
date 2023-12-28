@@ -141,6 +141,7 @@ Route::group(['middleware' => 'auth'], function () {
                     Route::post('/', [SurveyController::class, 'store']);
                     Route::get('/{event_survey_id}/surveys', [SurveyController::class, 'index']);
                     Route::patch('/{event_survey_id}/edit-surveys', [SurveyController::class, 'update']);
+                    Route::post('/upload-tandc-file', [SurveyController::class, 'uploadTandCFile']);
                 });
             });
 

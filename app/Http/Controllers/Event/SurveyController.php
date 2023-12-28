@@ -71,4 +71,13 @@ class SurveyController extends Controller
     {
         return $this->eventSurveyService->updateSurvey($request, $eventId, $eventSurveyId);
     }
+
+    public function uploadTandCFile(Request $request)
+    {
+        $request->validate([
+            'file' => 'file'
+        ]);
+
+        return $this->view(['file' => $this->eventSurveyService->uploadTandCFile($request)]);
+    }
 }

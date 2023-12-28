@@ -4,14 +4,21 @@ namespace App\Services;
 
 use App\Models\EventSurvey;
 use App\Repositories\BaseRepository;
+use App\Services\traits\HasFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class EventSurveyService extends BaseRepository
 {
-    public function __construct(EventSurvey $model)
+    use HasFile;
+
+    protected string $images_path;
+
+    public function __construct(EventSurvey $model, public FileService $file)
     {
         parent::__construct($model);
+        $this->images_path = config('filesystems.directory') . "tandc_files/";
     }
 
     public function fetchEventSurveys(Request $request, string $eventId)
@@ -98,7 +105,7 @@ class EventSurveyService extends BaseRepository
                 'title' => $survey['title'],
                 'title_arabic' => $survey['title_arabic'] ?? '',
                 'type' => $survey['type'],
-                'options' => $survey['options'],
+                'options' => $survey['type'] == 13 ? [['file_url' => $survey['file']]] : $survey['options'],
                 'required' => $survey['required'] ?? false,
                 'private' => $survey['private'] ?? false,
                 'parent_index' => $survey['parent_index'] ?? null,
@@ -131,5 +138,15 @@ class EventSurveyService extends BaseRepository
             $message = 'Could not update status';
             return $this->view(data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: $route, returnType: 'redirect');
         }
+    }
+
+    public function uploadTandCFile(Request $request): ?string
+    {
+        if ($file = $this->getFile($request, 'file')) {
+            $fileUrl = $this->uploadFile($file, 'surveys', '-tandc-file-');
+            return Storage::disk(config('filesystems.default'))->url($fileUrl);
+        }
+
+        return null;
     }
 }
