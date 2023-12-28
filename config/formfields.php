@@ -13,6 +13,7 @@ return [
         9 => ['name' => 'Radio input', 'key' => 'radio', 'has_options' => true],
         10 => ['name' => 'Header', 'key' => 'header', 'has_options' => false],
         11 => ['name' => 'Country', 'key' => 'country', 'has_options' => false],
-        12 => ['name' => 'Mobile Number', 'key' => 'mobile', 'has_options' => false]
+        12 => ['name' => 'Mobile Number', 'key' => 'mobile', 'has_options' => false],
+        13 => ['name' => 'Terms & Conditions', 'key' => 'tandc', 'has_options' => false],
     ]
 ];

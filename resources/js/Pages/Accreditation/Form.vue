@@ -266,7 +266,7 @@ select option {
                                         <template v-for="(field, idx) in fields" :key="field.key">
                                             <b-col :sm="field.value.type !== '10' ? '6' : '12'" class="pb-2" v-if="!field.value.parent_index">
                                                 <div class="form-group mb-0">
-                                                    <label :for="`surveys-${idx}`" v-if="field.value.type !== '10'" :style="{ color: accessLevel?.page_design?.font_color}">{{
+                                                    <label :for="`surveys-${idx}`" v-if="field.value.type !== '10' && field.value.type !== '13'" :style="{ color: accessLevel?.page_design?.font_color}">{{
                                                             lang === 'arabic' ? field.value.title_arabic : field.value.title
                                                         }}:</label>
 
@@ -406,6 +406,26 @@ select option {
                                                             {{ country.country }}
                                                         </option>
                                                     </Field>
+
+                                                    <template v-if="field.value.type === '13'">
+                                                      <br>
+                                                      <Field type="checkbox"
+                                                             :key="`${field.value.id}-tandc`"
+                                                             :name="`surveys[${idx}].answer`"
+                                                             v-slot="{field: boxField}"
+                                                             :class="`checkbox custom-checkbox-color`"
+                                                             :validateOnInput="true"
+                                                             :style="{backgroundColor: accessLevel?.page_design?.field_color, color: 'black'}"
+                                                             :value="true">
+                                                        <label class="mr-3">
+                                                          <input type="checkbox" :name="`surveys[${idx}].answer`"
+                                                                 v-bind="boxField"
+                                                                 :value="true"/> &nbsp;
+                                                          <a :href="field.value?.options[0].file_url" target="_blank">{{ lang === 'arabic' ? field.value?.title_arabic : field.value?.title }}</a>
+                                                        </label>
+                                                        <br>
+                                                      </Field>
+                                                    </template>
 
 
                                                     <ErrorMessage :name="`surveys[${idx}].answer`" class="text-danger"/>
