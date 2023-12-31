@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\Mail\PasswordReset;
 use App\Models\User;
 use App\Repositories\BaseRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class AuthService extends BaseRepository
@@ -66,23 +68,15 @@ class AuthService extends BaseRepository
 
             $user = $this->findOneByOrFail(['email' => $email]);
 
-            DB::table('password_resets')->insert([
-                'email' => $email,
+            DB::table('password_reset_tokens')->updateOrInsert(['email' => $email], [
                 'token' => $token,
                 'created_at' => now()
             ]);
 
-            Http::messaging()->post("send-mail", [
-                'to' => $email,
-                'subject' => 'Password Reset | EasyTicket',
-                'template' => 'password_reset',
-                'template_type' => 'markdown',
-                'params' => [
-                    'name' => $user->first_name . ' ' . $user->last_name,
-                    'email' => $user->email,
-                    'resetToken' => $token
-                ]
-            ]);
+            Mail::to($email)->later(now()->addSeconds(3), new PasswordReset(
+                user: $user,
+                resetToken: $token
+            ));
 
             DB::commit();
 
@@ -114,7 +108,7 @@ class AuthService extends BaseRepository
 
     public function verifyToken(string $token)
     {
-        $token = DB::table('password_resets')->whereToken($token)->first();
+        $token = DB::table('password_reset_tokens')->whereToken($token)->first();
 
         $timeDiff = now()->diffInMinutes($token->created_at);
 
@@ -142,7 +136,7 @@ class AuthService extends BaseRepository
 
     public function updatePassword(string $password, string $token)
     {
-        $userToken = DB::table('password_resets')->whereToken($token)->first();
+        $userToken = DB::table('password_reset_tokens')->whereToken($token)->first();
 
         if ($userToken) {
             $user = $this->findOneBy(['email' => $userToken->email]);
