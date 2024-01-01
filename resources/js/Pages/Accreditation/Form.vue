@@ -266,7 +266,7 @@ select option {
                                         <template v-for="(field, idx) in fields" :key="field.key">
                                             <b-col :sm="field.value.type !== '10' ? '6' : '12'" class="pb-2" v-if="!field.value.parent_index">
                                                 <div class="form-group mb-0">
-                                                    <label :for="`surveys-${idx}`" v-if="field.value.type !== '10'" :style="{ color: accessLevel?.page_design?.font_color}">{{
+                                                    <label :for="`surveys-${idx}`" v-if="field.value.type !== '10' && field.value.type !== '13'" :style="{ color: accessLevel?.page_design?.font_color}">{{
                                                             lang === 'arabic' ? field.value.title_arabic : field.value.title
                                                         }}:</label>
 
@@ -276,7 +276,7 @@ select option {
                                                         </Field>
                                                         <Field type="number"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }" :validateOnInput="true"/>
 
@@ -285,7 +285,7 @@ select option {
                                                     <Field type="text"
                                                            v-if="field.value.type === '1'"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }" :validateOnInput="true"/>
 
@@ -293,21 +293,21 @@ select option {
                                                            v-if="field.value.type === '2'"
                                                            rows="5"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
 
                                                     <Field type="date"
                                                            v-else-if="field.value.type === '3'"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
 
                                                     <Field type="file" title=" "
                                                            v-else-if="field.value.type === '4'"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            :id="`surveys-${idx}`"
                                                            accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
@@ -322,7 +322,7 @@ select option {
                                                     <Field as="select"
                                                            v-else-if="field.value.type === '6'"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true">
                                                         <option v-for="option in field.value.options"
@@ -335,7 +335,7 @@ select option {
                                                     <vue-select v-model="field.value.answer"
                                                                 v-else-if="field.value.type === '7'"
                                                                 :class="{'text-right': lang === 'arabic'}"
-                                                                :disabled="!!attendee"
+
                                                                 class="form-control mb-0"
                                                                 :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                                 sm="6"
@@ -350,7 +350,7 @@ select option {
                                                                :key="`${field.value.id}-${option.id}`"
                                                                :name="`surveys[${idx}].answer`"
                                                                v-slot="{field: boxField}"
-                                                               :disabled="!!attendee"
+
                                                                :class="`checkbox custom-checkbox-color`"
                                                                :validateOnInput="true"
                                                                :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
@@ -372,7 +372,7 @@ select option {
                                                                v-for="option in field.value.options"
                                                                :key="`${field.value.id}-${option.id}`"
                                                                :name="`surveys[${idx}].answer`"
-                                                               :disabled="!!attendee"
+
                                                                v-slot="{field: boxField}"
                                                                :class="`checkbox custom-radio-color`"
                                                                :validateOnInput="true"
@@ -397,7 +397,7 @@ select option {
                                                            v-else-if="field.value.type === '11'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
-                                                           :disabled="!!attendee"
+
                                                            :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                            :class="`form-control mb-0`" :validateOnInput="true">
                                                         <option v-for="country in countries"
@@ -406,6 +406,26 @@ select option {
                                                             {{ country.country }}
                                                         </option>
                                                     </Field>
+
+                                                    <template v-if="field.value.type === '13'">
+                                                      <br>
+                                                      <Field type="checkbox"
+                                                             :key="`${field.value.id}-tandc`"
+                                                             :name="`surveys[${idx}].answer`"
+                                                             v-slot="{field: boxField}"
+                                                             :class="`checkbox custom-checkbox-color`"
+                                                             :validateOnInput="true"
+                                                             :style="{backgroundColor: accessLevel?.page_design?.field_color, color: 'black'}"
+                                                             :value="true">
+                                                        <label class="mr-3">
+                                                          <input type="checkbox" :name="`surveys[${idx}].answer`"
+                                                                 v-bind="boxField"
+                                                                 :value="true"/> &nbsp;
+                                                          <a :href="field.value?.options[0].file_url" target="_blank">{{ lang === 'arabic' ? field.value?.title_arabic : field.value?.title }}</a>
+                                                        </label>
+                                                        <br>
+                                                      </Field>
+                                                    </template>
 
 
                                                     <ErrorMessage :name="`surveys[${idx}].answer`" class="text-danger"/>
@@ -424,7 +444,7 @@ select option {
                                                         </b-select>
                                                         <Field type="number"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }" :validateOnInput="true"/>
 
@@ -433,7 +453,7 @@ select option {
                                                     <Field type="text"
                                                            v-if="field.value.type === '1'"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }" :validateOnInput="true"/>
 
@@ -441,21 +461,21 @@ select option {
                                                            v-if="field.value.type === '2'"
                                                            rows="5"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
 
                                                     <Field type="date"
                                                            v-else-if="field.value.type === '3'"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
 
                                                     <Field type="file" title=" "
                                                            v-else-if="field.value.type === '4'"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
@@ -470,7 +490,7 @@ select option {
                                                     <Field as="select"
                                                            v-else-if="field.value.type === '6'"
                                                            :name="`surveys[${idx}].answer`"
-                                                           :disabled="!!attendee"
+
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true">
                                                         <option v-for="option in field.value.options"
@@ -483,7 +503,7 @@ select option {
                                                     <vue-select v-model="field.value.answer"
                                                                 v-else-if="field.value.type === '7'"
                                                                 :class="{'text-right': lang === 'arabic'}"
-                                                                :disabled="!!attendee"
+
                                                                 class="form-control mb-0"
                                                                 :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                                 sm="6"
@@ -499,7 +519,7 @@ select option {
                                                                :name="`surveys[${idx}].answer`"
                                                                v-slot="{field: boxField}"
                                                                :class="`checkbox custom-checkbox-color`"
-                                                               :disabled="!!attendee"
+
                                                                :validateOnInput="true"
                                                                :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                                :value="lang === 'arabic' ? option.name_arabic : option.name">
@@ -521,7 +541,7 @@ select option {
                                                                :key="`${field.value.id}-${option.id}`"
                                                                :name="`surveys[${idx}].answer`"
                                                                v-slot="{field: boxField}"
-                                                               :disabled="!!attendee"
+
                                                                :class="`checkbox custom-radio-color`"
                                                                :validateOnInput="true"
                                                                :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
@@ -545,7 +565,7 @@ select option {
                                                            v-else-if="field.value.type === '11'"
                                                            :name="`surveys[${idx}].answer`"
                                                            :id="`surveys-${idx}`"
-                                                           :disabled="!!attendee"
+
                                                            :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}"
                                                            :class="`form-control mb-0`" :validateOnInput="true">
                                                         <option v-for="country in countries"
@@ -565,7 +585,7 @@ select option {
                             </div>
 
                             <div class="col-12 pb-5 text-center" style="margin-top: 40px;">
-                                <b-btn type="submit" size="lg" class="px-5 py-2" :disabled="buttonDisabled || !!attendee" v-if="!isSubmitting"
+                                <b-btn type="submit" size="lg" class="px-5 py-2" :disabled="buttonDisabled" v-if="!isSubmitting"
                                        :style="{border:'none', backgroundColor: accessLevel?.page_design?.btn_color_code, color: accessLevel?.page_design?.btn_font_color_code}">
                                     {{
                                         lang === 'english' ? accessLevel?.page_design?.form_btn_value : accessLevel?.page_design?.form_btn_value_ar

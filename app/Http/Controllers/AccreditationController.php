@@ -9,6 +9,8 @@ use App\Models\Invite;
 use App\Services\AccessLevelsService;
 use App\Services\AttendeeService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class AccreditationController extends Controller
@@ -106,9 +108,23 @@ class AccreditationController extends Controller
         $accessLevel = $this->accessLevelsService->find($accessLevelId);
         $accessLevel->load(['pageDesign', 'event.organiser', 'generalSettings']);
 
+        $generalSettings = $accessLevel->generalSettings;
+
+        $success_message = optional($accessLevel->generalSettings)->success_message;
+        $success_message_arabic = optional($accessLevel->generalSettings)->success_message_arabic;
+
+        $link = optional($generalSettings)->link_address;
+
         return Inertia::render('Accreditation/FormSuccess', [
             'accessLevel' => $accessLevel,
-            'lang' => $request->lang
+            'lang' => $request->lang,
+            'success_message' => $success_message,
+            'success_message_arabic' => $success_message_arabic,
+            'social_share' => !!optional($generalSettings)->share_link,
+            'socials' => optional($generalSettings)->selected_socials ? json_decode($generalSettings->selected_socials) : [],
+            'social_share_message' => optional($generalSettings)->social_share_message,
+            'social_share_message_arabic' => optional($generalSettings)->social_share_message_arabic,
+            'link' => $link
         ]);
     }
 

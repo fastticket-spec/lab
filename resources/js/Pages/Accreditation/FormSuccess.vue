@@ -1,10 +1,37 @@
 <script setup>
 import {onMounted} from "vue";
+import Facebook from "../Events/Event/AccessLevels/components/Facebook.vue";
+import Twitter from "../Events/Event/AccessLevels/components/Twitter.vue";
+import LinkedIn from "../Events/Event/AccessLevels/components/LinkedIn.vue";
+import Whatsapp from "../Events/Event/AccessLevels/components/Whatsapp.vue";
 
 const props = defineProps({
     accessLevel: Object,
-    lang: String
+    lang: String,
+    success_message: String,
+    success_message_arabic: String,
+    social_share: Boolean,
+    socials: Array,
+    social_share_message: String,
+    social_share_message_arabic: String,
+    link: String
 })
+
+const share = ({value}) => {
+  let navUrl = '';
+  const text = props.lang === 'arabic' ? props.social_share_message_arabic : props.social_share_message;
+  if (value === 'facebook') {
+    navUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + props.link
+  } else if (value === 'twitter') {
+    navUrl = `https://twitter.com/intent/tweet?text=${text}&url=${props.link}`
+  } else if (value === 'linkedin') {
+    navUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${props.link}&title=${text}&summary=${text}`
+  } else if (value === 'whatsapp') {
+    navUrl = `https://wa.me/?text=${text} ${props.link}`
+  }
+  window.open(navUrl, '_blank');
+}
+
 
 onMounted(() => {
     document.querySelector('title').textContent = `${props.accessLevel.title} - ${props.accessLevel?.event?.organiser?.name}`
@@ -58,8 +85,17 @@ export default {
                         <img class="my-3 text-center img-fluid logo" :src="accessLevel?.page_design?.logo || accessLevel?.event?.event_image_url" alt="">
                     </div>
                     <p :style="{ color: accessLevel?.page_design?.font_color}"
-                        v-html="lang === 'arabic' ? accessLevel?.general_settings?.success_message_arabic : accessLevel?.general_settings?.success_message"
+                        v-html="lang === 'arabic' ? success_message_arabic : success_message"
                         class="text-center p-5"/>
+
+                    <div class="d-flex align-items-center justify-content-center" v-if="social_share">
+                      <a href="#" v-for="social in socials" :key="social.value" class="mr-2 mb-3" @click.prevent="share(social)">
+                        <Facebook :color="social.color" v-if="social.value === 'facebook' && social.enabled"/>
+                        <Twitter :color="social.color" v-if="social.value === 'twitter' && social.enabled"/>
+                        <LinkedIn :color="social.color" v-if="social.value === 'linkedin' && social.enabled"/>
+                        <Whatsapp :color="social.color" v-if="social.value === 'whatsapp' && social.enabled"/>
+                      </a>
+                    </div>
 
                     <div v-if="accessLevel?.page_design?.footer_logo" class="text-center">
                         <img :src="accessLevel?.page_design?.footer_logo" alt="" class="img-fluid" :style="`height: ${accessLevel?.page_design?.footer_logo_height}px; margin-bottom: 15px; text-align: center`">

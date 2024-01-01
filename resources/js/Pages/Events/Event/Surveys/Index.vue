@@ -5,6 +5,7 @@ import {router, usePage} from "@inertiajs/vue3";
 import {computed, onMounted, ref} from "vue";
 import VueSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
+import axios from 'axios';
 
 const props = defineProps({
     code: Number,
@@ -49,7 +50,8 @@ const initialValues = props.event_survey ? {
             options: (x.options).length > 0
                 ? x.options
                 : [{name: '', name_arabic: ''}],
-            open: false
+            open: false,
+            file: (x.type === '13' && ((x.options).length > 0)) ? x.options[0].file_url : ''
         }))
         : [
             {
@@ -162,6 +164,21 @@ const mappedSurveys = computed(() => idx => surveys.value.map((x, i) => ({...x, 
 
 const closeSurvey = surveyId => {
     setFieldValue(`surveys[${surveyId}].open`, false)
+}
+
+const uploadingFile = ref(false);
+const uploadTandCFile = async (event, idx) => {
+  uploadingFile.value = true;
+  const formData = new FormData();
+  formData.append('file', event.target.files[0]);
+  try {
+    const {data: {file}} = await axios.post(`/event/${props.event_id}/event-surveys/upload-tandc-file`, formData);
+    surveys.value[idx].file = file;
+    uploadingFile.value = false;
+  } catch (e) {
+    console.log(e);
+    uploadingFile.value = false;
+  }
 }
 
 const onSubmit = handleSubmit((values) => {
@@ -292,6 +309,15 @@ const canValidateInput = computed(() => fieldValue => {
                                             </Field>
                                             <ErrorMessage :name="`surveys[${idx}].type`" class="text-danger"/>
                                         </div>
+                                    </b-col>
+
+                                    <b-col v-show="field?.value?.open && (surveys[idx].type === '13')" sm="6">
+                                      <div class="mt-3" v-if="surveys[idx].options?.length > 0"><a :href="surveys[idx].options[0].file_url" target="_blank">{{surveys[idx].options[0].file_url}}</a></div>
+                                      <label :class="{'mt-3': surveys[idx].options?.length < 1}">
+                                        Tandc file
+                                        <br>
+                                        <input type="file" @change="uploadTandCFile($event, idx)" />
+                                      </label>
                                     </b-col>
 
                                     <b-col v-show="field?.value?.open" sm="2">
@@ -539,7 +565,7 @@ const canValidateInput = computed(() => fieldValue => {
 
                             <b-row class="mt-3">
                                 <b-col>
-                                    <b-button type="submit" :disabled="isSubmitting" variant="primary">
+                                    <b-button type="submit" :disabled="isSubmitting || uploadingFile" variant="primary">
                                         {{ $t(`button.${access_levels ? 'update' : 'create'}`) }}
                                     </b-button>
                                 </b-col>
