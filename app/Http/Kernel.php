@@ -5,6 +5,7 @@ namespace App\Http;
 use App\Http\Middleware\ActiveOrganiser;
 use App\Http\Middleware\CanEdit;
 use App\Http\Middleware\CheckIn;
+use App\Http\Middleware\CheckInOut;
 use App\Http\Middleware\OnlyAdmin;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -45,7 +46,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -73,5 +74,6 @@ class Kernel extends HttpKernel
         'only-admin' => OnlyAdmin::class,
         'can-edit' => CanEdit::class,
         'checkin' => CheckIn::class,
+        'checkinout' => CheckInOut::class,
     ];
 }

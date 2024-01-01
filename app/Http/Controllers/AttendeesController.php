@@ -206,7 +206,15 @@ class AttendeesController extends Controller
     {
         $request->validate(['attendee_ref' => 'required']);
 
-        return $this->attendeeService->checkinAttendee($request->attendee_ref);
+        return auth()->user()->userRole() == 'Checkin Users'
+            ? $this->attendeeService->checkinAttendee($request->attendee_ref)
+            : $this->attendeeService->checkoutAttendee($request->attendee_ref);
+    }
+    public function checkOutAttendee(Request $request)
+    {
+        $request->validate(['attendee_ref' => 'required']);
+
+        return $this->attendeeService->checkoutAttendee($request->attendee_ref);
     }
 
     public function scanAttendee(Request $request)

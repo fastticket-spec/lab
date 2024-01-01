@@ -922,6 +922,7 @@ class AttendeeService extends BaseRepository
             $attendee = $this->model->query()
                 ->whereRef($attendeeRef)
                 ->with(['accessLevel', 'event'])
+                ->where('status', 1)
                 ->whereHas('event', function ($query) use ($eventAccessIds) {
                     $query->whereIn('id', $eventAccessIds);
                 })
@@ -942,6 +943,54 @@ class AttendeeService extends BaseRepository
             return $this->view(
                 data: ['message' => 'Checked in successfully', 'attendee' => $attendee->answers, 'checked_in_by' => auth()->user()->first_name . ' ' . auth()->user()->last_name],
                 flashMessage: 'Checked in successfully',
+                component: '/dashboard',
+                returnType: 'redirect'
+            );
+        } catch (\Throwable $th) {
+            if ($th instanceof ModelNotFoundException) {
+                return $this->view(
+                    data: ['message' => 'Reference not found'],
+                    statusCode: 400,
+                    flashMessage: 'Reference not found',
+                    component: '/dashboard',
+                    returnType: 'redirect'
+                );
+            }
+            throw $th;
+        }
+    }
+
+    public function checkoutAttendee(string $attendeeRef)
+    {
+        try {
+            $eventAccessIds = auth()->user()->userEventAccessId();
+
+            $attendee = $this->model->query()
+                ->whereRef($attendeeRef)
+                ->with(['accessLevel', 'event'])
+                ->where('status', 1)
+                ->whereHas('event', function ($query) use ($eventAccessIds) {
+                    $query->whereIn('id', $eventAccessIds);
+                })
+                ->firstOrFail();
+
+            if (!$attendee->attendeeCheckins()->exists()) {
+                return $this->view(
+                    data: ['message' => 'Attendee has not been checked in yet.'],
+                    statusCode: 400,
+                    flashMessage: 'Attendee has not been checked in yet.',
+                    component: '/dashboard',
+                    returnType: 'redirect'
+                );
+            }
+
+            $attendeeCheckin = $attendee->attendeeCheckins()->latest()->first();
+
+            $attendeeCheckin->update(['checkout' => now()]);
+
+            return $this->view(
+                data: ['message' => 'Checked out successfully'],
+                flashMessage: 'Checked out successfully',
                 component: '/dashboard',
                 returnType: 'redirect'
             );

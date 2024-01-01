@@ -11,4 +11,8 @@ class RoleService extends BaseRepository
     {
         parent::__construct($model);
     }
+    public function fetchRoles()
+    {
+        return $this->model->query()->orderBy('role')->get(['id', 'role']);
+    }
 }

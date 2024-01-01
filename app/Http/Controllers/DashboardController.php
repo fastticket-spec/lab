@@ -18,8 +18,7 @@ class DashboardController extends Controller
         private AttendeeService  $attendeeService,
         private BadgeService     $badgeService,
         private AccountEventAccessService $accountEventAccessService
-    )
-    {
+    ) {
     }
 
     public function index(): \Inertia\Response
@@ -33,10 +32,10 @@ class DashboardController extends Controller
 
         $eventsAccessID = null;
         if ($roleId) {
-            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn($access) => $access->event_id);
+            $eventsAccessID = $this->accountEventAccessService->findBy(['account_id' => $account->id])->map(fn ($access) => $access->event_id);
         }
 
-        if ($userRole === 'Checkin Users' || $userRole === 'Misc') {
+        if ($userRole === 'Checkin Users' || $userRole === 'Checkout Users' || $userRole === 'Misc') {
             return Inertia::render('Dashboard/CheckInUserDashboard');
         }
 
@@ -100,16 +99,16 @@ class DashboardController extends Controller
         return Inertia::render("Dashboard/Index", [
             'data' => $data,
             'attendees' => []
-//        'attendees' => Attendee::with('event')
-//                ->latest()
-//                ->when($active_organiser, function ($query) use ($active_organiser) {
-//                    $query->whereOrganiserId($active_organiser);
-//                })
-//                ->when($eventsAccessID, function ($query) use ($eventsAccessID) {
-//                    $query->whereIn('event_id', $eventsAccessID);
-//                })
-//                ->take(10)
-//                ->get()
+            //        'attendees' => Attendee::with('event')
+            //                ->latest()
+            //                ->when($active_organiser, function ($query) use ($active_organiser) {
+            //                    $query->whereOrganiserId($active_organiser);
+            //                })
+            //                ->when($eventsAccessID, function ($query) use ($eventsAccessID) {
+            //                    $query->whereIn('event_id', $eventsAccessID);
+            //                })
+            //                ->take(10)
+            //                ->get()
         ]);
     }
 }

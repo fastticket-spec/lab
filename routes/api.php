@@ -16,6 +16,9 @@ Route::prefix('checkin-user')->group(function () {
 
     Route::group(['middleware' => ['auth:api', 'checkin']], function () {
         Route::post('verify-attendee', [AttendeesController::class, 'checkAttendee']);
+    });
+
+    Route::group(['middleware' => ['auth:api', 'checkinout']], function () {
         Route::post('check-in', [AttendeesController::class, 'checkInAttendee']);
     });
 });

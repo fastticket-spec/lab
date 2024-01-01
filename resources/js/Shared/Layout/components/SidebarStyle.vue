@@ -115,7 +115,7 @@ const menu = computed(() => {
                 "icon": "ri-home-4-line"
             }
         ];
-    } else if (userRole.value === 'Checkin Users' || userRole.value === 'Misc') {
+    } else if (userRole.value === 'Checkin Users' || userRole.value === 'Checkout Users' || userRole.value === 'Misc') {
         return [
             {
                 "title": "Scan Attendee",

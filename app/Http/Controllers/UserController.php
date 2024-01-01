@@ -27,7 +27,7 @@ class UserController extends Controller
     public function create(): \Inertia\Response
     {
         return Inertia::render('Users/Create', [
-            'roles' => $this->roleService->all(['id', 'role']),
+            'roles' => $this->roleService->fetchRoles(),
             'events' => Event::whereOrganiserId(auth()->user()->account->active_organiser)
                 ->get(['id', 'title', 'title_arabic'])
         ]);
