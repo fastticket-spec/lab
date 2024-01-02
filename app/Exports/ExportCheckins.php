@@ -21,9 +21,9 @@ class ExportCheckins implements FromCollection, WithHeadings, WithStyles, WithCh
             "FIRST NAME",
             "LAST NAME",
             "CHECKIN TIME",
-            "CHECKIN USER"
+            "CHECKIN USER",
+            "CHECKOUT TIME"
         ];
-
     }
 
 
@@ -36,7 +36,7 @@ class ExportCheckins implements FromCollection, WithHeadings, WithStyles, WithCh
     {
         return [
             // Style the first row as bold text.
-            1    => ['font' => ['bold' => true ]],
+            1    => ['font' => ['bold' => true]],
         ];
     }
 

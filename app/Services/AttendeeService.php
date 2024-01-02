@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Endroid\QrCode\QrCode;
 use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class AttendeeService extends BaseRepository
 {
@@ -1224,7 +1225,9 @@ class AttendeeService extends BaseRepository
                     'first_name' => $checkin[0]->attendee->first_name,
                     'last_name' => $checkin[0]->attendee->last_name,
                     'checkin_time' => $checkin[0]->created_at->format('d-M-Y H:i'),
-                    'checkin_user' => optional($checkinUser)->first_name . ' ' . optional($checkinUser)->last_name
+                    'checkin_user' => optional($checkinUser)->first_name . ' ' . optional($checkinUser)->last_name,
+                    'checkout_time' => $checkin->checkout ? Carbon::createFromFormat('Y-m-d H:i:s', $checkin->checkout)->format('d-M-Y H:i') : ''
+
                 ];
             });
 
