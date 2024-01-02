@@ -1226,7 +1226,7 @@ class AttendeeService extends BaseRepository
                     'last_name' => $checkin[0]->attendee->last_name,
                     'checkin_time' => $checkin[0]->created_at->format('d-M-Y H:i'),
                     'checkin_user' => optional($checkinUser)->first_name . ' ' . optional($checkinUser)->last_name,
-                    'checkout_time' => $checkin->checkout ? Carbon::createFromFormat('Y-m-d H:i:s', $checkin->checkout)->format('d-M-Y H:i') : ''
+                    'checkout_time' => $checkin[0]->checkout ? Carbon::createFromFormat('Y-m-d H:i:s', $checkin->checkout)->format('d-M-Y H:i') : ''
 
                 ];
             });
