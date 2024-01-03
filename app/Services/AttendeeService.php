@@ -879,9 +879,13 @@ class AttendeeService extends BaseRepository
                 })
                 ->firstOrFail();
 
-            if ($attendee->attendeeCheckins()->exists()) {
+            $accessLevel = $attendee->accessLevel;
+
+            $checkinLimit = optional($accessLevel->generalSettings)->checkin_limit;
+
+            if ($checkinLimit && ($attendee->attendeeCheckins()->whereDate('checkin', today())->count() >= $checkinLimit)) {
                 return $this->view(
-                    data: ['message' => 'Attendee already checked in.'],
+                    data: ['message' => 'Attendee check in limit exceeded.'],
                     statusCode: 400,
                     flashMessage: 'Attendee already checked in.',
                     component: '/dashboard',
@@ -929,15 +933,19 @@ class AttendeeService extends BaseRepository
                 })
                 ->firstOrFail();
 
-            // if ($attendee->attendeeCheckins()->exists()) {
-            //     return $this->view(
-            //         data: ['message' => 'Attendee already checked in.'],
-            //         statusCode: 400,
-            //         flashMessage: 'Attendee already checked in.',
-            //         component: '/dashboard',
-            //         returnType: 'redirect'
-            //     );
-            // }
+            $accessLevel = $attendee->accessLevel;
+
+            $checkinLimit = optional($accessLevel->generalSettings)->checkin_limit;
+
+            if ($checkinLimit && ($attendee->attendeeCheckins()->whereDate('checkin', today())->count() >= $checkinLimit)) {
+                return $this->view(
+                    data: ['message' => 'Attendee check in limit exceeded.'],
+                    statusCode: 400,
+                    flashMessage: 'Attendee already checked in.',
+                    component: '/dashboard',
+                    returnType: 'redirect'
+                );
+            }
 
             $attendee->checkinAttendee();
 

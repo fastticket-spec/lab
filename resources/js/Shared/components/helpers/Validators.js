@@ -85,7 +85,8 @@ export const accessLevelGeneralSchema = yup.object({
     email_message: yup.string().required('This field is required.'),
     email_message_arabic: yup.string().nullable(),
     start_on: yup.string().nullable(),
-    end_on: yup.string().nullable()
+    end_on: yup.string().nullable(),
+    checkin_limit: yup.number().nullable()
 })
 
 export const accessLevelRequestFormSchema = yup.object({

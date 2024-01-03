@@ -38,6 +38,8 @@ class AccessLevelGeneralSetting extends Model
         "selected_socials",
         "social_share_message",
         "social_share_message_arabic",
-        "link_address"
+        "link_address",
+        "checkin_limit",
+        "checkout_limit"
     ];
 }
