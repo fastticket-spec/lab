@@ -4,7 +4,8 @@ import {usePage} from "@inertiajs/vue3";
 
 const props = defineProps({
     data: Array,
-    attendees: Array
+    attendees: Array,
+    eventId: String
 })
 
 const userRole = computed(() => usePage().props.user_role);
@@ -75,7 +76,7 @@ const showItem = item => {
                             <template v-slot:button-content>
                                 <span class="text-primary"><i class="ri-more-fill"></i></span>
                             </template>
-                            <Link class="dropdown-item" href="/attendees"><i
+                            <Link class="dropdown-item" :href="eventId ? `/event/${eventId}/attendees` : '/attendees'"><i
                                 class="ri-eye-fill mr-2"></i>{{ $t('dashboard.orders_view') }}
                             </Link>
                         </b-dropdown>

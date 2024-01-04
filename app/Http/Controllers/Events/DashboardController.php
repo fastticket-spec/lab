@@ -76,7 +76,8 @@ class DashboardController extends Controller
 
         return Inertia::render('Events/Event/Dashboard', [
             'data' => $data,
-            'attendees' => Attendee::with('event')->whereEventId($eventId)->latest()->take(10)->get()
+            'attendees' => Attendee::with('event')->whereEventId($eventId)->latest()->take(10)->get(),
+            'eventId' => $eventId
         ]);
     }
 
