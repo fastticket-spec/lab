@@ -883,7 +883,10 @@ class AttendeeService extends BaseRepository
 
             $checkinLimit = optional($accessLevel->generalSettings)->checkin_limit;
 
-            if ($checkinLimit && ($attendee->attendeeCheckins()->whereDate('checkin', today())->count() >= $checkinLimit)) {
+            $attendeeCheckinsCount = $attendee->attendeeCheckins()->whereDate('checkin', today())->count();
+            $attendeeCheckoutsCount = $attendee->attendeeCheckins()->whereDate('checkin', today())->whereNotNull('checkout')->count();
+
+            if ($checkinLimit && (($attendeeCheckinsCount - $attendeeCheckoutsCount) >= $checkinLimit)) {
                 return $this->view(
                     data: ['message' => 'Attendee check in limit exceeded.'],
                     statusCode: 400,
@@ -937,7 +940,10 @@ class AttendeeService extends BaseRepository
 
             $checkinLimit = optional($accessLevel->generalSettings)->checkin_limit;
 
-            if ($checkinLimit && ($attendee->attendeeCheckins()->whereDate('checkin', today())->count() >= $checkinLimit)) {
+            $attendeeCheckinsCount = $attendee->attendeeCheckins()->whereDate('checkin', today())->count();
+            $attendeeCheckoutsCount = $attendee->attendeeCheckins()->whereDate('checkin', today())->whereNotNull('checkout')->count();
+
+            if ($checkinLimit && (($attendeeCheckinsCount - $attendeeCheckoutsCount) >= $checkinLimit)) {
                 return $this->view(
                     data: ['message' => 'Attendee check in limit exceeded.'],
                     statusCode: 400,
