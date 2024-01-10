@@ -90,5 +90,16 @@
                 "type": "account manager"
             }
         ]
+    },
+    {
+        "title": "Activity Logs",
+        "name": "sidebar.logs",
+        "is_heading": false,
+        "is_active": false,
+        "link": "/admin-logs",
+        "class_name": "",
+        "is_icon_class": true,
+        "component": "AdminLogs/Index",
+        "icon": "ri-home-4-line"
     }
 ]

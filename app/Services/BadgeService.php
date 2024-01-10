@@ -56,6 +56,8 @@ class BadgeService extends BaseRepository
 
         $message = 'Badge Created';
 
+        $this->logActivity("created $badge->title badge", $badge);
+
         return $this->view(
             data: ['data' => $badge, 'message' => $message],
             flashMessage: $message,
@@ -80,6 +82,8 @@ class BadgeService extends BaseRepository
         }
 
         $message = 'Badge Updated';
+
+        $this->logActivity("updated $badge->title badge", $badge);
 
         return $this->view(
             data: ['data' => [], 'message' => $message],

@@ -128,6 +128,8 @@ class AccessLevelsService extends BaseRepository
         try {
             $accessLevel = $this->create($data + ['event_id' => $eventId]);
 
+            $this->logActivity("created $accessLevel->title access level", $accessLevel);
+
             $message = 'Access level created';
             return $this->view(data: ['access_level' => $accessLevel, 'message' => $message], flashMessage: $message, component: "/event/$eventId/access-levels", returnType: 'redirect');
         } catch (\Throwable $th) {
@@ -141,7 +143,11 @@ class AccessLevelsService extends BaseRepository
     public function updateAccessLevel(Request $request, string $eventId, string $accessLevelId)
     {
         try {
-            $this->find($accessLevelId)->update($request->all());
+            $accessLevel = $this->find($accessLevelId);
+            $accessLevel->update($request->all());
+
+            $this->logActivity("updated $accessLevel->title access level", $accessLevel);
+
             $message = 'Access level updated successfully.';
 
             return $this->view(data: ['message' => $message], flashMessage: $message, component: "/event/$eventId/access-levels", returnType: 'redirect');
@@ -159,6 +165,8 @@ class AccessLevelsService extends BaseRepository
             $accessLevel = $this->find($accessLevelId);
             $accessLevel->update(['status' => $accessLevel->status ? 0 : 1]);
 
+            $this->logActivity(($accessLevel->status == 1 ? 'activated' : 'deactivated') . " $accessLevel->title access level", $accessLevel);
+
             $message = 'Access level status updated successfully.';
 
             return $this->view(data: ['message' => $message], flashMessage: $message, component: "/event/$eventId/access-levels", returnType: 'redirect');
@@ -175,6 +183,8 @@ class AccessLevelsService extends BaseRepository
         try {
             $accessLevel = $this->find($accessLevelId);
             $accessLevel->update(['public_status' => $accessLevel->public_status ? 0 : 1]);
+
+            $this->logActivity(($accessLevel->public_status == 1 ? 'activated' : 'deactivated') . " $accessLevel->title access level for public", $accessLevel);
 
             $message = 'Access level status updated successfully.';
 
@@ -201,6 +211,8 @@ class AccessLevelsService extends BaseRepository
 
             $accessLevel->generalSettings()->updateOrCreate(['access_level_id' => $accessLevelId], $request->except('selected_socials') + ['selected_socials' => json_encode($request->selected_socials)]);
 
+            $this->logActivity("customized $accessLevel->title access level", $accessLevel);
+
             $message = 'Access level settings updated';
 
             return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
@@ -220,6 +232,8 @@ class AccessLevelsService extends BaseRepository
             $accessLevel = $this->find($accessLevelId);
 
             $accessLevel->pageDesign()->updateOrCreate(['access_level_id' => $accessLevelId], $request->all());
+
+            $this->logActivity("updated page design for $accessLevel->title access level", $accessLevel);
 
             $message = 'Access level page design updated';
 
@@ -486,6 +500,11 @@ class AccessLevelsService extends BaseRepository
                 )->delay(now()->addSeconds(3));
             }
         }
+
+        $invitesCount = count($invitations);
+        $invitesData = collect($invitations)->map(fn ($invite) => ['phone' => $invite['phone'], 'email' => $invite['email']]);
+
+        $this->logActivity("sent $invitesCount invitation(s) from $accessLevel->title access level", $accessLevel, $invitesData->toArray());
 
         $message = 'Invitation has been sent to the ' . ($request->invitation_type == 'mail' ? 'emails' : 'phone numbers') . ' supplied';
 

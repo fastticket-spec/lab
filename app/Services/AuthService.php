@@ -52,6 +52,8 @@ class AuthService extends BaseRepository
 
         $accessToken = $user->createToken('authenticate_user')->accessToken;
 
+        $this->logActivity("logged in", $user);
+
         return [
             'user' => $user,
             'accessToken' => $accessToken,

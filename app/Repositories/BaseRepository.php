@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Contracts\BaseContract;
+use App\Helpers\ActivityLogger;
 use App\Http\Responses\HttpResponse;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class BaseRepository implements BaseContract
 {
-    use HttpResponse;
+    use HttpResponse, ActivityLogger;
 
     protected $model;
 

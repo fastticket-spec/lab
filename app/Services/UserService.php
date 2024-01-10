@@ -6,6 +6,7 @@ use App\Http\Requests\User\AddUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Mail\NewManager;
 use App\Mail\NewOrganiserUser;
+use App\Models\Role;
 use App\Models\User;
 use App\Repositories\BaseRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -96,6 +97,9 @@ class UserService extends BaseRepository
 
             Mail::to($user->email)->later(now()->addSeconds(3), new NewOrganiserUser("$user->first_name $user->last_name", $account->role->role, $user->email, $password, $organiser));
 
+            $role = Role::find($request->role_id);
+            $this->logActivity("added $user->fullName as $role->role", $user, $user->toArray());
+
             DB::commit();
             $message = 'User created successfully!';
 
@@ -150,6 +154,8 @@ class UserService extends BaseRepository
             ]);
 
             $account->eventAccess()->insert($eventAccesses->toArray());
+
+            $this->logActivity("updated $user->fullName user account", $user, $user->toArray());
             DB::commit();
 
             $message = 'User updated successfully!';
@@ -186,6 +192,8 @@ class UserService extends BaseRepository
         $user = $this->find($userId);
         $user->account->eventAccess()->delete();
         $user->account->delete();
+
+        $this->logActivity("deleted $user->fullName user account", $user, $user->toArray());
         $user->delete();
 
         DB::commit();
@@ -257,6 +265,8 @@ class UserService extends BaseRepository
 
             $message = 'Account manager created successfully';
 
+            $this->logActivity("created an account manager", $manager, ['first_name' => $manager->first_name, 'last_name' => $manager->last_name, 'email' => $manager->email]);
+
             return $this->view(
                 data: [
                     'message' => $message
@@ -283,6 +293,7 @@ class UserService extends BaseRepository
     {
         $accountManager = $this->find($accountManagerId);
         if ($accountManager->parent_account_id) {
+            $this->logActivity("deleted account manager ($accountManager->email)", $accountManager, ['first_name' => $accountManager->first_name, 'last_name' => $accountManager->last_name, 'email' => $accountManager->email]);
             $this->delete($accountManagerId);
         }
 
