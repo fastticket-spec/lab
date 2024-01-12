@@ -41,6 +41,8 @@ class LoginController extends Controller
 
     public function logout(): \Illuminate\Http\RedirectResponse
     {
+        $this->logActivity('logged out');
+
         auth()->logout();
         return redirect('/login');
     }

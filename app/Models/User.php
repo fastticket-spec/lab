@@ -34,6 +34,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
+    public function getFullNameAttribute(): string
+    {
+        return ucfirst($this->first_name) . ' ' . ucfirst($this->last_name);
+    }
+
     public function account(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Account::class, 'owner', 'id');

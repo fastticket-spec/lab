@@ -80,6 +80,8 @@ class OrganiserController extends Controller
 
     public function update(OrganiserRequest $request, string $organiserId)
     {
+        $organiser = $this->organiserService->find($organiserId);
+
         $updateOrganiser = $this->organiserService->update($request->except(['organiser_logo', 'organiser_logo_arabic']), $organiserId);
 
         if (!$updateOrganiser) {
@@ -89,14 +91,14 @@ class OrganiserController extends Controller
                 ], statusCode: Response::HTTP_BAD_REQUEST, component: 'Organisers\Edit');
         }
 
-        $organiser = $this->organiserService->find($organiserId);
+        $this->logActivity("updated organiser details for $organiser->name", $organiser);
 
         $message = 'Organiser updated successfully';
 
         return $this->view(
             data: [
                 'message' => $message,
-                'data' => $organiser
+                'data' => $organiser->refresh()
             ], flashMessage: $message, component: '/organisers', returnType: 'redirect'
         );
     }
@@ -114,6 +116,8 @@ class OrganiserController extends Controller
                 ], statusCode: Response::HTTP_BAD_REQUEST, component: 'Organisers\Edit');
         }
         $message = 'Organiser updated successfully';
+
+        $this->logActivity("updated organiser logo for $organiser->name", $organiser);
 
         return $this->view(
             data: [
@@ -140,6 +144,8 @@ class OrganiserController extends Controller
             );
         }
 
+        $this->logActivity("logged in to $organiser->name organiser", $organiser);
+
         return $this->view(
             data: [
                 'message' => 'Organiser logged in',
@@ -161,6 +167,8 @@ class OrganiserController extends Controller
                 ], statusCode: Response::HTTP_BAD_REQUEST, component: 'Organisers\Edit' //change component
             );
         }
+
+        $this->logActivity("logged out of $organiser->name organiser", $organiser);
 
         return $this->view(
             data: [

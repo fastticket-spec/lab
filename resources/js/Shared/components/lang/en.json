@@ -65,7 +65,8 @@
         "badges": "Badges",
         "accepted": "Accepted",
         "declined": "Declined",
-        "downloads": "Downloads"
+        "downloads": "Downloads",
+        "logs": "Activity Logs"
     },
     "customize": {
         "general": "General",

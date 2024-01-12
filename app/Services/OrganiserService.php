@@ -88,6 +88,8 @@ class OrganiserService extends BaseRepository
             $this->removeUploadedFile($organiserNavBarLogo);
             $this->removeUploadedFile($organiserBanner);
             $this->removeUploadedFile($organiserBannerArabic);
+        } else {
+            $this->logActivity("created an organiser", $organiser, ['name' => $organiser->name, 'email' => $organiser->email]);
         }
 
         return $organiser;

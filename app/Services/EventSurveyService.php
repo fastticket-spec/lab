@@ -73,6 +73,9 @@ class EventSurveyService extends BaseRepository
                 'input_length' => $survey['input_length'] ?? null
             ]);
         }
+
+        $this->logActivity("created surveys");
+
         DB::commit();
 
         $message = 'Survey created successfully';
@@ -114,6 +117,9 @@ class EventSurveyService extends BaseRepository
                 'input_length' => $survey['input_length'] ?? null
             ]);
         }
+
+        $this->logActivity("updated surveys");
+
         DB::commit();
 
         $message = 'Survey updated successfully';
@@ -129,7 +135,7 @@ class EventSurveyService extends BaseRepository
             $status = $eventSurvey->status ? 0 : 1;
             $eventSurvey->update(['status' => $status]);
 
-            $message = 'Status pdated successfully.';
+            $message = 'Status updated successfully.';
             return $this->view(data: ['message' => $message], flashMessage: $message, component: $route, returnType: 'redirect');
 
         } catch (\Throwable $th) {

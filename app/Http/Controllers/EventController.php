@@ -53,6 +53,8 @@ class EventController extends Controller
 
         $message = 'Event created successfully';
 
+        $this->logActivity("created $event->title category", $event);
+
         return $this->view(
             data: [
                 'message' => $message,
@@ -107,6 +109,8 @@ class EventController extends Controller
 
         $message = 'Event updated successfully';
 
+        $this->logActivity("updated $event->title category", $updatedEvent);
+
         return $this->view(
             data: [
                 'message' => $message,
@@ -122,6 +126,10 @@ class EventController extends Controller
 
     public function destroy(string $eventId): RedirectResponse
     {
+        $event = $this->eventService->find($eventId);
+
+        $this->logActivity("deleted $event->title category", $event, $event->toArray());
+
         $this->eventService->delete($eventId);
         return $this->view(flashMessage: 'Event deleted successfully', component: '/events', returnType: 'redirect');
     }

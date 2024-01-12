@@ -266,6 +266,10 @@ class AttendeeService extends BaseRepository
             ->whereIn('id', $attendeeIds)
             ->get();
 
+        $attendeesCount = count($attendees);
+
+        $this->logActivity(description: "approved $attendeesCount attendee(s)", properties: $attendees->map(fn ($attendee) => ['id' => $attendee->id, 'first_name' => $attendee->first_name, 'last_name' => $attendee->last_name, 'email' => $attendee->email])->toArray());
+
         if ($status == 1) {
             $this->sendApprovalEmailToAttendees($attendees);
         }
@@ -329,6 +333,8 @@ class AttendeeService extends BaseRepository
 
         $attendee->zones()->delete();
 
+        $zonesString = join(',', $zones);
+
         $zones = collect($zones)->map(fn ($zone) => [
             'id' => Str::uuid(),
             'attendee_id' => $attendeeId,
@@ -338,6 +344,8 @@ class AttendeeService extends BaseRepository
         ]);
 
         DB::table('attendee_zones')->insert($zones->toArray());
+
+        $this->logActivity("assigned $zonesString zone(s) to attendee", $attendee);
 
         $message = 'Zones has been assigned to attendee';
         $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
@@ -355,6 +363,8 @@ class AttendeeService extends BaseRepository
 
         $attendee->areas()->delete();
 
+        $areasString = join(',', $areas);
+
         $areas = collect($areas)->map(fn ($area) => [
             'id' => Str::uuid(),
             'attendee_id' => $attendeeId,
@@ -364,6 +374,8 @@ class AttendeeService extends BaseRepository
         ]);
 
         DB::table('attendee_areas')->insert($areas->toArray());
+
+        $this->logActivity("assigned $areasString area(s) to attendee", $attendee);
 
         $message = 'Areas has been assigned to attendee';
         $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
@@ -382,6 +394,8 @@ class AttendeeService extends BaseRepository
             ->whereIn('id', $attendeeIds)
             ->get();
 
+        $zonesString = join(',', $zones);
+
         foreach ($attendees as $attendee) {
             $attendee->zones()->delete();
 
@@ -394,6 +408,9 @@ class AttendeeService extends BaseRepository
         }
 
         $message = 'Zones has been assigned to attendees';
+
+        $this->logActivity(description: "assigned $zonesString zone(s) to attendees", properties: $attendees->map(fn ($attendee) => ['id' => $attendee->id, 'first_name' => $attendee->first_name, 'last_name' => $attendee->last_name, 'email' => $attendee->email])->toArray());
+
         $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         return $this->view(
             data: ['message' => $message],
@@ -410,6 +427,8 @@ class AttendeeService extends BaseRepository
             ->whereIn('id', $attendeeIds)
             ->get();
 
+        $areasString = join(',', $areas);
+
         foreach ($attendees as $attendee) {
             $attendee->areas()->delete();
 
@@ -422,6 +441,9 @@ class AttendeeService extends BaseRepository
         }
 
         $message = 'Area has been assigned to attendees';
+
+        $this->logActivity(description: "assigned $areasString area(s) to attendees", properties: $attendees->map(fn ($attendee) => ['id' => $attendee->id, 'first_name' => $attendee->first_name, 'last_name' => $attendee->last_name, 'email' => $attendee->email])->toArray());
+
         $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
         return $this->view(
             data: ['message' => $message],
@@ -514,6 +536,8 @@ class AttendeeService extends BaseRepository
                 'email' => $email,
                 'answers' => $answers
             ]);
+
+            $this->logActivity(description: "updated survey answers for attendee", performedOn: $attendee, properties: $attendee->answers);
 
             DB::commit();
 
@@ -848,6 +872,9 @@ class AttendeeService extends BaseRepository
             }
         }
 
+        $attendeesCount = count($attendees);
+
+        $this->logActivity("uploaded $attendeesCount attendee(s) for $accessLevel->title access level");
         DB::commit();
 
         $message = 'Attendees uploaded successfully!';
@@ -879,9 +906,16 @@ class AttendeeService extends BaseRepository
                 })
                 ->firstOrFail();
 
-            if ($attendee->attendeeCheckins()->exists()) {
+            $accessLevel = $attendee->accessLevel;
+
+            $checkinLimit = optional($accessLevel->generalSettings)->checkin_limit;
+
+            $attendeeCheckinsCount = $attendee->attendeeCheckins()->whereDate('checkin', today())->count();
+            $attendeeCheckoutsCount = $attendee->attendeeCheckins()->whereDate('checkin', today())->whereNotNull('checkout')->count();
+
+            if ($checkinLimit && (($attendeeCheckinsCount - $attendeeCheckoutsCount) >= $checkinLimit)) {
                 return $this->view(
-                    data: ['message' => 'Attendee already checked in.'],
+                    data: ['message' => 'Attendee check in limit exceeded.'],
                     statusCode: 400,
                     flashMessage: 'Attendee already checked in.',
                     component: '/dashboard',
@@ -929,17 +963,26 @@ class AttendeeService extends BaseRepository
                 })
                 ->firstOrFail();
 
-            // if ($attendee->attendeeCheckins()->exists()) {
-            //     return $this->view(
-            //         data: ['message' => 'Attendee already checked in.'],
-            //         statusCode: 400,
-            //         flashMessage: 'Attendee already checked in.',
-            //         component: '/dashboard',
-            //         returnType: 'redirect'
-            //     );
-            // }
+            $accessLevel = $attendee->accessLevel;
+
+            $checkinLimit = optional($accessLevel->generalSettings)->checkin_limit;
+
+            $attendeeCheckinsCount = $attendee->attendeeCheckins()->whereDate('checkin', today())->count();
+            $attendeeCheckoutsCount = $attendee->attendeeCheckins()->whereDate('checkin', today())->whereNotNull('checkout')->count();
+
+            if ($checkinLimit && (($attendeeCheckinsCount - $attendeeCheckoutsCount) >= $checkinLimit)) {
+                return $this->view(
+                    data: ['message' => 'Attendee check in limit exceeded.'],
+                    statusCode: 400,
+                    flashMessage: 'Attendee already checked in.',
+                    component: '/dashboard',
+                    returnType: 'redirect'
+                );
+            }
 
             $attendee->checkinAttendee();
+
+            $this->logActivity(description: "checked in $attendee->first_name $attendee->last_name", performedOn: $attendee, properties: ['id' => $attendee->id, 'first_name' => $attendee->first_name, 'last_name' => $attendee->last_name, 'email' => $attendee->email]);
 
             return $this->view(
                 data: ['message' => 'Checked in successfully', 'attendee' => $attendee->answers, 'checked_in_by' => auth()->user()->first_name . ' ' . auth()->user()->last_name],
@@ -1028,6 +1071,8 @@ class AttendeeService extends BaseRepository
 
             $attendee->checkinAttendee();
 
+            $this->logActivity(description: "checked in $attendee->first_name $attendee->last_name", performedOn: $attendee, properties: ['id' => $attendee->id, 'first_name' => $attendee->first_name, 'last_name' => $attendee->last_name, 'email' => $attendee->email]);
+
             return $this->view(
                 data: ['message' => 'Checked in successfully', 'attendee' => $attendee->answers],
                 flashMessage: 'Checked in successfully',
@@ -1057,6 +1102,11 @@ class AttendeeService extends BaseRepository
             ]);
 
         $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
+
+        $attendeeIdsString = join(',', $attendee_ids);
+        $printStatus = !$printed ? 'not' : '';
+        $this->logActivity(description: "marked $attendeeIdsString as $printStatus printed");
+
         $message = (count($attendee_ids) > 1 ? "Attendees" : "Attendee") . " print status updated.";
 
         return $this->view(
@@ -1076,6 +1126,11 @@ class AttendeeService extends BaseRepository
             ]);
 
         $route = $eventId ? "/event/$eventId/attendees?page=$page" : "/attendees?page=$page";
+
+        $attendeeIdsString = join(',', $attendee_ids);
+        $printStatus = !$collected ? 'not' : '';
+        $this->logActivity(description: "marked $attendeeIdsString as $printStatus collected");
+
         $message = (count($attendee_ids) > 1 ? "Attendees" : "Attendee") . " collection status updated.";
 
         return $this->view(
@@ -1195,7 +1250,7 @@ class AttendeeService extends BaseRepository
                 });
         }
 
-
+        $this->logActivity('exported attendees');
 
         return new ExportAttendees(event_id: $eventId, event_ids: auth()->user()->userEventAccessId(), attendees: $attendees, questions: count($surveys) > 0 ? $surveys->toArray() : []);
     }
@@ -1230,6 +1285,8 @@ class AttendeeService extends BaseRepository
 
                 ];
             });
+
+        $this->logActivity('exported attendee checkins');
 
         return new ExportCheckins($checkins);
     }

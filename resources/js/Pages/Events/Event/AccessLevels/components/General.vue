@@ -428,6 +428,20 @@ const onSubmit = handleSubmit(values => {
                                 </b-col>
                             </b-row>
 
+                            <hr>
+
+                            <b-row>
+                              <b-col sm="6">
+                                <div class="form-group">
+                                  <label for="checkin_limit">Daily Checkin Limit</label> <small>Leave empty for unlimited</small>
+                                  <Field type="number" name="checkin_limit" id="checkin_limit"
+                                         :class="`form-control mb-0`"
+                                         placeholder="Checkin Limit" :validateOnInput="true"/>
+                                  <ErrorMessage name="checkin_limit" class="text-danger"/>
+                                </div>
+                              </b-col>
+                            </b-row>
+
                             <b-row class="mt-3">
                                 <b-col>
                                     <b-button :disabled="isSubmitting" type="submit" variant="primary">

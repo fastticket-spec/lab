@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountManagerController;
 use App\Http\Controllers\AccreditationController;
+use App\Http\Controllers\AdminLogsController;
 use App\Http\Controllers\AreasController;
 use App\Http\Controllers\AttendeesController;
 use App\Http\Controllers\BadgeController;
@@ -238,6 +239,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::delete('/logo/{type}', [PreferencesController::class, 'deleteLogo']);
         Route::post('/', [PreferencesController::class, 'store']);
     });
+
+    Route::get('admin-logs', [AdminLogsController::class, 'index'])->middleware('only-admin');
 });
 
 Route::prefix('checkin-user')->group(function () {
