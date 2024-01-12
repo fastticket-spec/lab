@@ -703,12 +703,13 @@ class AttendeeService extends BaseRepository
                     $attXone = [];
                     $nodeId = $element->getAttribute('id');
                     foreach ($attendee->zones as $att_zone) {
-                        $attXone[] = optional(BadgesZone::where('zone_id', $att_zone->zone_id)->first())->id;
+                        $attXone[] = optional(BadgesZone::where('zone_id', $att_zone->zone_id)->first())->zone_id;
                     }
 
-                    //                    if (!in_array($element->getAttribute('id'), $attXone)) {
-                    //                        $element->setAttribute('style', 'display: none;');
-                    //                    }
+
+                    if (!in_array($element->getAttribute('id'), $attXone)) {
+                        $element->setAttribute('style', 'display: none;');
+                    }
 
                     if (!in_array($nodeId, $attXone)) {
                         $element->nodeValue = optional(Zone::find($nodeId))->zone;
