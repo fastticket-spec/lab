@@ -11,7 +11,7 @@ const props = defineProps({
 const {handleSubmit, isSubmitting} = useForm({
     initialValues: props.zones.length > 0
         ? {
-            zones: props.zones.map(zone => ({zone: zone.zone}))
+            zones: props.zones.map(zone => ({id: zone.id, zone: zone.zone}))
         }
         : {
             zones: [{zone: ''}]

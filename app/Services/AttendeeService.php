@@ -560,7 +560,7 @@ class AttendeeService extends BaseRepository
         foreach ($badgeColumn as $k => $col) {
             foreach ($survey as $i => $question) {
 
-                if (in_array(strtolower(str_replace(' ', '_', $question['question'])), ['personal_photo', 'personal_picture', 'bhhgggg', 'persoal_photo']) && $answer = $question['answer']) {
+                if (in_array(strtolower(str_replace(' ', '_', $question['question'])), ['personal_photo', 'personal_picture', 'bhhgggg', 'persoal_photo', 'upload_your_photo_*_(jpg_format_only,_500px_minimum_width/height_(we_can_change_this_to_the_format_that_fits_the_platform)']) && $answer = $question['answer']) {
                     $attendee->user_photo = $answer;
                 } elseif ($answer = $question['answer']) {
                     $badgeDatas[] = (object)['column_title' => strtolower(str_replace(' ', '_', $question['question'])), 'column_value' => $answer];

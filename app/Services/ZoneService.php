@@ -39,7 +39,7 @@ class ZoneService extends BaseRepository
     {
         return $this->model->query()
             ->with(['event'])
-            ->when($eventId, function ($query) use($eventId) {
+            ->when($eventId, function ($query) use ($eventId) {
                 $query->whereEventId($eventId);
             })
             ->latest()
@@ -51,20 +51,23 @@ class ZoneService extends BaseRepository
         try {
             $this->eventService->find($eventId)->zones()->delete();
 
-            $zonesData = collect($zonesData)->map(fn($data) => [
-                'id' => Str::uuid(),
-                'zone' => $data['zone'],
-                'event_id' => $eventId,
-                'created_at' => now(),
-                'updated_at' => now()
-            ])->toArray();
-
-            DB::table('zones')->insert($zonesData);
+            foreach ($zonesData as $data) {
+                DB::table('zones')->insert([
+                    'id' => $data['id'] ?? Str::uuid(),
+                    'zone' => $data['zone'],
+                    'event_id' => $eventId,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
 
             $message = 'Zones added successfully';
 
             return $this->view(
-                data: ['message' => $message], flashMessage: $message, component: "/event/$eventId/zones", returnType: 'redirect'
+                data: ['message' => $message],
+                flashMessage: $message,
+                component: "/event/$eventId/zones",
+                returnType: 'redirect'
             );
         } catch (\Throwable $th) {
             \Log::error($th);
@@ -72,7 +75,11 @@ class ZoneService extends BaseRepository
             $message = 'Zones could not be saved';
 
             return $this->view(
-                data: ['message' => $message], flashMessage: $message, messageType: 'danger', component: "/event/$eventId/zones/create", returnType: 'redirect'
+                data: ['message' => $message],
+                flashMessage: $message,
+                messageType: 'danger',
+                component: "/event/$eventId/zones/create",
+                returnType: 'redirect'
             );
         }
     }
@@ -89,7 +96,10 @@ class ZoneService extends BaseRepository
         $message = 'Zone status updated successfully';
 
         return $this->view(
-            data: ['message' => $message], flashMessage: $message, component: "/event/$eventId/zones", returnType: 'redirect'
+            data: ['message' => $message],
+            flashMessage: $message,
+            component: "/event/$eventId/zones",
+            returnType: 'redirect'
         );
     }
 
@@ -117,5 +127,4 @@ class ZoneService extends BaseRepository
             ->whereIn('event_id', $eventIds)
             ->count();
     }
-
 }
