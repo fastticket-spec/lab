@@ -163,6 +163,10 @@ export const accreditationFormSchema = lang => yup.object({
                             schemaBuilder = schemaBuilder.matches(/^[0-9]+$/, lang === 'english' ? 'Must only be numbers' : 'يجب أن تكون أرقامًا فقط');
                         }
 
+                        if (input_type === 'text') {
+                            schemaBuilder = schemaBuilder.matches(/^[a-zA-Z ]*$/, lang === 'english' ? 'Must only be texts' : 'يجب أن تكون النصوص فقط');
+                        }
+
 
                         return schemaBuilder;
 
