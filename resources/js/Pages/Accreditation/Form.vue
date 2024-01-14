@@ -276,6 +276,7 @@ select option {
                                                         </Field>
                                                         <Field type="number"
                                                            :name="`surveys[${idx}].answer`"
+                                                           :min="0"
 
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }" :validateOnInput="true"/>
@@ -443,6 +444,7 @@ select option {
                                                             <b-select-option v-for="code in countryCodes" :key="code.id" :value="'+' + code.code"> {{ lang === 'english' ? code.name_en : code.name_ar}}</b-select-option>
                                                         </b-select>
                                                         <Field type="number"
+                                                           :min="0"
                                                            :name="`surveys[${idx}].answer`"
 
                                                            :id="`surveys-${idx}`"
