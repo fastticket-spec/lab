@@ -226,6 +226,10 @@ const onSubmit = handleSubmit((values) => {
         survey.parent_index = surveyParent?.parentIndex;
         survey.parent_answer = surveyParent?.parentAnswer;
         survey.options = survey.options.filter(option => (option.name || option.name_arabic));
+        if (!survey.hasValidation) {
+          survey.input_type = null;
+          survey.input_length = null;
+        }
         return survey;
     });
 
