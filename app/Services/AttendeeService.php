@@ -170,6 +170,9 @@ class AttendeeService extends BaseRepository
                 if ($answer['type'] == '4' && ($file = $answer['answer'])) {
                     $fileUrl = $this->uploadFile($file, $answer['question'], '-accreditation-file-');
                     $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => Storage::disk(config('filesystems.default'))->url($fileUrl)];
+                } else if ($answer['type'] == '14' && ($file = $answer['answer'])) {
+                    $fileUrl = $this->uploadBase64File(file_get_contents($file), $answer['question']);
+                    $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => Storage::disk(config('filesystems.default'))->url($fileUrl)];
                 } elseif ($answer['type'] == '12') {
                     $answers[] = ['type' => $answer['type'], 'question' => $answer['question'], 'answer' => $answer['country_code'] . '-' . $answer['answer'] ?? ''];
                 } else {

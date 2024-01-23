@@ -9,7 +9,7 @@ import VueCountryCode from "vue-country-code";
 import VuePhoneNumberInput from 'vue-phone-number-input';
 import 'vue-phone-number-input/dist/vue-phone-number-input.css';
 import debounce from "lodash.debounce";
-
+import Cropper from "../../Shared/components/helpers/Cropper.vue";
 
 const props = defineProps({
     accessLevel: Object,
@@ -159,6 +159,34 @@ const onSubmit = handleSubmit(values => {
         preserveScroll: true
     })
 });
+
+const cropperModalShow = ref(false);
+const imgSrc = ref('');
+const personalPhoto = ref('');
+const personalPhotoFieldDetails = reactive({
+  idx: '',
+  updater: null
+})
+
+const onUploadImage = (idx, update) => {
+  const reader = new FileReader();
+
+  reader.onload = (event) => {
+    imgSrc.value = event.target.result;
+    cropperModalShow.value = true;
+    personalPhotoFieldDetails.idx = idx;
+    personalPhotoFieldDetails.updater = update;
+  };
+
+  reader.readAsDataURL(personalPhoto.value[0].files[0]);
+}
+
+const onCrop = croppedImage => {
+  const imageField = surveysFields.value[personalPhotoFieldDetails.idx]
+  imageField.answer = croppedImage;
+  cropperModalShow.value = false;
+  personalPhotoFieldDetails.updater(personalPhotoFieldDetails.idx, imageField);
+}
 </script>
 
 <script>
@@ -262,7 +290,7 @@ select option {
                             <div class="col-12 m-0 p-0">
                                 <div class="row m-0">
 
-                                    <FieldArray name="surveys" v-slot="{ fields, insert, remove, swap }">
+                                    <FieldArray name="surveys" v-slot="{ fields, insert, remove, swap, update }">
                                         <template v-for="(field, idx) in fields" :key="field.key">
                                             <b-col :sm="field.value.type !== '10' ? '6' : '12'" class="pb-2" v-if="!field.value.parent_index">
                                                 <div class="form-group mb-0">
@@ -276,6 +304,7 @@ select option {
                                                         </Field>
                                                         <Field type="number"
                                                            :name="`surveys[${idx}].answer`"
+                                                           :min="0"
 
                                                            :id="`surveys-${idx}`"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color }" :validateOnInput="true"/>
@@ -310,6 +339,15 @@ select option {
 
                                                            :id="`surveys-${idx}`"
                                                            accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
+                                                           :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
+
+                                                    <input type="file" title=" "
+                                                           v-else-if="field.value.type === '14'"
+                                                           :id="`surveys-${idx}`"
+                                                           ref="personalPhoto"
+                                                           @change="onUploadImage(idx, update)"
+                                                           :multiple="false"
+                                                           accept="image/jpeg,image/gif,image/png"
                                                            :class="`form-control mb-0`" :style="{backgroundColor: accessLevel?.page_design?.field_color, color: accessLevel?.page_design?.font_color}" :validateOnInput="true"/>
 
                                                     <Field type="email"
@@ -443,6 +481,7 @@ select option {
                                                             <b-select-option v-for="code in countryCodes" :key="code.id" :value="'+' + code.code"> {{ lang === 'english' ? code.name_en : code.name_ar}}</b-select-option>
                                                         </b-select>
                                                         <Field type="number"
+                                                           :min="0"
                                                            :name="`surveys[${idx}].answer`"
 
                                                            :id="`surveys-${idx}`"
@@ -602,6 +641,17 @@ select option {
             </div>
         </div>
     </b-container>
+
+    <b-modal v-model="cropperModalShow" size="xl" id="cropper-modal" title="Crop Photo">
+      <b-row class="mt-3">
+        <b-col sm="12">
+          <Cropper :img-src="imgSrc" v-if="imgSrc" :on-crop="onCrop" />
+        </b-col>
+      </b-row>
+      <template #modal-footer>
+      </template>
+    </b-modal>
+
 </template>
 
 <style scoped>

@@ -15,5 +15,6 @@ return [
         11 => ['name' => 'Country', 'key' => 'country', 'has_options' => false],
         12 => ['name' => 'Mobile Number', 'key' => 'mobile', 'has_options' => false],
         13 => ['name' => 'Terms & Conditions', 'key' => 'tandc', 'has_options' => false],
+        14 => ['name' => 'Personal Photo', 'key' => 'personal_photo', 'has_options' => false],
     ]
 ];
